@@ -1,0 +1,29 @@
+[0] Config.pm:328> INFO - This is Biber 2.21
+[0] Config.pm:331> INFO - Logfile is 'AI Template.blg'
+[78] biber-MSWIN64:342> INFO - === 
+[111] Biber.pm:421> INFO - Reading 'AI Template.bcf'
+[189] Biber.pm:1002> INFO - Found 13 citekeys in bib section 0
+[200] Biber.pm:4487> INFO - Processing section 0
+[207] Biber.pm:4678> INFO - Looking for bibtex file 'references.bib' for section 0
+[252] bibtex.pm:1713> INFO - LaTeX decoding ...
+[295] bibtex.pm:1519> INFO - Found BibTeX data source 'references.bib'
+[306] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[306] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[306] Biber.pm:4307> INFO - Sorting list 'nty/global//global/global/global' of type 'entry' with template 'nty' and locale 'en-US'
+[307] Biber.pm:4313> INFO - No sort tailoring available for locale 'en-US'
+[307] bbl.pm:676> INFO - Writing 'AI Template.bbl' with encoding 'UTF-8'
+[307] bbl.pm:779> INFO - Output to AI Template.bbl
+[307] Biber.pm:132> WARN - I didn't find a database entry for 'mcclean2018barren' (section 0)
+[307] Biber.pm:132> WARN - I didn't find a database entry for 'weigold2021encoding' (section 0)
+[307] Biber.pm:132> WARN - I didn't find a database entry for 'tudisco2026angle' (section 0)
+[307] Biber.pm:132> WARN - I didn't find a database entry for 'schuld2020ceur' (section 0)
+[307] Biber.pm:132> WARN - I didn't find a database entry for 'schuld2022hybrid' (section 0)
+[307] Biber.pm:132> WARN - I didn't find a database entry for 'zhou2025stacking' (section 0)
+[307] Biber.pm:132> WARN - I didn't find a database entry for 'adaboostq2025' (section 0)
+[307] Biber.pm:132> WARN - I didn't find a database entry for 'huang2023postvariational' (section 0)
+[307] Biber.pm:132> WARN - I didn't find a database entry for 'rath2022multiclass' (section 0)
+[307] Biber.pm:132> WARN - I didn't find a database entry for 'qmlmulticlass2024' (section 0)
+[307] Biber.pm:132> WARN - I didn't find a database entry for 'medmnist2026ibm' (section 0)
+[307] Biber.pm:132> WARN - I didn't find a database entry for 'ibmbenchmark2025' (section 0)
+[307] Biber.pm:132> WARN - I didn't find a database entry for 'wine_pca' (section 0)
+[308] Biber.pm:134> INFO - WARNINGS: 13

@@ -1,0 +1,497 @@
+\documentclass[]{UCD_CS_FYP_Report}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage[backend=biber]{biblatex}
+\addbibresource{references.bib}
+
+%%%%%%%%%%%%%%%%%%%%%%
+%%% Temporary Research Note Colour Commands (remove before submission)
+\newcommand{\motive}[1]{{\color{blue}#1}}
+\newcommand{\challenge}[1]{{\color{red}#1}}
+\newcommand{\limitation}[1]{{\color{orange}#1}}
+\newcommand{\method}[1]{{\color{cyan!70!black}#1}}
+\newcommand{\result}[1]{{\color{yellow!60!black}#1}}
+\newcommand{\benchmark}[1]{{\color{violet}#1}}
+\newcommand{\comparison}[1]{{\color{magenta!70!black}#1}}
+\newcommand{\theory}[1]{{\color{gray}#1}}
+\newcommand{\tooling}[1]{{\color{brown}#1}}
+\newcommand{\gap}[1]{{\color{black}\textbf{#1}}}
+\newcommand{\validation}[1]{{\color{green!60!black}#1}}
+
+
+\usepackage{subcaption}
+\usepackage{pgfgantt}
+\usepackage{rotating}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+}
+
+\lstset{
+    mathescape=true,
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    numbers=left,
+    numberstyle=\tiny,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    language=Python
+}
+
+%%%%%%%%%%%%%%%%%%%%%%
+%%% Project Details
+
+\def\studentname{Edward Mallia}
+\def\studentid{25233259}
+\def\projecttitle{Quantum Ensemble Stacking with State Preservation}
+\def\supervisorname{Dr Simon Caton}
+
+\begin{document}
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%
+%%% Table of Contents
+
+\tableofcontents
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%
+%%% Abstract
+
+
+%%%%%%%%%%%%%%%%%%%%%%
+%%% TEMPORARY: Research Notes Colour Reference
+%%% Remove this chapter before final submission
+
+\chapter*{Research Notes: Colour-Coding Key}
+
+This chapter is a \textbf{temporary reference} to be removed before final submission. It documents the colour-coding system used when annotating quotes and evidence throughout the research and writing process. Each colour corresponds to a category of information; when recording a note, write it in the appropriate colour using the commands below.
+
+\bigskip
+
+\noindent\textbf{Colour Command Definitions:}
+
+\begin{verbatim}
+\motive{text}     % Blue   - Motivation
+\challenge{text}  % Red    - Challenge
+\limitation{text} % Orange - Limitation
+\method{text}     % Cyan   - Method
+\result{text}     % Yellow - Result
+\benchmark{text}  % Purple - Benchmark
+\comparison{text} % Pink   - Comparison
+\theory{text}     % Grey   - Theory
+\tooling{text}    % Brown  - Tooling
+\gap{text}        % Black  - Gap
+\validation{text} % Green  - Validation
+\end{verbatim}
+
+\noindent\rule{\textwidth}{0.4pt}
+\medskip
+
+\motive{\large \textbf{Motivation}\\
+\normalsize Argues why something is worth doing. Use for justifying your research questions, the measurement-collapse premise, and the value of ensemble diversity in QML.}
+
+\bigskip
+
+\challenge{\large \textbf{Challenge}\\
+\normalsize Identifies a known problem or obstacle. Use for barren plateaus, SWAP overhead, decoherence, training instability, and coherence-time limitations on NISQ hardware.}
+
+\bigskip
+
+\limitation{\large \textbf{Limitation}\\
+\normalsize Documents a specific shortcoming of an existing approach. Particularly useful for flagging simulation-only scope, narrow dataset choice, or restricted circuit ansatz.}
+
+\bigskip
+
+\method{\large \textbf{Method}\\
+\normalsize Describes how something is done. Use for circuit architectures, training procedures, error mitigation techniques, ensemble construction strategies, and decomposition schemes.}
+
+\bigskip
+
+\result{\large \textbf{Result}\\
+\normalsize Reports concrete empirical findings. Use for accuracy numbers, convergence rates, hardware-versus-simulation gaps, and qubit resource counts.}
+
+\bigskip
+
+\benchmark{\large \textbf{Benchmark}\\
+\normalsize Establishes a performance baseline or reference point against which other work can be compared. Use for state-of-the-art accuracy figures, circuit depth baselines, and classical ML comparisons.}
+
+\bigskip
+
+\comparison{\large \textbf{Comparison}\\
+\normalsize Directly contrasts two or more approaches, models, or configurations. Use when a paper explicitly positions one method against another, or when you are drawing your own cross-paper comparison.}
+
+\bigskip
+
+\theory{\large \textbf{Theory}\\
+\normalsize Provides formal or mathematical grounding. Use for the no-cloning theorem, expressibility proofs, gradient variance analysis, circuit complexity bounds, and quantum information-theoretic arguments.}
+
+\bigskip
+
+\tooling{\large \textbf{Tooling}\\
+\normalsize Describes software, frameworks, or hardware. Use for Qiskit, PennyLane, IBM Eagle/Heron, Qiskit Runtime, \texttt{mthree}, and any other concrete implementation resource.}
+
+\bigskip
+
+\gap{\large \textbf{Gap}\\
+\normalsize Explicitly identifies something that has not been studied. These are high-value notes for novelty justification in your introduction and related work chapters.}
+
+\bigskip
+
+\validation{\large \textbf{Validation}\\
+\normalsize Demonstrates that a method works on real hardware or a non-toy dataset. Use for papers that go beyond simulation to confirm results on actual IBM machines or domain-relevant data.}
+
+\newpage
+
+\abstract
+This dissertation investigates a fully quantum stacking architecture for ensemble classification on Noisy Intermediate-Scale Quantum (NISQ) hardware. Classical ensemble stacking requires measuring the outputs of base learners before passing them to a meta-learner, a process that collapses quantum superposition and discards amplitude and phase information encoded in the quantum state. This work proposes and empirically evaluates a measurement-free alternative, in which multiple small Variational Quantum Circuit (VQC) base learners run in parallel on separate qubit registers of the same IBM quantum device, and their unmeasured states are passed directly into a quantum meta-learner circuit. Three experimental conditions are compared: a classical stacking baseline, a quantum meta-learner operating on re-encoded classical outputs, and the novel measurement-free quantum stacking architecture. All three conditions are evaluated across established benchmark classification datasets under both noiseless simulation, noisy simulation, and real IBM quantum hardware, with Qiskit Runtime error mitigation applied throughout. The study aims to determine whether preserving quantum state information across the stacking boundary provides measurable classification benefit, and whether this benefit is robust to NISQ-era noise.
+
+%%%%%%%%
+\chapter{Project Specification}
+
+\section{Programme and Context}
+
+This project is submitted in partial fulfilment of the requirements for the degree of MSc Advanced Artificial Intelligence at University College Dublin. The dissertation is supervised by Dr Simon Caton and is due for submission on 7 August 2026.
+
+\section{Core Goals}
+
+The following core goals define the minimum acceptable scope of this dissertation:
+
+\begin{enumerate}
+    \item Implement three stacking ensemble conditions for quantum classifiers: (A) classical meta-learner baseline, (B) quantum meta-learner with re-encoded classical inputs, and (C) measurement-free quantum meta-learner with state-preserving register concatenation.
+    \item Evaluate all three conditions on a minimum of two standard benchmark classification datasets using PennyLane or Qiskit simulation (noiseless and noisy).
+    \item Deploy at least one condition on real IBM quantum hardware via Qiskit Runtime and apply standard error mitigation techniques (dynamical decoupling, M3 measurement mitigation).
+    \item Produce a rigorous quantitative comparison of conditions using accuracy, F1-score, circuit depth, and noise degradation metrics.
+    \item Conduct a thorough literature review of quantum ensemble methods, post-variational QNNs, and NISQ-era stacking approaches.
+\end{enumerate}
+
+\section{Advanced Goals}
+
+The following goals extend the core scope and are pursued subject to time and hardware constraints:
+
+\begin{enumerate}
+    \item Evaluate all three conditions on a third benchmark dataset.
+    \item Compare One-vs-One and One-vs-Rest decomposition strategies as the source of base learner binary tasks.
+    \item Introduce diversity across base learners by varying encoding strategy (angle encoding, amplitude encoding, ZZFeatureMap) and measure its effect on ensemble performance.
+    \item Analyse gradient variance during training as a proxy for barren plateau susceptibility per condition.
+    \item Deploy all three conditions on IBM hardware and record full noise degradation profiles per condition.
+\end{enumerate}
+
+%%%%%%%%
+\chapter{Introduction}
+
+\section{Motivation}
+
+Quantum Machine Learning (QML) sits at a genuinely unsettled frontier. The NISQ era has produced a family of hybrid quantum-classical algorithms --- most notably Variational Quantum Circuits (VQCs) --- that hold theoretical promise but whose practical utility remains actively debated. A major structural limitation of current QML pipelines is that they almost universally terminate quantum processing with a measurement step before any aggregation, combination, or further learning occurs. In classical machine learning, measurement is free: reading a neuron's activation does not alter it. In quantum mechanics, measurement is irreversible: it collapses the superposition state into a definite classical outcome, discarding all phase and amplitude information that was encoded in the quantum state.
+
+This dissertation is motivated by a simple and underexplored question: when building an ensemble of quantum classifiers, is it possible --- and beneficial --- to defer measurement until after the meta-learner has acted on the full quantum state?
+
+\section{Problem Statement}
+
+Ensemble learning is one of the most reliably effective paradigms in classical machine learning. Stacking, in particular, allows a meta-learner to learn from the combined outputs of diverse base learners, often achieving higher accuracy than any individual model. In quantum computing, ensemble methods have begun to receive attention, but virtually all proposed architectures follow a measure-then-combine pipeline that is architecturally identical to its classical counterpart: base classifiers produce classical probability vectors, and a classical or quantum meta-learner then processes these vectors. The quantum nature of the base classifiers is lost the moment they are measured.
+
+This work proposes and evaluates a measurement-free stacking architecture, hereafter referred to as Condition C, in which base VQC circuits run in parallel on spatially separated qubit registers of a single IBM quantum processor. Their output states are routed directly into a quantum meta-learner circuit without intermediate measurement. The full classification pipeline --- from input encoding through to final prediction --- is executed as a single unitary transformation, with measurement occurring only once, at the very end.
+
+\section{Research Questions}
+
+This dissertation is structured around three specific, falsifiable research questions:
+
+\begin{enumerate}
+    \item Does a measurement-free quantum meta-learner (Condition C) achieve higher classification accuracy than a classical stacking baseline (Condition A) under noiseless simulation?
+    \item Does the advantage of Condition C over Condition A persist under realistic NISQ noise, as modelled by a noisy simulator and confirmed on IBM hardware?
+    \item Does Condition B --- a quantum meta-learner operating on re-encoded classical outputs --- bridge the gap between Conditions A and C, isolating the contribution of quantum meta-learning from the contribution of state preservation?
+\end{enumerate}
+
+\section{Scope and Contributions}
+
+The work is scoped to multi-class classification tasks decomposed into binary sub-tasks using One-vs-Rest or One-vs-One strategies. The principal contribution is an empirical comparison of the three stacking conditions, with the measurement-free architecture (Condition C) constituting the novel element. A secondary contribution is the hardware validation component: all conditions are tested on real IBM quantum hardware, providing evidence that is largely absent from the current QML ensemble literature.
+
+\section{Report Structure}
+
+Chapter 3 reviews related work in quantum ensemble methods, post-variational quantum neural networks, and NISQ-era classification. Chapter 4 characterises the datasets used. Chapter 5 presents the experimental design, circuit architectures, and training strategy. Chapter 6 presents results and analysis. Chapter 7 concludes the dissertation and identifies directions for future work.
+
+%%%%%%%%
+\chapter{Related Work}
+
+\section{Quantum Machine Learning: An Overview}
+
+Quantum Machine Learning encompasses algorithms that use quantum computational primitives to perform or accelerate machine learning tasks. The primary paradigm for near-term QML is the Variational Quantum Circuit (VQC), a parameterised quantum circuit trained via a classical optimiser in a hybrid loop. VQCs are hardware-efficient and expressible, but suffer from a well-documented pathology: the barren plateau phenomenon, in which gradients vanish exponentially as circuit depth and qubit count increase, rendering training impractical beyond modest scales \cite{mcclean2018barren}.
+
+A foundational challenge for all QML models is data encoding: there is no consensus on how to map classical data into quantum states. Angle encoding, amplitude encoding, and feature-map-based encoding (e.g., the ZZFeatureMap) each impose different inductive biases and resource requirements \cite{weigold2021encoding}. Encoding choice has been shown to produce accuracy differences of up to 41\% across standard datasets, confirming its role as a critical design parameter \cite{tudisco2026angle}.
+
+\section{Ensemble Methods in QML}
+
+Classical ensemble learning --- bagging, boosting, and stacking --- is among the most reliably effective paradigms in supervised learning. Its quantum analogue is nascent but growing. An early 2020 analysis noted explicitly that no quantum classifier at that time fulfilled the full requirements for ensemble learning \cite{schuld2020ceur}. Since then, the field has progressed: a 2022 hybrid ensemble framework demonstrated improved combination strategies on MNIST \cite{schuld2022hybrid}, a 2025 stacking paper integrated VQCs, QSVMs, and quantum kernel methods for industrial fault detection \cite{zhou2025stacking}, and AdaBoost.Q --- a fully quantum adaptation of AdaBoost --- was published in \textit{npj Quantum Information} in 2025 \cite{adaboostq2025}. The common thread across all of these is that ensemble combination occurs after measurement, in the classical domain.
+
+\section{Post-Variational Quantum Neural Networks}
+
+The closest architectural precedent to the measurement-free stacking proposed here is the post-variational quantum neural network framework of Huang and Rebentrost \cite{huang2023postvariational}. Post-variational QNNs shift all trainable parameters from the quantum circuit to a classical post-processing layer, using an ensemble of fixed quantum feature maps whose measurement outputs are combined classically. This architecture is explicitly motivated by the desire to avoid barren plateaus, and achieves strong performance on binary classification benchmarks. Crucially, however, it still measures all base circuits and combines their outputs classically --- the quantum information is discarded at the base learner output stage. This work's Condition C is a principled counter-proposal: it retains the ensemble structure of post-variational QNNs but removes the intermediate measurement, routing unmeasured quantum states directly into the meta-learner.
+
+\section{Multi-Class Classification in QML}
+
+Binary classification is the natural output mode for a single-qubit measurement in a VQC. Multi-class problems are therefore typically handled by decomposition strategies borrowed directly from classical machine learning: One-vs-Rest (OvR) and One-vs-One (OvO) \cite{rath2022multiclass}. A 2024 arXiv study specifically examined QML for multi-class classification and provided methodological baselines for OvR and OvO decomposition on small-scale circuits \cite{qmlmulticlass2024}. In this dissertation, multi-class decomposition serves as the mechanism for generating the binary base learners; the principal research question concerns the meta-learner architecture, not the decomposition strategy itself.
+
+\section{Benchmarking on Real IBM Hardware}
+
+The majority of QML papers are conducted on noiseless or lightly noisy simulators. Real hardware introduces coherent errors, depolarising noise, and readout errors that are qualitatively different from the noise models used in simulation. A 2026 \textit{Scientific Reports} paper demonstrated end-to-end QML on a 127-qubit IBM Eagle processor for medical image classification, using dynamical decoupling and M3 measurement mitigation to suppress hardware noise \cite{medmnist2026ibm}. A 2025 arXiv benchmarking study further characterised IBM hardware performance across a range of circuit depths and qubit configurations \cite{ibmbenchmark2025}. Both papers provide the methodological template for the hardware validation phase of this work.
+
+\section{Research Gap}
+
+No existing work implements or evaluates a measurement-free quantum stacking architecture in which base VQC circuits pass their unmeasured quantum states directly to a quantum meta-learner on real NISQ hardware. This constitutes the principal research gap that this dissertation addresses.
+
+%%%%%%%%
+\chapter{Data Considerations}
+
+\section{Dataset Selection Rationale}
+
+The central constraint on dataset selection is circuit width: each base learner VQC uses 2--3 qubits, meaning the number of input features must be reducible to this scale. Dimensionality reduction via Principal Component Analysis (PCA) is standard practice in QML \cite{weigold2021encoding}, and is applied here to all datasets with more than three features. All selected datasets are publicly available under permissive licences (UCI Machine Learning Repository, scikit-learn), raise no privacy or ethical concerns, and are classically well-studied, enabling rigorous comparison against established baselines.
+
+\section{Primary Datasets}
+
+\subsection{Iris}
+The Iris dataset contains 150 samples across three classes (setosa, versicolor, virginica) with four features (sepal length/width, petal length/width). It is the standard sanity-check dataset in QML research and is used here as the primary validation dataset. PCA reduction to three features maps directly to a 3-qubit base learner. The three-class structure produces three binary OvO pairs and three OvR classifiers, making it well-suited for testing both decomposition strategies.
+
+\subsection{Wine}
+The Wine dataset contains 178 samples across three classes with 13 features. PCA reduction to three principal components has been demonstrated to retain approximately 68\% of variance \cite{wine_pca}. The higher initial dimensionality means the PCA step introduces a non-trivial preprocessing decision that must be documented and justified as part of the methodology. Wine is included as a second validation point to test whether ensemble performance differences between conditions are consistent across datasets.
+
+\subsection{Breast Cancer Wisconsin (Optional)}
+The Breast Cancer Wisconsin dataset is a binary classification problem (malignant vs. benign) with 30 features and 569 samples. It is included as an optional third dataset to validate base learner circuit performance independently of the multi-class decomposition. A 2026 IBM hardware paper reported 91.23\% accuracy on this dataset using native-gate VQCs \cite{medmnist2026ibm}, providing a direct benchmark.
+
+\section{Preprocessing}
+
+All datasets are standardised to zero mean and unit variance before encoding. PCA is applied after standardisation. Train/test splits of 70/30 are used consistently across all conditions and datasets, with stratification to maintain class balance. No data augmentation is applied. All preprocessing steps are implemented in scikit-learn and are fully reproducible via fixed random seeds.
+
+\section{Data Licensing and Ethics}
+
+All datasets are sourced from the UCI Machine Learning Repository and the scikit-learn library. Both sources distribute their datasets under open-access licences that permit academic use without restriction. No personally identifiable information is present in any dataset. No ethical review is required for this work.
+
+%%%%%%%%
+\chapter{Outline of Approach}
+
+\section{Experimental Conditions}
+
+The experiment is structured around three stacking conditions that form a ladder of quantum-ness in the aggregation mechanism:
+
+\begin{description}
+    \item[Condition A --- Classical Meta-Learner (Baseline)] Base VQC circuits are measured after training. The resulting probability vectors (or predicted class labels) are assembled into a classical feature matrix and passed to a logistic regression meta-learner. This mirrors standard classical stacking and establishes the performance baseline.
+    
+    \item[Condition B --- Quantum Meta-Learner with Re-encoding] Base circuits are measured as in Condition A. The classical output vectors are then re-encoded into a fresh quantum register using angle encoding, and a second VQC (the quantum meta-learner) processes this re-encoded state to produce the final classification. This condition isolates the effect of using a quantum meta-learner from the effect of state preservation.
+    
+    \item[Condition C --- Measurement-Free Quantum Stacking] Base VQC circuits run in parallel on spatially separated qubit registers of the same quantum device. No intermediate measurement is performed. The combined multi-register state is routed into a quantum meta-learner circuit that applies entangling operations across registers before producing the final measurement. This is the novel architecture under investigation.
+\end{description}
+
+\section{Circuit Architecture}
+
+\subsection{Base Learners}
+Each base learner is a 2--3 qubit VQC using a hardware-efficient ansatz. The RealAmplitudes ansatz (alternating $R_Y$ rotations and CNOT entanglement) is used as the default, as it minimises two-qubit gate count and is natively supported by IBM hardware. Circuit depth is set to 2 layers as a default, with a 3-layer variant tested in simulation to assess the depth-vs-performance trade-off.
+
+\subsection{Condition C Meta-Learner}
+The meta-learner circuit for Condition C spans all base learner registers simultaneously. It consists of:
+\begin{enumerate}
+    \item A layer of single-qubit $R_Y$ and $R_Z$ rotations on all qubits (trainable parameters)
+    \item A set of CNOT entangling gates across register boundaries, creating cross-register correlations
+    \item A final layer of single-qubit rotations
+    \item A single measurement on a designated output qubit (or pair of qubits for multi-class output)
+\end{enumerate}
+Qubit layout on IBM hardware is chosen to minimise SWAP overhead given the device's heavy-hex topology, using Qiskit's transpiler with optimisation level 3.
+
+\section{Training Strategy}
+
+A staged training strategy is adopted to avoid barren plateaus in the full Condition C circuit:
+
+\begin{enumerate}
+    \item Train all base learner circuits independently on their binary sub-tasks using the COBYLA optimiser (gradient-free, well-suited to shallow NISQ circuits).
+    \item Freeze all base learner parameters.
+    \item Initialise the meta-learner circuit parameters using a near-zero strategy to avoid barren plateaus at initialisation.
+    \item Train the meta-learner circuit only, with frozen base learners, for a fixed number of iterations.
+    \item Optionally fine-tune the full circuit end-to-end for a small number of additional epochs.
+\end{enumerate}
+
+\section{Simulation Framework}
+
+All simulation experiments are implemented in PennyLane with the \texttt{default.qubit} device for noiseless simulation. Noisy simulation uses the \texttt{qiskit.aer} device with an IBM hardware noise model (depolarising error + readout error), sourced from the \texttt{ibm\_kyoto} or equivalent backend via Qiskit Runtime. Noiseless and noisy simulation results are collected for all three conditions before any hardware experiments are run.
+
+\section{Hardware Deployment}
+
+Hardware experiments are run on IBM Quantum free-tier devices via Qiskit Runtime. The \texttt{SamplerV2} primitive is used for all circuit execution. The following error mitigation techniques are applied:
+\begin{itemize}
+    \item \textbf{Dynamical Decoupling (DD)}: Applied via \texttt{PassManagerConfig} to suppress idle qubit decoherence.
+    \item \textbf{M3 Measurement Mitigation}: Applied via the \texttt{mthree} package to correct readout errors.
+    \item \textbf{Gate Twirling}: Applied to two-qubit gates to convert coherent errors into stochastic noise, improving the accuracy of noise models and error mitigation.
+\end{itemize}
+
+\section{Evaluation Metrics}
+
+\begin{table}[h]
+\centering
+\caption{Evaluation metrics and their purpose in this study.}
+\label{tab:metrics}
+\begin{tabular}{lll}
+\toprule
+\textbf{Metric} & \textbf{Description} & \textbf{Condition(s)} \\
+\midrule
+Classification Accuracy & Proportion of correctly classified test samples & A, B, C \\
+Macro F1-Score & Balanced performance across classes & A, B, C \\
+Training Loss Curve & Convergence behaviour of the meta-learner & B, C \\
+Circuit Depth (transpiled) & Two-qubit gate depth after transpilation & C \\
+Two-Qubit Gate Count & Proxy for noise exposure on hardware & C \\
+Sim-to-Hardware Gap & Accuracy drop from simulation to real hardware & A, B, C \\
+Gradient Variance & Variance of cost function gradients across training & B, C \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%%%%%%%%
+\chapter{Project Workplan}
+
+\section{Timeline}
+
+The project spans three months, from June to August 2026, structured into three phases. Table~\ref{tab:timeline} provides a summary of milestones.
+
+\begin{table}[h]
+\centering
+\caption{High-level project milestones.}
+\label{tab:timeline}
+\begin{tabular}{lll}
+\toprule
+\textbf{Phase} & \textbf{Period} & \textbf{Key Deliverable} \\
+\midrule
+Phase 1: Setup \& Simulation & June 1 -- June 30 & All three conditions implemented and simulated \\
+Phase 2: Hardware \& Analysis & July 1 -- July 20 & Hardware results collected, analysis drafted \\
+Phase 3: Writing \& Submission & July 21 -- Aug 7 & Complete dissertation submitted \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Gantt Chart}
+
+\begin{sidewaystable}
+\centering
+\caption{Detailed Gantt chart for dissertation project.}
+\label{tab:gantt}
+\begin{ganttchart}[
+    hgrid,
+    vgrid,
+    x unit=0.55cm,
+    y unit title=0.6cm,
+    y unit chart=0.5cm,
+    title height=1,
+    bar height=0.6,
+    bar label font=\small,
+    title label font=\small
+]{1}{10}
+    \gantttitle{June}{4}
+    \gantttitle{July}{4}
+    \gantttitle{Aug}{2} \\
+    \gantttitlelist{1,...,10}{1} \\
+    \ganttbar{Literature Review}{1}{3} \\
+    \ganttbar{Environment Setup}{1}{2} \\
+    \ganttbar{Base Learner Implementation (A)}{2}{3} \\
+    \ganttbar{Condition B Implementation}{3}{4} \\
+    \ganttbar{Condition C Implementation}{4}{5} \\
+    \ganttbar{Noiseless Simulation}{3}{5} \\
+    \ganttbar{Noisy Simulation}{5}{6} \\
+    \ganttbar{IBM Hardware Experiments}{6}{8} \\
+    \ganttbar{Data Analysis \& Figures}{7}{8} \\
+    \ganttbar{Dissertation Writing}{3}{9} \\
+    \ganttbar{Revisions \& Submission}{9}{10}
+\end{ganttchart}
+\end{sidewaystable}
+
+\section{Evaluation Strategy}
+
+The dissertation is evaluated through quantitative empirical comparison. All three conditions are compared on identical datasets, splits, and metrics. Statistical significance of accuracy differences is assessed using McNemar's test. Hardware results are compared to simulation results to quantify noise sensitivity. The primary claim of the dissertation --- that Condition C outperforms Condition A under noiseless conditions, and that the gap narrows under noise --- is falsifiable and directly testable by the collected data.
+
+\section{Risk Assessment}
+
+\begin{table}[h]
+\centering
+\caption{Project risks and mitigation strategies.}
+\label{tab:risks}
+\begin{tabular}{p{5cm}p{2cm}p{6cm}}
+\toprule
+\textbf{Risk} & \textbf{Likelihood} & \textbf{Mitigation} \\
+\midrule
+IBM hardware queue time exceeds budget & Medium & Run short circuits first; parallelise across multiple accounts \\
+Condition C circuit too deep for hardware coherence & Medium & Reduce to 2-qubit base learners; aggressive transpiler optimisation \\
+Barren plateaus prevent meta-learner convergence & Medium & Staged training; near-zero initialisation; gradient-free optimiser \\
+PCA reduction degrades dataset signal & Low & Retain variance threshold $\geq 95\%$; report PCA variance explained \\
+Insufficient time for all three datasets & Low & Iris and Wine are core; Breast Cancer is optional \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%%%%%%%%
+\chapter{Results and Analysis}
+
+\textit{This chapter will be completed as experimental results are collected. The following sections define the structure and reporting format.}
+
+\section{Noiseless Simulation Results}
+
+% Tables and figures comparing Conditions A, B, C on Iris and Wine
+% under noiseless simulation. Report accuracy, F1, and training curves.
+
+\section{Noisy Simulation Results}
+
+% Same conditions and datasets under IBM noise model.
+% Highlight accuracy degradation per condition.
+
+\section{IBM Hardware Results}
+
+% Hardware accuracy vs noisy simulation comparison.
+% Error mitigation effectiveness per condition.
+% Circuit depth and two-qubit gate count on real hardware.
+
+\section{Discussion}
+
+% Interpret results against the three research questions.
+% Address whether state preservation provides measurable benefit.
+% Discuss noise sensitivity and practical implications for NISQ-era ensembles.
+
+%%%%%%%%
+\chapter{Summary and Conclusions}
+
+\textit{This chapter will be completed upon the conclusion of experiments. The following structure is planned.}
+
+\section{Summary of Findings}
+
+% One paragraph per research question, drawing directly on Chapter 6.
+
+\section{Contributions}
+
+This dissertation makes two principal contributions to the QML literature:
+
+\begin{enumerate}
+    \item A novel measurement-free quantum stacking architecture (Condition C) for ensemble classification, motivated by the information loss inherent in quantum measurement, and implemented on real IBM quantum hardware.
+    \item A three-condition comparative empirical study that isolates the contribution of quantum meta-learning from the contribution of quantum state preservation, providing a methodologically rigorous evaluation absent from existing quantum ensemble work.
+\end{enumerate}
+
+\section{Limitations and Future Work}
+
+The work is limited to small-scale, low-dimensional datasets chosen for circuit feasibility. Scaling to larger feature spaces, deeper circuits, and larger qubit registers remains an open challenge contingent on advances in NISQ hardware fidelity. Future work may explore learned qubit routing to minimise SWAP overhead in Condition C, alternative entanglement patterns in the meta-learner, and the application of the architecture to quantum-native datasets where the input data itself is a quantum state.
+
+\section{Ethical Considerations}
+
+This work is a purely algorithmic research study. No personal data is collected. All datasets are sourced from open-access repositories. The use of IBM Quantum free-tier access involves no deception or resource abuse beyond what is standard in the academic community. The use of multiple IBM Quantum accounts to extend compute time is acknowledged and documented here for transparency.
+
+%%%%%%%%%%%%%%%%%%%%%%
+%%% Acknowledgements
+
+\chapter*{Acknowledgements}
+
+The author thanks Dr Simon Caton for his supervision and guidance throughout this project. Thanks are also due to the open-source communities behind PennyLane, Qiskit, and scikit-learn, whose tools make empirical QML research accessible. IBM Quantum free-tier access was used for all hardware experiments.
+
+%%%% BIBLIOGRAPHY
+\printbibliography
+
+\end{document}
