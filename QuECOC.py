@@ -9,11 +9,10 @@ from scipy.linalg import hadamard
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, accuracy_score
 from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
 from IPython.display import clear_output
-from typing import TypeAlias, Union
-from pandas import DataFrame
-from numpy.typing import ArrayLike
+from pandas import DataFrame, Series
 import  warnings
 warnings.filterwarnings(
     "ignore",
@@ -21,11 +20,6 @@ warnings.filterwarnings(
     category=qml.exceptions.PennyLaneDeprecationWarning,
     module=r"pennylane\.operation",
 )
-
-MatrixLike: TypeAlias = Union[
-    ArrayLike,
-    DataFrame
-]
 
 def build_ecoc_matrix(n_classes: int, n_learners: int) -> np.ndarray:
     n = 2 ** int(np.ceil(np.log2(n_learners)) + 1)
@@ -194,8 +188,7 @@ class BinaryVQC(nn.Module):
         probs = self.qlayer(x)
 
         half = probs.shape[1] // 2
-        return torch.stack([probs[:, :half].sum(dim=1), probs[:, half:].sum(dim=1)], dim=1)
-        
+        return torch.stack([probs[:, :half].sum(dim=1), probs[:, half:].sum(dim=1)], dim=1)[:, 1]
     
     def fit(
         self,
@@ -204,7 +197,7 @@ class BinaryVQC(nn.Module):
         epochs: int = 100,
         lr: float = 0.01,
         optimizer_cls: torch.optim.Optimizer = torch.optim.Adam,
-        criterion: nn.Module = nn.NLLLoss(),
+        criterion: nn.Module = nn.BCELoss(),
         patience: int = 10,
         warmup: int = 15,
         min_delta: float = 1e-3,
@@ -239,7 +232,7 @@ class BinaryVQC(nn.Module):
                 optimizer.zero_grad()
 
                 probs = self(X_batch)
-                loss = criterion(probs, y_batch)
+                loss = criterion(probs, y_batch.float())
 
                 loss.backward()
                 optimizer.step()
@@ -261,11 +254,11 @@ class BinaryVQC(nn.Module):
                         y_batch = y_batch.to(self.device)
 
                         probs = self(X_batch)
-                        loss = criterion(probs, y_batch)
+                        loss = criterion(probs, y_batch.float())
 
                         val_loss += loss.item()
 
-                        preds = probs.argmax(dim=1)
+                        preds = (probs > 0.5).long()
                         correct += (preds == y_batch).sum().item()
                         total += y_batch.size(0)
 
@@ -320,24 +313,19 @@ class BinaryVQC(nn.Module):
 
         self.training_time = time.time() - time_start
         if verbose:
-            print(f"Total training time: {self.training_time:.2f} seconds")
+            print(f"Training time: {self.training_time:.2f} seconds")
 
         self.train_losses = train_losses
         self.val_losses = val_losses
         self.best_loss = best_loss
-
-    def predict(self, X: torch.Tensor) -> torch.Tensor:
-        self.eval()
-        with torch.no_grad():
-            probs = self(X.to(self.device))
-            preds = probs.argmax(dim=1)
-            return preds.cpu()
     
     def predict_proba(self, X: torch.Tensor) -> torch.Tensor:
         self.eval()
         with torch.no_grad():
-            probs = self(X.to(self.device))
-            return probs.cpu()
+            return self(X.to(self.device)).cpu()
+
+    def predict(self, X: torch.Tensor) -> torch.Tensor:
+        return (self.predict_proba(X) > 0.5).long()
 
     def score(self, X: torch.Tensor, y: torch.Tensor) -> float:
         preds = self.predict(X)
@@ -363,7 +351,7 @@ class QuECOC:
         return self
     
     def initialise(self):
-        self.ecoc = build_ecoc_matrix(self.n_classes, self.n_learners)
+        self.ecoc = build_ecoc_matrix(len(self.labels), self.n_learners)
         for i in range(self.n_learners):
             qlayer, circuit, weight_shapes, n_features = reuploading_qlayer(
                 n_qubits=self.kwargs.get("n_qubits", 2),
@@ -383,10 +371,31 @@ class QuECOC:
             clf.n_features = n_features
             self.classifiers.append(clf)
 
-    def fit(self, X: MatrixLike, y: ArrayLike, X_test: MatrixLike = None, y_test: ArrayLike = None, plot: bool = False, verbose: bool = False, **fit_params):
-        self.n_classes = len(np.unique(y))
+    def fit(self, X: DataFrame, y: Series, X_test: DataFrame = None, y_test: Series = None, scaler_range: tuple = (0, np.pi), plot: bool = False, verbose: bool = False, **fit_params):
+        self.features = X.columns.tolist()
+        self.features_to_int = {feat: idx for idx, feat in enumerate(self.features)}
+        self.int_to_features = {idx: feat for idx, feat in enumerate(self.features)}
+        if verbose:
+            print(f"Feature mapping: {self.features_to_int}")
+        
+        self.scaler = MinMaxScaler(feature_range=scaler_range)
+        X = self.scaler.fit_transform(X)
+
+        if X_test is not None:
+            X_test = self.scaler.transform(X_test)
+        
+        self.labels = sorted(y.unique())
+        self.label_to_int = {label: idx for idx, label in enumerate(self.labels)}
+        self.int_to_label = {idx: label for idx, label in enumerate(self.labels)}
+        if verbose:
+            print(f"Label mapping: {self.label_to_int}")
+        y = y.map(self.label_to_int)
+
+        if y_test is not None:
+            y_test = y_test.map(self.label_to_int)
+
         if self.n_learners is None:
-            self.n_learners = 2 * self.n_classes
+            self.n_learners = 2 * len(self.labels)
         self.initialise()
 
         # pick a list of random features for each classifier
@@ -398,6 +407,9 @@ class QuECOC:
             final_feats += feats
 
         for i, clf in enumerate(self.classifiers):
+            if verbose:
+                print(f"\nTraining classifier {i + 1}/{self.n_learners}")
+
             clf.feats = [final_feats.pop() for _ in range(clf.n_features)]
             X_tr = torch.tensor(np.array([X[:, feat] for feat in clf.feats]).T, dtype=torch.float32).to(self.cuda_device)
 
@@ -417,7 +429,10 @@ class QuECOC:
             trainloader = DataLoader(TensorDataset(X_tr, y_tr), batch_size=32, shuffle=True)
 
             clf.fit(trainloader, testloader, title_prefix=f"Classifier {i + 1}/{self.n_learners}: ", plot=plot, verbose=verbose, **fit_params)
-            clf.report = classification_report(y_test.apply(lambda x: code[x]) if y_test is not None else y_train, clf.predict(X_te), zero_division=0)
+
+            if testloader:
+                clf.val_probs = clf.predict_proba(X_te)
+                clf.val_report = classification_report(y_test.apply(lambda x: code[x]), (clf.val_probs > 0.5).long(), zero_division=0)
 
         if plot:
             clear_output(wait=True)
@@ -433,34 +448,37 @@ class QuECOC:
             plt.show()
 
         if verbose:
-            print(f"Total training time after fitting {self.n_learners} classifiers: {sum(clf.training_time for clf in self.classifiers):.2f} seconds")
+            print(f"\nTotal training time after fitting {self.n_learners} classifiers: {sum(clf.training_time for clf in self.classifiers):.2f} seconds")
 
-    def predict(self, X: MatrixLike) -> np.ndarray:
+    def predict(self, X: DataFrame) -> np.ndarray:
+        X = self.scaler.transform(X)
         with torch.no_grad():
-            final_preds = np.array([[0] * self.n_classes] * len(X))
+            final_preds = np.array([[0] * len(self.labels)] * len(X))
             for i, clf in enumerate(self.classifiers):
                 X_tr = torch.tensor(np.array([X[:, feat] for feat in clf.feats]).T, dtype=torch.float32).to(self.cuda_device)
-                preds = clf.predict(X_tr)
 
+                preds = clf.predict(X_tr)
                 for j, pred in enumerate(preds):
                     final_preds[j][self.ecoc[i] == pred.item()] += 1
 
-            return np.array(final_preds).argmax(axis=1).tolist()
+            return [self.int_to_label[pred.item()] for pred in np.array(final_preds).argmax(axis=1)]
     
-    def predict_proba(self, X: MatrixLike) -> np.ndarray:
+    def predict_proba(self, X: DataFrame) -> np.ndarray:
+        X = self.scaler.transform(X)
         with torch.no_grad():
-            final_preds = np.array([[0.0] * self.n_classes] * len(X))
+            final_preds = np.array([[0.0] * len(self.labels)] * len(X))
             for i, clf in enumerate(self.classifiers):
                 X_tr = torch.tensor(np.array([X[:, feat] for feat in clf.feats]).T, dtype=torch.float32).to(self.cuda_device)
-                preds = clf.predict_proba(X_tr)
 
-                for j, pred in enumerate(preds):
-                    final_preds[j][self.ecoc[i] == 0] += pred[0].item()
-                    final_preds[j][self.ecoc[i] == 1] += pred[1].item()
+                p1 = clf.predict_proba(X_tr).numpy()
+                p0 = 1.0 - p1
+
+                final_preds[:, self.ecoc[i] == 0] += p0[:, None]
+                final_preds[:, self.ecoc[i] == 1] += p1[:, None]
 
             return np.array(final_preds) / self.n_learners
     
-    def score(self, X, y):
+    def score(self, X: DataFrame, y: Series) -> float:
         preds = self.predict(X)
         return accuracy_score(y.values, preds)
 
@@ -470,75 +488,64 @@ class CsQuECOC(QuECOC):
     """
     def __init__(self, meta_learner = None, n_learners: int = None, device: qml.Device = None, **kwargs):
         super().__init__(n_learners, device, **kwargs)
-        self.meta_learner = meta_learner if meta_learner else LogisticRegression(max_iter=1000)
+        self.meta_learner = meta_learner if meta_learner is not None else LogisticRegression(max_iter=1000)
 
-    def fit(self, X: MatrixLike, y: ArrayLike, X_test: MatrixLike = None, y_test: ArrayLike = None, plot: bool = False, verbose: bool = False, **fit_params):
-
+    def fit(self, X: DataFrame, y: Series, plot: bool = False, verbose: bool = False, **fit_params):
         X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3, random_state=2, stratify=y)
+        super().fit(X_train, y_train, X_val, y_val, plot=plot, verbose=verbose, **fit_params)
 
-        super().fit(X_train, y_train, X_val, y_val, plot, verbose, **fit_params)
+        meta_X_train = np.array([clf.val_probs for clf in self.classifiers]).T
+        self.meta_learner.fit(meta_X_train, y_val.map(self.label_to_int))
 
-        meta_X_train = []
-        meta_X_val = []
-
-        for clf in self.classifiers:
-            X_tr = torch.tensor(np.array([X_train[:, feat] for feat in clf.feats]).T, dtype=torch.float32).to(self.cuda_device)
-            X_va = torch.tensor(np.array([X_val[:, feat] for feat in clf.feats]).T, dtype=torch.float32).to(self.cuda_device)
-
-            meta_X_train.append(clf.predict(X_tr))
-            meta_X_val.append(clf.predict(X_va))
-
-        meta_X_train = np.array(meta_X_train).T
-        meta_X_val = np.array(meta_X_val).T
-
-        self.meta_learner.fit(meta_X_train, y_train)
-        
-        meta_val_preds = self.meta_learner.predict(meta_X_val)
-        meta_val_acc = accuracy_score(y_val, meta_val_preds)
-        
-        if verbose:
-            print(f"Meta-learner validation accuracy: {meta_val_acc:.2f}")
-            print("Meta-learner classification report:\n", classification_report(y_val, meta_val_preds, zero_division=0))
-
-    def predict(self, X: MatrixLike) -> np.ndarray:
-        meta_X = np.array([clf.predict(torch.tensor(np.array([X[:, feat] for feat in clf.feats]).T, dtype=torch.float32).to(self.cuda_device)) for clf in self.classifiers]).T
-        return self.meta_learner.predict(meta_X)
+    def predict(self, X: DataFrame) -> np.ndarray:
+        X = self.scaler.transform(X)
+        meta_X = np.array([clf.predict_proba(torch.tensor(np.array([X[:, feat] for feat in clf.feats]).T, dtype=torch.float32).to(self.cuda_device)) for clf in self.classifiers]).T
+        return [self.int_to_label[pred] for pred in self.meta_learner.predict(meta_X)]
     
-    def predict_proba(self, X: MatrixLike) -> np.ndarray:
-        meta_X = np.array([clf.predict(torch.tensor(np.array([X[:, feat] for feat in clf.feats]).T, dtype=torch.float32).to(self.cuda_device)) for clf in self.classifiers]).T
+    def predict_proba(self, X: DataFrame) -> np.ndarray:
+        X = self.scaler.transform(X)
+        meta_X = np.array([clf.predict_proba(torch.tensor(np.array([X[:, feat] for feat in clf.feats]).T, dtype=torch.float32).to(self.cuda_device)) for clf in self.classifiers]).T
         return self.meta_learner.predict_proba(meta_X)
     
-    def score(self, X, y):
+    def score(self, X: DataFrame, y: Series) -> float:
         preds = self.predict(X)
         return accuracy_score(y.values, preds)
 
 if __name__ == "__main__":
     import prince
-    from sklearn.preprocessing import MinMaxScaler
     from ucimlrepo import fetch_ucirepo
-    iris = fetch_ucirepo(id=53)
+    import pandas as pd
 
-    X = iris.data.features
-    y = iris.data.targets
-    label_names = sorted(y[y.columns[0]].unique())
-    label_to_int = {label: idx for idx, label in enumerate(label_names)}
-    int_to_label = {idx: label for idx, label in enumerate(label_names)}
-    print(f"Label mapping: {label_to_int}")
-    y = y[y.columns[0]].map(label_to_int)
+    # iris = fetch_ucirepo(id=53)
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=2, stratify=y)
+    # X = iris.data.features
+    # y = iris.data.targets['class']
 
-    pca = prince.PCA(n_components=2, n_iter=5, random_state=2)
-    X_train = pca.fit_transform(X_train)
-    X_test = pca.transform(X_test)
+    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=2, stratify=y)
 
-    scaler = MinMaxScaler()
-    X_train_scaled = scaler.fit_transform(X_train)
-    X_test_scaled = scaler.transform(X_test)
+    # ens = CsQuECOC().to("cpu")
+    # ens.fit(X_train, y_train, epochs=200, plot=False, verbose=True)
 
-    ens = QuECOC().to("cpu")
-    ens.fit(X_train_scaled, y_train, X_test_scaled, y_test, epochs=200)
+    # train_score = ens.score(X_train, y_train)
+    # print(f"Training Accuracy: {train_score:.2f}")
+    # print("Testing Classification Report:\n", classification_report(y_test, ens.predict(X_test), zero_division=0))
 
-    train_score = ens.score(X_train_scaled, y_train)
+    # ---
+
+    lab_train = pd.read_csv('lab1-train-processed.csv')
+    lab_test = pd.read_csv('lab1-test-processed.csv')
+
+    y_train = lab_train['class']
+    y_test = lab_test['class']
+    X_train = lab_train.drop('class', axis=1)
+    X_test = lab_test.drop('class', axis=1)
+
+    top_cols = [col for col in X_train.columns if col.startswith('X')]
+    famd_cols = [col for col in X_train.columns if col.startswith('C')]
+
+    ens = CsQuECOC(feats_per_qubit=3, reuploads=3, trainable_layers=[1,2,3]).to("cpu")
+    ens.fit(X_train, y_train, epochs=200, plot=False, verbose=True)
+
+    train_score = ens.score(X_train, y_train)
     print(f"Training Accuracy: {train_score:.2f}")
-    print("Classification Report:\n", classification_report(y_test, ens.predict(X_test_scaled), zero_division=0))
+    print("Testing Classification Report:\n", classification_report(y_test, ens.predict(X_test), zero_division=0))
