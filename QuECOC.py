@@ -6,7 +6,9 @@ from torch.utils.data import DataLoader, TensorDataset
 import pennylane as qml
 from pennylane import numpy as np
 from scipy.linalg import hadamard
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, accuracy_score
+from sklearn.linear_model import LogisticRegression
 import matplotlib.pyplot as plt
 from IPython.display import clear_output
 from typing import TypeAlias, Union
@@ -342,8 +344,11 @@ class BinaryVQC(nn.Module):
         return accuracy_score(y, preds)
 
 class QuECOC:
+    """
+    Quantum Error-Correcting Output Codes ensemble classifier for multi-class classification using binary variational quantum classifiers as base learners.
+    """
     def __init__(self, n_learners: int = None, device: qml.Device = None, **kwargs):
-        self.n_learners = n_learners if n_learners else None
+        self.n_learners = n_learners
 
         self.cuda_device = "cpu"
         self.qml_device = device if device else qml.device("default.qubit", wires=2)
@@ -453,16 +458,63 @@ class QuECOC:
                     final_preds[j][self.ecoc[i] == 0] += pred[0].item()
                     final_preds[j][self.ecoc[i] == 1] += pred[1].item()
 
-            return (np.array(final_preds) / self.n_learners).argmax(axis=1).tolist()
+            return np.array(final_preds) / self.n_learners
     
     def score(self, X, y):
         preds = self.predict(X)
         return accuracy_score(y.values, preds)
+
+class CsQuECOC(QuECOC):
+    """
+    Classical Stacked Quantum Error-Correcting Output Codes ensemble that extends QuECOC by adding a classical meta-learner on top of the quantum base learners.
+    """
+    def __init__(self, meta_learner = None, n_learners: int = None, device: qml.Device = None, **kwargs):
+        super().__init__(n_learners, device, **kwargs)
+        self.meta_learner = meta_learner if meta_learner else LogisticRegression(max_iter=1000)
+
+    def fit(self, X: MatrixLike, y: ArrayLike, X_test: MatrixLike = None, y_test: ArrayLike = None, plot: bool = False, verbose: bool = False, **fit_params):
+
+        X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3, random_state=2, stratify=y)
+
+        super().fit(X_train, y_train, X_val, y_val, plot, verbose, **fit_params)
+
+        meta_X_train = []
+        meta_X_val = []
+
+        for clf in self.classifiers:
+            X_tr = torch.tensor(np.array([X_train[:, feat] for feat in clf.feats]).T, dtype=torch.float32).to(self.cuda_device)
+            X_va = torch.tensor(np.array([X_val[:, feat] for feat in clf.feats]).T, dtype=torch.float32).to(self.cuda_device)
+
+            meta_X_train.append(clf.predict(X_tr))
+            meta_X_val.append(clf.predict(X_va))
+
+        meta_X_train = np.array(meta_X_train).T
+        meta_X_val = np.array(meta_X_val).T
+
+        self.meta_learner.fit(meta_X_train, y_train)
+        
+        meta_val_preds = self.meta_learner.predict(meta_X_val)
+        meta_val_acc = accuracy_score(y_val, meta_val_preds)
+        
+        if verbose:
+            print(f"Meta-learner validation accuracy: {meta_val_acc:.2f}")
+            print("Meta-learner classification report:\n", classification_report(y_val, meta_val_preds, zero_division=0))
+
+    def predict(self, X: MatrixLike) -> np.ndarray:
+        meta_X = np.array([clf.predict(torch.tensor(np.array([X[:, feat] for feat in clf.feats]).T, dtype=torch.float32).to(self.cuda_device)) for clf in self.classifiers]).T
+        return self.meta_learner.predict(meta_X)
     
+    def predict_proba(self, X: MatrixLike) -> np.ndarray:
+        meta_X = np.array([clf.predict(torch.tensor(np.array([X[:, feat] for feat in clf.feats]).T, dtype=torch.float32).to(self.cuda_device)) for clf in self.classifiers]).T
+        return self.meta_learner.predict_proba(meta_X)
+    
+    def score(self, X, y):
+        preds = self.predict(X)
+        return accuracy_score(y.values, preds)
+
 if __name__ == "__main__":
     import prince
     from sklearn.preprocessing import MinMaxScaler
-    from sklearn.model_selection import train_test_split
     from ucimlrepo import fetch_ucirepo
     iris = fetch_ucirepo(id=53)
 
