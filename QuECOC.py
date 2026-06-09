@@ -8,7 +8,7 @@ from pennylane import numpy as np
 from scipy.linalg import hadamard
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, accuracy_score
-from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
 from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
 from IPython.display import clear_output
@@ -418,7 +418,7 @@ class QuECOC:
 
             code = self.ecoc[i]
             y_train = y.apply(lambda x: code[x])
-            y_tr = torch.tensor(y_train, dtype=torch.long).to(self.cuda_device)
+            y_tr = torch.tensor(y_train.values, dtype=torch.long).to(self.cuda_device)
 
             if X_test is not None and y_test is not None:
                 y_te = torch.tensor(y_test.apply(lambda x: code[x]).values, dtype=torch.long).to(self.cuda_device)
@@ -432,7 +432,7 @@ class QuECOC:
 
             if testloader:
                 clf.val_probs = clf.predict_proba(X_te)
-                clf.val_report = classification_report(y_test.apply(lambda x: code[x]), (clf.val_probs > 0.5).long(), zero_division=0)
+                clf.val_report = classification_report(y_test.apply(lambda x: code[x]), (clf.val_probs > 0.5).long(), zero_division=0, output_dict=True)
 
         if plot:
             clear_output(wait=True)
@@ -488,7 +488,7 @@ class CsQuECOC(QuECOC):
     """
     def __init__(self, meta_learner = None, n_learners: int = None, device: qml.Device = None, **kwargs):
         super().__init__(n_learners, device, **kwargs)
-        self.meta_learner = meta_learner if meta_learner is not None else LogisticRegression(max_iter=1000)
+        self.meta_learner = meta_learner if meta_learner is not None else SVC(kernel="rbf", class_weight='balanced', random_state=2)
 
     def fit(self, X: DataFrame, y: Series, plot: bool = False, verbose: bool = False, **fit_params):
         X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3, random_state=2, stratify=y)
@@ -532,20 +532,30 @@ if __name__ == "__main__":
 
     # ---
 
-    lab_train = pd.read_csv('lab1-train-processed.csv')
-    lab_test = pd.read_csv('lab1-test-processed.csv')
+    # lab_train = pd.read_csv('lab1-train-processed.csv')
+    # lab_test = pd.read_csv('lab1-test-processed.csv')
 
-    y_train = lab_train['class']
-    y_test = lab_test['class']
-    X_train = lab_train.drop('class', axis=1)
-    X_test = lab_test.drop('class', axis=1)
+    # y_train = lab_train['class']
+    # y_test = lab_test['class']
+    # X_train = lab_train.drop('class', axis=1)
+    # X_test = lab_test.drop('class', axis=1)
 
-    top_cols = [col for col in X_train.columns if col.startswith('X')]
-    famd_cols = [col for col in X_train.columns if col.startswith('C')]
+    # top_cols = [col for col in X_train.columns if col.startswith('X')]
+    # famd_cols = [col for col in X_train.columns if col.startswith('C')]
 
-    ens = CsQuECOC(feats_per_qubit=3, reuploads=3, trainable_layers=[1,2,3]).to("cpu")
-    ens.fit(X_train, y_train, epochs=200, plot=False, verbose=True)
+    # ens = CsQuECOC(feats_per_qubit=3, reuploads=3, trainable_layers=[1,2,3]).to("cpu")
+    # ens.fit(X_train, y_train, epochs=200, plot=False, verbose=True)
 
-    train_score = ens.score(X_train, y_train)
-    print(f"Training Accuracy: {train_score:.2f}")
-    print("Testing Classification Report:\n", classification_report(y_test, ens.predict(X_test), zero_division=0))
+    # train_score = ens.score(X_train, y_train)
+    # print(f"Training Accuracy: {train_score:.2f}")
+    # print("Testing Classification Report:\n", classification_report(y_test, ens.predict(X_test), zero_division=0))
+
+    X = pd.read_csv(f"datasets/0/iris.csv")
+    y = X['target']
+    X = X.drop('target', axis=1)
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=2, stratify=y)
+
+    CQens = CsQuECOC(feats_per_qubit=3, reuploads=3, trainable_layers=[1,2,3]).to("cpu")
+    CQens.fit(X_train, y_train, epochs=200, plot=False, verbose=True)
+    print(f"CsQuECOC Classification Report:\n{classification_report(y_test, CQens.predict(X_test), zero_division=0)}\n")
