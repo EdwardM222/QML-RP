@@ -22,13 +22,25 @@ warnings.filterwarnings(
     module=r"pennylane\.operation",
 )
 
-def print_dict(d, indent=0):
-    for key, value in d.items():
-        if isinstance(value, dict):
-            print(" " * indent + f"{key}:")
-            print_dict(value, indent + 4)
-        else:
-            print(" " * indent + f"{key}: {value}")
+class ValReport(dict):
+    def __str__(self):
+        report_str = ""
+        for label, metrics in self.items():
+            report_str += f"{label}:\n"
+            for metric, value in metrics.items():
+                report_str += f"  {metric}: {value:.4f}\n"
+        return report_str
+
+class TimeInt(int):
+    def __str__(self):
+        secs, mins, hours = self, 0, 0
+        if secs >= 60:
+            mins = secs // 60
+            secs = secs % 60
+            if mins >= 60:
+                hours = mins // 60
+                mins = mins % 60
+        return f"{f'{int(hours)}h ' if hours > 0 else ''}{f'{int(mins)}m ' if mins > 0 else ''}{secs:.2f}s"
 
 def build_ecoc_matrix(n_classes: int, n_learners: int) -> np.ndarray:
     n = 2 ** int(np.ceil(np.log2(n_learners)) + 1)
@@ -390,9 +402,9 @@ class BinaryVQC(nn.Module):
         if restore_best and best_state is not None:
             self.load_state_dict(best_state)
 
-        self.training_time = time.time() - time_start
+        self.training_time = TimeInt(time.time() - time_start)
         if verbose:
-            print(f"Training time: {self.training_time:.2f} seconds")
+            print(f"Training time: {self.training_time}")
 
         self.train_losses = train_losses
         self.val_losses = val_losses
@@ -481,7 +493,7 @@ class QuantumECOC:
             clf.feats = self.feat_map[i]
             clf.code = self.ecoc[i]
 
-    def train_ensemble(self, X: np.ndarray, y: Series, X_test: np.ndarray, y_test: Series, plot: bool, verbose: bool, **fit_params):
+    def train_ensemble(self, X: np.ndarray, y: Series, X_test: np.ndarray, y_test: Series, plot: bool, verbose: bool, fold: int = 0, **fit_params):
         for i, clf in enumerate(self.classifiers):
             if verbose:
                 print(f"\nTraining classifier {i + 1}/{self.n_learners}")
@@ -494,7 +506,7 @@ class QuantumECOC:
             if k >= 1.0:
                 samples = np.arange(len(X))
             else:
-                samples, _ = train_test_split(range(len(X)), train_size=k, stratify=y_train)
+                samples, _ = train_test_split(range(len(X)), train_size=k, stratify=y_train, random_state=2+i+(1000*fold))
 
             X_tr = torch.tensor(np.array([X[samples, feat] for feat in clf.feats]).T, dtype=torch.float32).to(self.cuda_device)
             y_tr = torch.tensor(y_train.iloc[samples].values, dtype=torch.long).to(self.cuda_device)
@@ -511,25 +523,26 @@ class QuantumECOC:
 
             if testloader is not None:
                 clf.val_probs = clf.predict_proba(X_te)
-                clf.val_report = classification_report(y_test.apply(lambda x: clf.code[x]), (clf.val_probs > 0.5).long(), zero_division=0, output_dict=True)
+                clf.val_report = ValReport(classification_report(y_test.apply(lambda x: clf.code[x]), (clf.val_probs > 0.5).long(), zero_division=0, output_dict=True))
 
         if plot:
             clear_output(wait=True)
-            plt.figure(figsize=(10, 6))
-            for j, clf in enumerate(self.classifiers):
-                plt.plot(clf.val_losses, label=f"Classifier {j + 1} (Code: {self.ecoc[j]})")
-            plt.xlabel("Epoch")
-            plt.ylabel("Validation Loss")
-            plt.title("Validation Loss for Each Classifier")
-            plt.xlim(0, max(1, max(len(clf.val_losses) for clf in self.classifiers) - 1))
-            plt.legend()
-            plt.grid(True)
-            plt.show()
+            self.plot()
 
-        if verbose:
-            print(f"\nTotal training time after fitting {self.n_learners} classifiers: {sum(clf.training_time for clf in self.classifiers):.2f} seconds")
+    def plot(self):
+        plt.figure(figsize=(10, 6))
+        for i, clf in enumerate(self.classifiers):
+            plt.plot(clf.val_losses, label=f"Classifier {i + 1} (Code: {clf.code})")
+        plt.xlabel("Epoch")
+        plt.ylabel("Validation Loss")
+        plt.title("Validation Loss for Each Classifier")
+        plt.xlim(0, max(1, max(len(clf.val_losses) for clf in self.classifiers) - 1))
+        plt.legend()
+        plt.grid(True)
+        plt.show()
 
     def fit(self, X: DataFrame, y: Series, X_test: DataFrame = None, y_test: Series = None, plot: bool = False, verbose: bool = False, **fit_params):
+        start_time = time.time()
         self.initialise_ensemble(X, y, verbose)
         self.initialise_classifiers()
 
@@ -543,12 +556,16 @@ class QuantumECOC:
 
         self.train_ensemble(X, y, X_test, y_test, plot, verbose, **fit_params)
 
+        self.training_time = TimeInt(time.time() - start_time)
+        if verbose:
+            print(f"\nTotal training time after fitting {self.n_learners} classifiers: {self.training_time}")
+
     @property
     def learner_weights(self):
         if all(hasattr(clf, "weight") for clf in self.classifiers):
             return [clf.weight for clf in self.classifiers]
         return None
-
+    
     def predict(self, X: DataFrame) -> np.ndarray:
         X = self.scaler.transform(X)
         with torch.no_grad():
@@ -590,6 +607,7 @@ class StackedECOC(QuantumECOC):
         self.meta_learner = meta_learner if meta_learner is not None else SVC(kernel="rbf", random_state=2)
 
     def fit(self, X: DataFrame, y: Series, X_test: DataFrame = None, y_test: Series = None, k_folds: int = 5, plot: bool = False, verbose: bool = False, **fit_params):
+        start_time = time.time()
         self.initialise_ensemble(X, y, verbose=verbose)
 
         class_samples = y.value_counts()
@@ -613,7 +631,7 @@ class StackedECOC(QuantumECOC):
                 y_train = y_train.map(self.label_to_int)
                 y_val = y_val.map(self.label_to_int)
 
-                self.train_ensemble(X_train, y_train, X_val, y_val, plot=False, verbose=False, **fit_params)
+                self.train_ensemble(X_train, y_train, X_val, y_val, plot=False, verbose=False, fold=f, **fit_params)
 
                 X_fold = np.array([
                     clf.val_probs.numpy() # maybe * clf.weight later
@@ -648,6 +666,10 @@ class StackedECOC(QuantumECOC):
 
             X_meta = np.array([clf.val_probs for clf in self.classifiers]).T
             self.meta_learner.fit(X_meta, y_val)
+
+        self.training_time = time.time() - start_time
+        if verbose:
+            print(f"\nTotal training time after fitting {self.n_learners} classifiers across {k_folds} folds: {self.training_time:.2f} seconds")
 
     def predict(self, X: DataFrame) -> np.ndarray:
         X = self.scaler.transform(X)
