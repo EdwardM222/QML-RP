@@ -493,14 +493,17 @@ class QuantumECOC:
             clf.feats = self.feat_map[i]
             clf.code = self.ecoc[i]
 
-    def train_ensemble(self, X: np.ndarray, y: Series, X_test: np.ndarray, y_test: Series, plot: bool, verbose: bool, fold: int = 0, **fit_params):
+    def train_ensemble(self, X: np.ndarray, y: Series, X_test: np.ndarray, y_test: Series, bagging: tuple[float, int, int] | None, plot: bool, verbose: bool, fold: int = 0, **fit_params):
         for i, clf in enumerate(self.classifiers):
             if verbose:
                 print(f"\nTraining classifier {i + 1}/{self.n_learners}")
 
             y_train = y.apply(lambda x: clf.code[x])
 
-            k = min(min(max(len(X)//2, 512), 2048), len(X)) / len(X)
+            if bagging is None:
+                k = 1.0
+            else:
+                k = min(min(max(len(X)*bagging[0], bagging[1]), bagging[2]), len(X)) / len(X)
             if verbose:
                 print(f"Using {k*len(X)}//{len(X)} samples")
             if k >= 1.0:
@@ -541,7 +544,7 @@ class QuantumECOC:
         plt.grid(True)
         plt.show()
 
-    def fit(self, X: DataFrame, y: Series, X_test: DataFrame = None, y_test: Series = None, plot: bool = False, verbose: bool = False, **fit_params):
+    def fit(self, X: DataFrame, y: Series, X_test: DataFrame = None, y_test: Series = None, bagging: tuple[float, int, int] | None = (0.5, 512, 2048), plot: bool = False, verbose: bool = False, **fit_params):
         start_time = time.time()
         self.initialise_ensemble(X, y, verbose)
         self.initialise_classifiers()
@@ -554,7 +557,7 @@ class QuantumECOC:
         if y_test is not None:
             y_test = y_test.map(self.label_to_int)
 
-        self.train_ensemble(X, y, X_test, y_test, plot, verbose, **fit_params)
+        self.train_ensemble(X, y, X_test, y_test, bagging, plot, verbose, **fit_params)
 
         self.training_time = TimeInt(time.time() - start_time)
         if verbose:
