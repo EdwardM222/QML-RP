@@ -6,13 +6,14 @@ from torch.utils.data import DataLoader, TensorDataset
 import pennylane as qml
 from pennylane import numpy as np
 from scipy.linalg import hadamard
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, StratifiedKFold
 from sklearn.metrics import classification_report, accuracy_score
 from sklearn.svm import SVC
 from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
 from IPython.display import clear_output
 from pandas import DataFrame, Series
+from random import choices, sample
 import  warnings
 warnings.filterwarnings(
     "ignore",
@@ -20,6 +21,14 @@ warnings.filterwarnings(
     category=qml.exceptions.PennyLaneDeprecationWarning,
     module=r"pennylane\.operation",
 )
+
+def print_dict(d, indent=0):
+    for key, value in d.items():
+        if isinstance(value, dict):
+            print(" " * indent + f"{key}:")
+            print_dict(value, indent + 4)
+        else:
+            print(" " * indent + f"{key}: {value}")
 
 def build_ecoc_matrix(n_classes: int, n_learners: int) -> np.ndarray:
     n = 2 ** int(np.ceil(np.log2(n_learners)) + 1)
@@ -174,13 +183,83 @@ def reuploading_qlayer(
     return qlayer, circuit, weight_shapes, n_features
 
 class BinaryVQC(nn.Module):
-    def __init__(self, qlayer: qml.qnn.TorchLayer):
+    def __init__(self, qml_device: qml.Device, template: int | str = None):
         super().__init__()
-        self.qlayer = qlayer
-        self.device = "cpu"
+        self.template = template
+        self.cuda_device = "cpu"
+        self.qml_device = qml_device
+
+        self.initialise()
+
+    def initialise(self):
+        match(self.template):
+            case 1:
+                self.qlayer, self.circuit, self.weight_shapes, self.n_features = reuploading_qlayer(
+                    n_qubits=2,
+                    feats_per_qubit=3,
+                    device=self.qml_device,
+                    reuploads=3,
+                    entangle_between_reuploads=True,
+                    trainable_layers=[1, 2, 3]
+                )
+            case 2:
+                self.qlayer, self.circuit, self.weight_shapes, self.n_features = reuploading_qlayer(
+                    n_qubits=2,
+                    feats_per_qubit=3,
+                    device=self.qml_device,
+                    reuploads=3,
+                    entangle_between_reuploads=False,
+                    trainable_layers=[3]
+                )
+            case 3:
+                self.qlayer, self.circuit, self.weight_shapes, self.n_features = reuploading_qlayer(
+                    n_qubits=3,
+                    feats_per_qubit=2,
+                    device=self.qml_device,
+                    reuploads=3,
+                    entangle_between_reuploads=True,
+                    trainable_layers=[1, 2, 3],
+                    ranges=1
+                )
+            case 'deep':
+                self.qlayer, self.circuit, self.weight_shapes, self.n_features = reuploading_qlayer(
+                    n_qubits=2,
+                    feats_per_qubit=2,
+                    device=self.qml_device,
+                    reuploads=5,
+                    entangle_between_reuploads=True,
+                    trainable_layers=[1, 2, 2, 3, 3]
+                )
+            case 'wide':
+                self.qlayer, self.circuit, self.weight_shapes, self.n_features = reuploading_qlayer(
+                    n_qubits=4,
+                    feats_per_qubit=1,
+                    device=self.qml_device,
+                    reuploads=2,
+                    entangle_between_reuploads=True,
+                    trainable_layers=[1, 2]
+                )
+            case 'dense':
+                self.qlayer, self.circuit, self.weight_shapes, self.n_features = reuploading_qlayer(
+                    n_qubits=2,
+                    feats_per_qubit=4,
+                    device=self.qml_device,
+                    reuploads=2,
+                    entangle_between_reuploads=True,
+                    trainable_layers=[1, 2]
+                )
+            case _:
+                self.qlayer, self.circuit, self.weight_shapes, self.n_features = reuploading_qlayer(
+                    n_qubits=2,
+                    feats_per_qubit=2,
+                    device=self.qml_device,
+                    reuploads=2,
+                    entangle_between_reuploads=True,
+                    trainable_layers=[1, 2]
+                )
 
     def to(self, device):
-        self.device = device
+        self.cuda_device = device
         self.qlayer.to(device)
         return super().to(device)
 
@@ -206,7 +285,7 @@ class BinaryVQC(nn.Module):
         restore_best: bool = True,
         verbose: bool = True,
     ):
-        self.to(self.device)
+        self.to(self.cuda_device)
 
         optimizer = optimizer_cls(self.parameters(), lr=lr)
 
@@ -226,8 +305,8 @@ class BinaryVQC(nn.Module):
                 if verbose:
                     print(f"[Epoch {epoch + 1}/{epochs}] Batch {batch_idx + 1}/{len(train_loader)}", end="\r")
 
-                X_batch = X_batch.to(self.device)
-                y_batch = y_batch.to(self.device)
+                X_batch = X_batch.to(self.cuda_device)
+                y_batch = y_batch.to(self.cuda_device)
 
                 optimizer.zero_grad()
 
@@ -243,15 +322,15 @@ class BinaryVQC(nn.Module):
             train_losses.append(avg_train_loss)
 
             # Validation
-            if test_loader:
+            if test_loader is not None:
                 val_loss = 0.0
                 correct = 0
                 total = 0
                 self.eval()
                 with torch.no_grad():
                     for X_batch, y_batch in test_loader:
-                        X_batch = X_batch.to(self.device)
-                        y_batch = y_batch.to(self.device)
+                        X_batch = X_batch.to(self.cuda_device)
+                        y_batch = y_batch.to(self.cuda_device)
 
                         probs = self(X_batch)
                         loss = criterion(probs, y_batch.float())
@@ -272,21 +351,21 @@ class BinaryVQC(nn.Module):
                 clear_output(wait=True)
                 plt.figure(figsize=(10, 6))
                 plt.plot(train_losses, label="Train Loss")
-                if test_loader:
+                if test_loader is not None:
                     plt.plot(val_losses, label="Validation Loss")
                 plt.xlabel("Epoch")
                 plt.ylabel("Loss")
-                plt.title(f"{title_prefix}Training {'and Validation' if test_loader else ''} Loss")
+                plt.title(f"{title_prefix}Training {'and Validation' if test_loader is not None else ''} Loss")
                 plt.legend()
                 plt.grid(True)
                 plt.xlim(0, max(1, len(train_losses) - 1))
                 plt.show()
 
             if verbose:
-                print(f"[Epoch {epoch + 1}/{epochs}] Train Loss: {avg_train_loss:.4f} {f'| Val Loss: {avg_val_loss:.4f} | Val Acc: {val_acc:.3f}' if test_loader else ''}")
+                print(f"[Epoch {epoch + 1}/{epochs}] Train Loss: {avg_train_loss:.4f} {f'| Val Loss: {avg_val_loss:.4f} | Val Acc: {val_acc:.3f}' if test_loader is not None else ''}")
             
             # Early stopping
-            monitor_loss = avg_val_loss if test_loader else avg_train_loss
+            monitor_loss = avg_val_loss if test_loader is not None else avg_train_loss
             if epoch >= warmup:
                 if monitor_loss < best_loss - min_delta:
                     best_loss = monitor_loss
@@ -318,11 +397,18 @@ class BinaryVQC(nn.Module):
         self.train_losses = train_losses
         self.val_losses = val_losses
         self.best_loss = best_loss
+
+    @property
+    def weight(self):
+        if hasattr(self, "val_report"):
+            w = self.val_report['macro avg']['f1-score']
+            return min(max(w, 0.01), 1.0)
+        return 1.0
     
     def predict_proba(self, X: torch.Tensor) -> torch.Tensor:
         self.eval()
         with torch.no_grad():
-            return self(X.to(self.device)).cpu()
+            return self(X.to(self.cuda_device)).cpu()
 
     def predict(self, X: torch.Tensor) -> torch.Tensor:
         return (self.predict_proba(X) > 0.5).long()
@@ -331,18 +417,19 @@ class BinaryVQC(nn.Module):
         preds = self.predict(X)
         return accuracy_score(y, preds)
 
-class QuECOC:
+class QuantumECOC:
     """
     Quantum Error-Correcting Output Codes ensemble classifier for multi-class classification using binary variational quantum classifiers as base learners.
     """
-    def __init__(self, n_learners: int = None, device: qml.Device = None, **kwargs):
-        self.n_learners = n_learners
+    def __init__(self, n_learners: int = None, templates: int | str | list[int | str] = None, device: qml.Device = None, scaler_range: tuple[float, float] = (0, np.pi)):
+        self.n_learners = len(templates) if isinstance(templates, list) else n_learners
+        self.templates = templates
 
         self.cuda_device = "cpu"
         self.qml_device = device if device else qml.device("default.qubit", wires=2)
         self.classifiers = []
 
-        self.kwargs = kwargs
+        self.scaler = MinMaxScaler(feature_range=scaler_range)
 
     def to(self, device):
         self.cuda_device = device
@@ -350,89 +437,81 @@ class QuECOC:
             clf.to(device)
         return self
     
-    def initialise(self):
-        self.ecoc = build_ecoc_matrix(len(self.labels), self.n_learners)
-        for i in range(self.n_learners):
-            qlayer, circuit, weight_shapes, n_features = reuploading_qlayer(
-                n_qubits=self.kwargs.get("n_qubits", 2),
-                feats_per_qubit=self.kwargs.get("feats_per_qubit", 2),
-                device=self.qml_device,
-                reuploads=self.kwargs.get("reuploads", 2),
-                entangle_between_reuploads=self.kwargs.get("entangle_between_reuploads", True),
-                trainable_layers=self.kwargs.get("trainable_layers", 2),
-                ranges=self.kwargs.get("ranges", 1),
-                rot_gates=self.kwargs.get("rot_gates", [qml.RX, qml.RZ]),
-                ent_gate=self.kwargs.get("ent_gate", qml.CZ),
-                measurement_wires=self.kwargs.get("measurement_wires", [0])
-            )
-            clf = BinaryVQC(qlayer).to(self.cuda_device)
-            clf.n_qubits = self.kwargs.get("n_qubits", 2)
-            clf.weight_shapes = weight_shapes
-            clf.n_features = n_features
-            self.classifiers.append(clf)
-
-    def fit(self, X: DataFrame, y: Series, X_test: DataFrame = None, y_test: Series = None, scaler_range: tuple = (0, np.pi), plot: bool = False, verbose: bool = False, **fit_params):
+    def initialise_ensemble(self, X: DataFrame, y: Series, verbose: bool):
         self.features = X.columns.tolist()
         self.features_to_int = {feat: idx for idx, feat in enumerate(self.features)}
         self.int_to_features = {idx: feat for idx, feat in enumerate(self.features)}
         if verbose:
             print(f"Feature mapping: {self.features_to_int}")
-        
-        self.scaler = MinMaxScaler(feature_range=scaler_range)
-        X = self.scaler.fit_transform(X)
 
-        if X_test is not None:
-            X_test = self.scaler.transform(X_test)
-        
         self.labels = sorted(y.unique())
         self.label_to_int = {label: idx for idx, label in enumerate(self.labels)}
         self.int_to_label = {idx: label for idx, label in enumerate(self.labels)}
         if verbose:
             print(f"Label mapping: {self.label_to_int}")
-        y = y.map(self.label_to_int)
-
-        if y_test is not None:
-            y_test = y_test.map(self.label_to_int)
 
         if self.n_learners is None:
             self.n_learners = 2 * len(self.labels)
-        self.initialise()
 
+        self.ecoc = build_ecoc_matrix(len(self.labels), self.n_learners)
+        self.feat_map = None
+
+    def initialise_classifiers(self):
+        if self.templates is not None:
+            if isinstance(self.templates, int) or isinstance(self.templates, str):
+                self.templates = [self.templates] * self.n_learners
+            else:
+                if len(self.templates) != self.n_learners:
+                    raise ValueError(f"Length of templates does not match n_learners. Got {len(self.templates)} templates and n_learners={self.n_learners}.")
+            self.classifiers = [BinaryVQC(self.qml_device, learner).to(self.cuda_device) for learner in self.templates]
+        else:
+            self.classifiers = [BinaryVQC(self.qml_device).to(self.cuda_device) for _ in range(self.n_learners)]
+        
         # pick a list of random features for each classifier
-        feats = [i for i in range(X.shape[1])]
-        total_feats_needed = self.kwargs.get("n_qubits", 2) * self.kwargs.get("feats_per_qubit", 2) * self.n_learners
-        final_feats = feats.copy()
-        while len(final_feats) < total_feats_needed:
-            np.random.shuffle(feats)
-            final_feats += feats
+        if self.feat_map is None:
+            feats = [i for i in range(len(self.features))]
+            total_feats_needed = sum(clf.n_features for clf in self.classifiers)
+            final_feats = feats.copy()
+            while len(final_feats) < total_feats_needed:
+                np.random.shuffle(feats)
+                final_feats += feats
+            self.feat_map = [[final_feats.pop() for _ in range(clf.n_features)] for clf in self.classifiers]
 
+        for i, clf in enumerate(self.classifiers):
+            clf.feats = self.feat_map[i]
+            clf.code = self.ecoc[i]
+
+    def train_ensemble(self, X: np.ndarray, y: Series, X_test: np.ndarray, y_test: Series, plot: bool, verbose: bool, **fit_params):
         for i, clf in enumerate(self.classifiers):
             if verbose:
                 print(f"\nTraining classifier {i + 1}/{self.n_learners}")
 
-            clf.feats = [final_feats.pop() for _ in range(clf.n_features)]
-            X_tr = torch.tensor(np.array([X[:, feat] for feat in clf.feats]).T, dtype=torch.float32).to(self.cuda_device)
+            y_train = y.apply(lambda x: clf.code[x])
 
-            if X_test is not None:
-                X_te = torch.tensor(np.array([X_test[:, feat] for feat in clf.feats]).T, dtype=torch.float32).to(self.cuda_device)
+            k = min(min(max(len(X)//2, 512), 2048), len(X)) / len(X)
+            if verbose:
+                print(f"Using {k*len(X)}//{len(X)} samples")
+            if k >= 1.0:
+                samples = np.arange(len(X))
+            else:
+                samples, _ = train_test_split(range(len(X)), train_size=k, stratify=y_train)
 
-            code = self.ecoc[i]
-            y_train = y.apply(lambda x: code[x])
-            y_tr = torch.tensor(y_train.values, dtype=torch.long).to(self.cuda_device)
+            X_tr = torch.tensor(np.array([X[samples, feat] for feat in clf.feats]).T, dtype=torch.float32).to(self.cuda_device)
+            y_tr = torch.tensor(y_train.iloc[samples].values, dtype=torch.long).to(self.cuda_device)
+            trainloader = DataLoader(TensorDataset(X_tr, y_tr), batch_size=64, shuffle=True)
 
             if X_test is not None and y_test is not None:
-                y_te = torch.tensor(y_test.apply(lambda x: code[x]).values, dtype=torch.long).to(self.cuda_device)
-                testloader = DataLoader(TensorDataset(X_te, y_te), batch_size=32, shuffle=False)
+                X_te = torch.tensor(np.array([X_test[:, feat] for feat in clf.feats]).T, dtype=torch.float32).to(self.cuda_device)
+                y_te = torch.tensor(y_test.apply(lambda x: clf.code[x]).values, dtype=torch.long).to(self.cuda_device)
+                testloader = DataLoader(TensorDataset(X_te, y_te), batch_size=64, shuffle=False)
             else:
                 testloader = None
 
-            trainloader = DataLoader(TensorDataset(X_tr, y_tr), batch_size=32, shuffle=True)
-
             clf.fit(trainloader, testloader, title_prefix=f"Classifier {i + 1}/{self.n_learners}: ", plot=plot, verbose=verbose, **fit_params)
 
-            if testloader:
+            if testloader is not None:
                 clf.val_probs = clf.predict_proba(X_te)
-                clf.val_report = classification_report(y_test.apply(lambda x: code[x]), (clf.val_probs > 0.5).long(), zero_division=0, output_dict=True)
+                clf.val_report = classification_report(y_test.apply(lambda x: clf.code[x]), (clf.val_probs > 0.5).long(), zero_division=0, output_dict=True)
 
         if plot:
             clear_output(wait=True)
@@ -450,16 +529,36 @@ class QuECOC:
         if verbose:
             print(f"\nTotal training time after fitting {self.n_learners} classifiers: {sum(clf.training_time for clf in self.classifiers):.2f} seconds")
 
+    def fit(self, X: DataFrame, y: Series, X_test: DataFrame = None, y_test: Series = None, plot: bool = False, verbose: bool = False, **fit_params):
+        self.initialise_ensemble(X, y, verbose)
+        self.initialise_classifiers()
+
+        X = self.scaler.fit_transform(X)
+        if X_test is not None:
+            X_test = self.scaler.transform(X_test)
+
+        y = y.map(self.label_to_int)
+        if y_test is not None:
+            y_test = y_test.map(self.label_to_int)
+
+        self.train_ensemble(X, y, X_test, y_test, plot, verbose, **fit_params)
+
+    @property
+    def learner_weights(self):
+        if all(hasattr(clf, "weight") for clf in self.classifiers):
+            return [clf.weight for clf in self.classifiers]
+        return None
+
     def predict(self, X: DataFrame) -> np.ndarray:
         X = self.scaler.transform(X)
         with torch.no_grad():
-            final_preds = np.array([[0] * len(self.labels)] * len(X))
-            for i, clf in enumerate(self.classifiers):
+            final_preds = np.array([[0.0] * len(self.labels)] * len(X))
+            for clf in self.classifiers:
                 X_tr = torch.tensor(np.array([X[:, feat] for feat in clf.feats]).T, dtype=torch.float32).to(self.cuda_device)
 
                 preds = clf.predict(X_tr)
                 for j, pred in enumerate(preds):
-                    final_preds[j][self.ecoc[i] == pred.item()] += 1
+                    final_preds[j][clf.code == pred.item()] += clf.weight
 
             return [self.int_to_label[pred.item()] for pred in np.array(final_preds).argmax(axis=1)]
     
@@ -467,49 +566,134 @@ class QuECOC:
         X = self.scaler.transform(X)
         with torch.no_grad():
             final_preds = np.array([[0.0] * len(self.labels)] * len(X))
-            for i, clf in enumerate(self.classifiers):
+            for clf in self.classifiers:
                 X_tr = torch.tensor(np.array([X[:, feat] for feat in clf.feats]).T, dtype=torch.float32).to(self.cuda_device)
 
                 p1 = clf.predict_proba(X_tr).numpy()
                 p0 = 1.0 - p1
 
-                final_preds[:, self.ecoc[i] == 0] += p0[:, None]
-                final_preds[:, self.ecoc[i] == 1] += p1[:, None]
+                final_preds[:, clf.code == 0] += p0[:, None] * clf.weight
+                final_preds[:, clf.code == 1] += p1[:, None] * clf.weight
 
-            return np.array(final_preds) / self.n_learners
+            return final_preds / sum(clf.weight for clf in self.classifiers)
     
     def score(self, X: DataFrame, y: Series) -> float:
         preds = self.predict(X)
         return accuracy_score(y.values, preds)
 
-class CsQuECOC(QuECOC):
+class StackedECOC(QuantumECOC):
     """
-    Classical Stacked Quantum Error-Correcting Output Codes ensemble that extends QuECOC by adding a classical meta-learner on top of the quantum base learners.
+    Stacked Quantum Ensemble that extends QuantumECOC by adding a meta-learner on top of the quantum base learners.
     """
-    def __init__(self, meta_learner = None, n_learners: int = None, device: qml.Device = None, **kwargs):
-        super().__init__(n_learners, device, **kwargs)
-        self.meta_learner = meta_learner if meta_learner is not None else SVC(kernel="rbf", class_weight='balanced', random_state=2)
+    def __init__(self, meta_learner = None, n_learners: int = None, templates: list[int | str] = None, device: qml.Device = None, **kwargs):
+        super().__init__(n_learners, templates, device, **kwargs)
+        self.meta_learner = meta_learner if meta_learner is not None else SVC(kernel="rbf", random_state=2)
 
-    def fit(self, X: DataFrame, y: Series, plot: bool = False, verbose: bool = False, **fit_params):
-        X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3, random_state=2, stratify=y)
-        super().fit(X_train, y_train, X_val, y_val, plot=plot, verbose=verbose, **fit_params)
+    def fit(self, X: DataFrame, y: Series, X_test: DataFrame = None, y_test: Series = None, k_folds: int = 5, plot: bool = False, verbose: bool = False, **fit_params):
+        self.initialise_ensemble(X, y, verbose=verbose)
 
-        meta_X_train = np.array([clf.val_probs for clf in self.classifiers]).T
-        self.meta_learner.fit(meta_X_train, y_val.map(self.label_to_int))
+        class_samples = y.value_counts()
+        k_folds = min(k_folds, class_samples.min())
+        if k_folds > 1:
+            X_meta = np.zeros((len(X), self.n_learners))
+            skf = StratifiedKFold(n_splits=k_folds, shuffle=True, random_state=2)
+            for f, (train_index, val_index) in enumerate(skf.split(X, y)):
+                if verbose:
+                    print(f"\nFold {f + 1}/{k_folds}")
+                
+                X_train, X_val = X.iloc[train_index], X.iloc[val_index]
+                y_train, y_val = y.iloc[train_index], y.iloc[val_index]
+
+                self.initialise_classifiers()
+
+                fold_scaler = MinMaxScaler(feature_range=self.scaler.feature_range)
+                X_train = fold_scaler.fit_transform(X_train)
+                X_val = fold_scaler.transform(X_val)
+
+                y_train = y_train.map(self.label_to_int)
+                y_val = y_val.map(self.label_to_int)
+
+                self.train_ensemble(X_train, y_train, X_val, y_val, plot=False, verbose=False, **fit_params)
+
+                X_fold = np.array([
+                    clf.val_probs.numpy() # maybe * clf.weight later
+                    for clf in self.classifiers
+                ]).T
+
+                X_meta[val_index, :] = X_fold
+            self.meta_learner.fit(X_meta, y.map(self.label_to_int))
+
+            self.initialise_classifiers()
+
+            X = self.scaler.fit_transform(X)
+            if X_test is not None:
+                X_test = self.scaler.transform(X_test)
+
+            y = y.map(self.label_to_int)
+            if y_test is not None:
+                y_test = y_test.map(self.label_to_int)
+
+            self.train_ensemble(X, y, X_test, y_test, plot, verbose, **fit_params)
+        else:
+            X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3, random_state=2, stratify=y)
+            
+            X_train = self.scaler.fit_transform(X_train)
+            X_val = self.scaler.transform(X_val)
+
+            y_train = y_train.map(self.label_to_int)
+            y_val = y_val.map(self.label_to_int)
+
+            self.initialise_classifiers()
+            self.train_ensemble(X_train, y_train, X_val, y_val, plot, verbose, **fit_params)
+
+            X_meta = np.array([clf.val_probs for clf in self.classifiers]).T
+            self.meta_learner.fit(X_meta, y_val)
 
     def predict(self, X: DataFrame) -> np.ndarray:
         X = self.scaler.transform(X)
-        meta_X = np.array([clf.predict_proba(torch.tensor(np.array([X[:, feat] for feat in clf.feats]).T, dtype=torch.float32).to(self.cuda_device)) for clf in self.classifiers]).T
+        meta_X = np.array(
+            [
+                clf.predict_proba(
+                    torch.tensor(
+                        np.array([X[:, feat] for feat in clf.feats]).T,
+                        dtype=torch.float32
+                    ).to(self.cuda_device)
+                ) for clf in self.classifiers
+            ]
+        ).T
         return [self.int_to_label[pred] for pred in self.meta_learner.predict(meta_X)]
     
     def predict_proba(self, X: DataFrame) -> np.ndarray:
         X = self.scaler.transform(X)
-        meta_X = np.array([clf.predict_proba(torch.tensor(np.array([X[:, feat] for feat in clf.feats]).T, dtype=torch.float32).to(self.cuda_device)) for clf in self.classifiers]).T
+        meta_X = np.array(
+            [
+                clf.predict_proba(
+                    torch.tensor(
+                        np.array([X[:, feat] for feat in clf.feats]).T,
+                        dtype=torch.float32
+                    ).to(self.cuda_device)
+                ) for clf in self.classifiers
+            ]
+        ).T
         return self.meta_learner.predict_proba(meta_X)
     
     def score(self, X: DataFrame, y: Series) -> float:
         preds = self.predict(X)
         return accuracy_score(y.values, preds)
+    
+class MetaVQC:
+    """
+    Quantum meta-learner for StackedECOC that takes the outputs of the base learners as input and learns to optimally combine their predictions.
+    """
+    def __init__(self):
+        pass
+
+class CoherentECOC(QuantumECOC):
+    """
+    Measurement Free Quantum Ensemble that extends QuantumECOC by combining the outputs of the base learners without collapsing their quantum states.
+    """
+    def __init__(self, n_learners: int = None, templates: list[int | str] = None, device: qml.Device = None, **kwargs):
+        super().__init__(n_learners, templates, device, **kwargs)
 
 if __name__ == "__main__":
     import prince
@@ -556,6 +740,21 @@ if __name__ == "__main__":
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=2, stratify=y)
 
-    CQens = CsQuECOC(feats_per_qubit=3, reuploads=3, trainable_layers=[1,2,3]).to("cpu")
-    CQens.fit(X_train, y_train, epochs=200, plot=False, verbose=True)
-    print(f"CsQuECOC Classification Report:\n{classification_report(y_test, CQens.predict(X_test), zero_division=0)}\n")
+    # ens = QuantumECOC().to("cpu")
+    # ens.fit(X_train, y_train, X_test, y_test, epochs=200, plot=False, verbose=True)
+    # print(f"QuantumECOC Classification Report:\n{classification_report(y_test, ens.predict(X_test), zero_division=0)}\n")
+
+    ens = StackedECOC().to("cpu")
+    ens.fit(X_train, y_train, X_test, y_test, epochs=200, plot=False, verbose=True)
+    print(f"StackedECOC Classification Report:\n{classification_report(y_test, ens.predict(X_test), zero_division=0)}\n")
+
+    plt.figure(figsize=(10, 6))
+    for j, clf in enumerate(ens.classifiers):
+        plt.plot(clf.val_losses, label=f"Classifier {j + 1} (Code: {ens.ecoc[j]})")
+    plt.xlabel("Epoch")
+    plt.ylabel("Validation Loss")
+    plt.title("Validation Loss for Each Classifier")
+    plt.xlim(0, max(1, max(len(clf.val_losses) for clf in ens.classifiers) - 1))
+    plt.legend()
+    plt.grid(True)
+    plt.show()
