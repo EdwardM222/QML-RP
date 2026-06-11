@@ -20,6 +20,12 @@ warnings.filterwarnings(
     category=qml.exceptions.PennyLaneDeprecationWarning,
     module=r"pennylane\.operation",
 )
+warnings.filterwarnings(
+    "ignore",
+    message=r"Using 'id' to add a custom label to your operator is deprecated\.",
+    category=qml.exceptions.PennyLaneDeprecationWarning,
+    module=r"pennylane\.operation",
+)
 from typeguard import typechecked
 
 class ValReport(dict):
