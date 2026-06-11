@@ -708,7 +708,7 @@ class StackedECOC(QuantumECOC):
             self,
             meta_learner = None,
             n_learners: int | None = None,
-            templates: list[int | str] | None = None,
+            templates: int | str | list[int | str] | None = None,
             ecoc_depth: int = 2,
             device: qml.devices.Device | None = None,
             **kwargs
@@ -763,7 +763,7 @@ class StackedECOC(QuantumECOC):
 
             if verbose:
                 print("\nTraining meta-learner...")
-            self.meta_learner.fit(np.array(X_meta), np.array(y_meta), verbose=verbose)
+            self.meta_learner.fit(np.array(X_meta), np.array(y_meta))
 
             if verbose:
                 print("\nTraining final ensemble on full dataset...")
@@ -797,7 +797,7 @@ class StackedECOC(QuantumECOC):
 
             if verbose:
                 print("\nTraining meta-learner...")
-            self.meta_learner.fit(X_meta, np.array(y_val), verbose=verbose)
+            self.meta_learner.fit(X_meta, np.array(y_val))
 
         self.training_time = time.time() - start_time
         if verbose:
