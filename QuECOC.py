@@ -89,8 +89,8 @@ def reuploading_qlayer(
     device: qml.devices.Device,
     reuploads: int = 2,
     entangle_between_reuploads: bool = True,
-    trainable_layers: int | list[int] = None,
-    ranges: int | list[int] | list[list[int]] = 1,
+    trainable_layers: int | list[int] = 1,
+    ranges: int | list[int] = 1,
     rot_gates: list[type[qml.RX]] | None = None,
     ent_gate: type[qml.CZ] = qml.CZ,
     measurement_wires: list[int] | None = None,
@@ -112,8 +112,6 @@ def reuploading_qlayer(
 
     n_features = n_qubits * feats_per_qubit
 
-    if trainable_layers is None:
-        trainable_layers = [0] * (reuploads - 1) + [2]
     if isinstance(trainable_layers, int):
         if entangle_between_reuploads:
            trainable_layers = [trainable_layers] * reuploads
@@ -136,15 +134,12 @@ def reuploading_qlayer(
     
     if isinstance(ranges, int):
         ranges = [ranges] * reuploads
-    elif len(ranges) != reuploads:
-        raise ValueError(
-            f"`ranges` must be either an int or a list of length equal to `reuploads`. "
-            f"Got ranges={ranges} and reuploads={reuploads}."
-        )
-
+    elif not entangle_between_reuploads and len(ranges) == trainable_layers[-1]:
+        ranges = [0] * (reuploads - 1) + [ranges] 
+    
     if len(ranges) != reuploads:
         raise ValueError(
-            f"`ranges` must have length equal to `reuploads`. "
+            f"`ranges` must be either an int or a list of length equal to `reuploads`. "
             f"Got len(ranges)={len(ranges)} and reuploads={reuploads}."
         )
     
@@ -155,8 +150,8 @@ def reuploading_qlayer(
         measurement_wires = [0]
 
     def feature_block(inputs):
-        for q in range(n_qubits):
-            for f in range(feats_per_qubit):
+        for f in range(feats_per_qubit):
+            for q in range(n_qubits):
                 feature_idx = (q * feats_per_qubit + f) % inputs.shape[-1]
                 gate = rot_gates[f % len(rot_gates)]
                 gate(inputs[..., feature_idx], wires=q, id=f"f{feature_idx}")
@@ -173,8 +168,10 @@ def reuploading_qlayer(
             )
         
         for layer in range(repeats):
-            for q in range(n_qubits):
-                if trainable_layers > 0:
+            if trainable_layers > 0:
+                if layer == 0:
+                    qml.Barrier(wires=range(n_qubits), only_visual=True)
+                for q in range(n_qubits):
                     # Apply trainable Rot gates for this layer
                     for g, gate in enumerate(rot_gates):
                         gate(weights[start_idx + layer, q, g], wires=q, id=f"l{start_idx + layer}g{g}")
@@ -193,15 +190,13 @@ def reuploading_qlayer(
                     ent_gate(wires=[control, target])
 
                 if n_qubits > 2:
-                    ent_gate(wires=[n_qubits - 1, 0])
+                    ent_gate(wires=[n_qubits - 1, ranges[layer] - 1])
 
     @qml.qnode(device, interface="torch", diff_method="best")
     def circuit(inputs, weights):
         layer_idx = 0
         for r in range(reuploads):
             feature_block(inputs)
-            if r == reuploads - 1:
-                qml.Barrier(wires=range(n_qubits), only_visual=True)
             if entangle_between_reuploads or r == reuploads - 1:
                 strongly_entangling_block(weights, trainable_layers[r], ranges[r], layer_idx)
             layer_idx += trainable_layers[r]
@@ -805,9 +800,9 @@ class StackedECOC(QuantumECOC):
                 print("\nTraining meta-learner...")
             self.meta_learner.fit(X_meta, np.array(y_val))
 
-        self.training_time = time.time() - start_time
+        self.training_time = TimeInt(time.time() - start_time)
         if verbose:
-            print(f"\nTotal training time after fitting {self.n_learners} classifiers across {k_folds} folds: {self.training_time:.2f} seconds")
+            print(f"\nTotal training time after fitting {self.n_learners} classifiers across {k_folds} folds: {self.training_time}")
 
     def predict(self, X: DataFrame) -> np.ndarray:
         X_s = self.scaler.transform(X)
