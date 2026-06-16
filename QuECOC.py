@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 from IPython.display import clear_output
 from pandas import DataFrame, Series
 from itertools import product
+from random import sample, choices
 import  warnings
 warnings.filterwarnings(
     "ignore",
@@ -217,7 +218,7 @@ class VQC(nn.Module):
             self,
             qml_device: str | qml.devices.Device,
             n_classes: int = 2,
-            template: int | str | None = None,
+            template: int | str = 0,
             **kwargs
         ):
         super().__init__()
@@ -530,7 +531,7 @@ class QuantumECOC:
     def __init__(
         self,
         n_learners: int | None = None,
-        templates: int | str | list[int | str] | None = None,
+        templates: int | str | list[int | str] = 0,
         ecoc_depth: int = 2,
         device: str = "default.qubit",
         scaler_range: tuple[float, float] = (0, np.pi)
@@ -569,47 +570,32 @@ class QuantumECOC:
 
         self.ecoc = build_ecoc_matrix(len(self.labels), self.n_learners, self.ecoc_depth)
 
-    def initialise_classifiers(self):
-        if self.templates is not None:
-            if isinstance(self.templates, int) or isinstance(self.templates, str):
-                self.templates = [self.templates] * self.n_learners
-            else:
-                if len(self.templates) != self.n_learners:
-                    raise ValueError(f"Length of templates does not match n_learners. Got {len(self.templates)} templates and n_learners={self.n_learners}.")
-            self.classifiers = [VQC(self.qml_device, len(set(self.ecoc[i])), learner).to(self.cuda_device) for i, learner in enumerate(self.templates)]
-        else:
-            self.classifiers = [VQC(self.qml_device, len(set(self.ecoc[i]))).to(self.cuda_device) for i in range(self.n_learners)]
-        
-        # pick a list of random features for each classifier
-        if self.feat_map is None:
-            feats = [i for i in range(len(self.features))]
-            total_feats_needed = sum(clf.n_features for clf in self.classifiers)
-            final_feats = feats.copy()
-            while len(final_feats) < total_feats_needed:
-                np.random.shuffle(feats)
-                final_feats += feats
-            self.feat_map = [[final_feats.pop() for _ in range(clf.n_features)] for clf in self.classifiers]
-
-        for i, clf in enumerate(self.classifiers):
-            clf.feats = self.feat_map[i]
-            clf.code = self.ecoc[i]
+        if isinstance(self.templates, int) or isinstance(self.templates, str):
+            self.templates = [self.templates] * self.n_learners
+        elif len(self.templates) != self.n_learners:
+            raise ValueError(f"Length of templates does not match n_learners. Got {len(self.templates)} templates and n_learners={self.n_learners}.")
 
     def train_ensemble(
-            self,
-            X: np.ndarray,
-            y: Series,
-            X_test: np.ndarray,
-            y_test: Series,
-            bagging: tuple[float, int, int] | None,
-            parallel: bool,
-            n_jobs: int,
-            plot: bool, verbose: bool,
-            fold: int = 0,
-            **fit_params
-        ):
-        for i, clf in enumerate(self.classifiers):
+        self,
+        X: np.ndarray,
+        y: Series,
+        X_test: np.ndarray,
+        y_test: Series,
+        bagging: tuple[float, int, int] | None,
+        parallel: bool,
+        n_jobs: int,
+        plot: bool, verbose: bool,
+        fold: int = 0,
+        **fit_params
+    ):
+        for i, template in enumerate(self.templates):
             if verbose:
                 print(f"\nTraining classifier {i + 1}/{self.n_learners}")
+
+            clf = VQC(qml_device=self.qml_device, n_classes=len(set(self.ecoc[i])), template=template)
+            
+            clf.code = self.ecoc[i]
+            clf.feats = choices(range(X.shape[1]), k=clf.n_features)
 
             y_train = y.apply(lambda x: clf.code[x])
 
@@ -630,10 +616,6 @@ class QuantumECOC:
             y_te = y_test.apply(lambda x: clf.code[x]).values
 
             clf.fit(X_tr, y_tr, X_te, y_te, title_prefix=f"Classifier {i + 1}/{self.n_learners}: ", plot=plot, verbose=verbose, **fit_params)
-
-            if X_te is not None and y_te is not None:
-                clf.val_probs = clf.predict_proba(X_te)
-                clf.val_report = ValReport(classification_report(y_test.apply(lambda x: clf.code[x]), clf.val_probs.argmax(axis=1), zero_division=0, output_dict=True))
 
         if plot:
             clear_output(wait=True)
