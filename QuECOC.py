@@ -523,6 +523,98 @@ class VQC(nn.Module):
         preds = self.predict(X)
         return accuracy_score(y, preds)
 
+def _series_or_array_to_numpy(values):
+    """Return a NumPy array without requiring pandas objects in worker jobs."""
+    if values is None:
+        return None
+    if hasattr(values, "to_numpy"):
+        return values.to_numpy()
+    return np.asarray(values)
+
+def _fit_vqc_job(job: dict) -> dict:
+    """
+    Multiprocessing-safe VQC training job.
+
+    The parent process must not send an already-initialised VQC, qml.Device,
+    QNode, or TorchLayer here because those objects are not reliably picklable.
+    Instead, this function receives only simple, picklable construction data,
+    recreates the VQC inside the child process, fits it, and returns a CPU
+    state_dict plus metadata that the parent can load back into its own VQC.
+    """
+    idx = int(job["idx"])
+    code = np.asarray(job["code"], dtype=int)
+    feats = list(job["feats"])
+
+    X = np.asarray(job["X"])
+    y = np.asarray(job["y"], dtype=int)
+    X_test = None if job.get("X_test") is None else np.asarray(job["X_test"])
+    y_test = None if job.get("y_test") is None else np.asarray(job["y_test"], dtype=int)
+
+    bagging = job.get("bagging")
+    fold = int(job.get("fold", 0))
+
+    # Recreate the VQC inside the worker process. qml_device should be a string,
+    # e.g. "default.qubit", not an already-created qml.device instance.
+    clf = VQC(
+        job["qml_device"],
+        n_classes=int(job["n_classes"]),
+        template=job["template"],
+        **job.get("vqc_kwargs", {}),
+    ).to(job.get("cuda_device", "cpu"))
+
+    clf.code = code
+    clf.feats = feats
+
+    y_train_all = code[y]
+
+    if bagging is None:
+        k = 1.0
+    else:
+        k = min(min(max(len(X) * bagging[0], bagging[1]), bagging[2]), len(X)) / len(X)
+
+    if k >= 1.0:
+        samples = np.arange(len(X))
+    else:
+        samples, _ = train_test_split(
+            np.arange(len(X)),
+            train_size=k,
+            stratify=y_train_all,
+            random_state=2 + idx + (1000 * fold),
+        )
+
+    X_tr = X[samples][:, feats]
+    y_tr = y_train_all[samples]
+
+    if X_test is not None and y_test is not None:
+        X_te = X_test[:, feats]
+        y_te = code[y_test]
+    else:
+        X_te = None
+        y_te = None
+
+    fit_params = dict(job.get("fit_params", {}))
+    fit_params["plot"] = False  # never plot from child processes
+    fit_params["verbose"] = bool(job.get("verbose", False))
+    fit_params["title_prefix"] = f"Classifier {idx + 1}: "
+
+    clf.fit(X_tr, y_tr, X_te, y_te, **fit_params)
+
+    result = {
+        "idx": idx,
+        "state_dict": {k: v.detach().cpu() for k, v in clf.state_dict().items()},
+        "train_losses": getattr(clf, "train_losses", None),
+        "val_losses": getattr(clf, "val_losses", None),
+        "best_loss": getattr(clf, "best_loss", None),
+        "training_time": getattr(clf, "training_time", None),
+    }
+
+    if hasattr(clf, "val_probs"):
+        result["val_probs"] = clf.val_probs
+    if hasattr(clf, "val_report"):
+        result["val_report"] = dict(clf.val_report)
+
+    return result
+
 @typechecked
 class QuantumECOC:
     """
@@ -579,6 +671,7 @@ class QuantumECOC:
                     raise ValueError(f"Length of templates does not match n_learners. Got {len(self.templates)} templates and n_learners={self.n_learners}.")
             self.classifiers = [VQC(self.qml_device, len(set(self.ecoc[i])), learner).to(self.cuda_device) for i, learner in enumerate(self.templates)]
         else:
+            self.templates = [0] * self.n_learners
             self.classifiers = [VQC(self.qml_device, len(set(self.ecoc[i]))).to(self.cuda_device) for i in range(self.n_learners)]
         
         for i, clf in enumerate(self.classifiers):
@@ -586,43 +679,178 @@ class QuantumECOC:
             clf.feats = choices(range(X.shape[1]), k=clf.n_features)
             self.feat_map.append(clf.feats)
 
+    def _fit_single_classifier_sequential(
+        self,
+        i: int,
+        clf: VQC,
+        X: np.ndarray,
+        y: Series | np.ndarray,
+        X_test: np.ndarray | None,
+        y_test: Series | np.ndarray | None,
+        bagging: tuple[float, int, int] | None,
+        plot: bool,
+        verbose: bool,
+        fold: int,
+        **fit_params
+    ):
+        y_arr = _series_or_array_to_numpy(y).astype(int)
+        y_train = clf.code[y_arr]
+
+        if bagging is None:
+            k = 1.0
+        else:
+            k = min(min(max(len(X) * bagging[0], bagging[1]), bagging[2]), len(X)) / len(X)
+
+        if verbose:
+            print(f"Using {int(k * len(X))}/{len(X)} samples")
+
+        if k >= 1.0:
+            samples = np.arange(len(X))
+        else:
+            samples, _ = train_test_split(
+                np.arange(len(X)),
+                train_size=k,
+                stratify=y_train,
+                random_state=2 + i + (1000 * fold),
+            )
+
+        X_tr = X[samples][:, clf.feats]
+        y_tr = y_train[samples]
+
+        if X_test is not None and y_test is not None:
+            y_test_arr = _series_or_array_to_numpy(y_test).astype(int)
+            X_te = X_test[:, clf.feats]
+            y_te = clf.code[y_test_arr]
+        else:
+            X_te = None
+            y_te = None
+
+        clf.fit(
+            X_tr,
+            y_tr,
+            X_te,
+            y_te,
+            title_prefix=f"Classifier {i + 1}/{self.n_learners}: ",
+            plot=plot,
+            verbose=verbose,
+            **fit_params,
+        )
+
+    def _make_parallel_jobs(
+        self,
+        X: np.ndarray,
+        y: Series | np.ndarray,
+        X_test: np.ndarray | None,
+        y_test: Series | np.ndarray | None,
+        bagging: tuple[float, int, int] | None,
+        fold: int,
+        verbose: bool,
+        fit_params: dict,
+    ) -> list[dict]:
+        y_arr = _series_or_array_to_numpy(y).astype(int)
+        y_test_arr = None if y_test is None else _series_or_array_to_numpy(y_test).astype(int)
+
+        jobs = []
+        for i, clf in enumerate(self.classifiers):
+            jobs.append({
+                "idx": i,
+                "qml_device": self.qml_device,
+                "cuda_device": "cpu",  # safest for multi-process VQC training
+                "template": self.templates[i],
+                "n_classes": len(set(self.ecoc[i])),
+                "vqc_kwargs": getattr(clf, "kwargs", {}),
+                "code": self.ecoc[i].copy(),
+                "feats": list(self.feat_map[i]),
+                "X": X,
+                "y": y_arr,
+                "X_test": X_test,
+                "y_test": y_test_arr,
+                "bagging": bagging,
+                "fold": fold,
+                "fit_params": fit_params,
+                "verbose": verbose,
+            })
+        return jobs
+
+    def _load_parallel_result(self, result: dict):
+        clf = self.classifiers[result["idx"]]
+        clf.load_state_dict(result["state_dict"])
+        clf.train_losses = result.get("train_losses")
+        clf.val_losses = result.get("val_losses")
+        clf.best_loss = result.get("best_loss")
+
+        if result.get("training_time") is not None:
+            clf.training_time = result["training_time"]
+        if "val_probs" in result:
+            clf.val_probs = result["val_probs"]
+        if "val_report" in result:
+            clf.val_report = ValReport(result["val_report"])
 
     def train_ensemble(
         self,
         X: np.ndarray,
-        y: Series,
-        X_test: np.ndarray,
-        y_test: Series,
-        bagging: tuple[float, int, int] | None,
-        parallel: bool,
-        n_jobs: int,
-        plot: bool, verbose: bool,
+        y: Series | np.ndarray,
+        X_test: np.ndarray | None = None,
+        y_test: Series | np.ndarray | None = None,
+        bagging: tuple[float, int, int] | None = None,
+        parallel: bool = False,
+        n_jobs: int = -1,
+        plot: bool = False,
+        verbose: bool = False,
         fold: int = 0,
         **fit_params
     ):
-        for i, clf in enumerate(self.classifiers):
-            if verbose:
-                print(f"\nTraining classifier {i + 1}/{self.n_learners}")
+        if not parallel:
+            for i, clf in enumerate(self.classifiers):
+                if verbose:
+                    print(f"\nTraining classifier {i + 1}/{self.n_learners}")
 
-            y_train = y.apply(lambda x: clf.code[x])
+                self._fit_single_classifier_sequential(
+                    i=i,
+                    clf=clf,
+                    X=X,
+                    y=y,
+                    X_test=X_test,
+                    y_test=y_test,
+                    bagging=bagging,
+                    plot=plot,
+                    verbose=verbose,
+                    fold=fold,
+                    **fit_params,
+                )
+        else:
+            from concurrent.futures import ProcessPoolExecutor, as_completed
+            import os
 
-            if bagging is None:
-                k = 1.0
-            else:
-                k = min(min(max(len(X)*bagging[0], bagging[1]), bagging[2]), len(X)) / len(X)
-            if verbose:
-                print(f"Using {int(k*len(X))}/{len(X)} samples")
-            if k >= 1.0:
-                samples = np.arange(len(X))
-            else:
-                samples, _ = train_test_split(range(len(X)), train_size=k, stratify=y_train, random_state=2+i+(1000*fold))
+            if plot and verbose:
+                print("Disabling per-classifier live plots while using multiprocessing.")
 
-            X_tr = np.array([X[samples, feat] for feat in clf.feats]).T
-            y_tr = y_train.iloc[samples].values
-            X_te = np.array([X_test[:, feat] for feat in clf.feats]).T
-            y_te = y_test.apply(lambda x: clf.code[x]).values
+            max_workers = os.cpu_count() if n_jobs in (None, -1) else int(n_jobs)
+            if max_workers is None or max_workers < 1:
+                max_workers = 1
 
-            clf.fit(X_tr, y_tr, X_te, y_te, title_prefix=f"Classifier {i + 1}/{self.n_learners}: ", plot=plot, verbose=verbose, **fit_params)
+            jobs = self._make_parallel_jobs(
+                X=X,
+                y=y,
+                X_test=X_test,
+                y_test=y_test,
+                bagging=bagging,
+                fold=fold,
+                verbose=verbose,
+                fit_params=fit_params,
+            )
+
+            results = []
+            with ProcessPoolExecutor(max_workers=max_workers) as executor:
+                futures = [executor.submit(_fit_vqc_job, job) for job in jobs]
+                for future in as_completed(futures):
+                    result = future.result()
+                    results.append(result)
+                    if verbose:
+                        print(f"Finished classifier {result['idx'] + 1}/{self.n_learners}")
+
+            for result in sorted(results, key=lambda r: r["idx"]):
+                self._load_parallel_result(result)
 
         if plot:
             clear_output(wait=True)
@@ -630,13 +858,17 @@ class QuantumECOC:
 
     def plot(self):
         plt.figure(figsize=(10, 6))
+        plotted = False
         for i, clf in enumerate(self.classifiers):
-            plt.plot(clf.val_losses, label=f"Classifier {i + 1} (Code: {clf.code})")
+            if hasattr(clf, "val_losses") and clf.val_losses:
+                plt.plot(clf.val_losses, label=f"Classifier {i + 1} (Code: {clf.code})")
+                plotted = True
         plt.xlabel("Epoch")
         plt.ylabel("Validation Loss")
         plt.title("Validation Loss for Each Classifier")
-        plt.xlim(0, max(1, max(len(clf.val_losses) for clf in self.classifiers) - 1))
-        plt.legend()
+        if plotted:
+            plt.xlim(0, max(1, max(len(clf.val_losses) for clf in self.classifiers if hasattr(clf, "val_losses") and clf.val_losses) - 1))
+            plt.legend()
         plt.grid(True)
         plt.show()
 
@@ -657,16 +889,23 @@ class QuantumECOC:
         self.initialise_ensemble(X, y, verbose)
 
         X_s = self.scaler.fit_transform(X)
-        X_test_s = None
-        if X_test is not None:
-            X_test_s = self.scaler.transform(X_test)
+        X_test_s = self.scaler.transform(X_test) if X_test is not None else None
 
         y_m = y.map(self.label_to_int)
-        y_test_m = None
-        if y_test is not None:
-            y_test_m = y_test.map(self.label_to_int)
+        y_test_m = y_test.map(self.label_to_int) if y_test is not None else None
 
-        self.train_ensemble(X_s, y_m, X_test_s, y_test_m, bagging=bagging, parallel=parallel, n_jobs=n_jobs, plot=plot, verbose=verbose, **fit_params)
+        self.train_ensemble(
+            X_s,
+            y_m,
+            X_test_s,
+            y_test_m,
+            bagging=bagging,
+            parallel=parallel,
+            n_jobs=n_jobs,
+            plot=plot,
+            verbose=verbose,
+            **fit_params,
+        )
 
         self.training_time = TimeInt(time.time() - start_time)
         if verbose:
@@ -683,7 +922,7 @@ class QuantumECOC:
 
         final_preds = np.array([[0.0] * len(self.labels)] * len(X_s))
         for clf in self.classifiers:
-            X_clf = np.array([X_s[:, feat] for feat in clf.feats]).T
+            X_clf = X_s[:, clf.feats]
             preds = clf.predict(X_clf)
             for i, pred in enumerate(preds):
                 final_preds[i, clf.code == pred.item()] += clf.weight
@@ -696,7 +935,7 @@ class QuantumECOC:
 
         final_preds = np.array([[0.0] * len(self.labels)] * len(X_s))
         for clf in self.classifiers:
-            X_clf = np.array([X_s[:, feat] for feat in clf.feats]).T
+            X_clf = X_s[:, clf.feats]
             probs = clf.predict_proba(X_clf)
             for i in range(clf.n_classes):
                 final_preds[:, clf.code == i] += probs[:, i][:, None] * clf.weight
@@ -707,6 +946,7 @@ class QuantumECOC:
         preds = self.predict(X)
         return accuracy_score(y.values, preds)
 
+
 @typechecked
 class StackedECOC(QuantumECOC):
     """
@@ -714,7 +954,7 @@ class StackedECOC(QuantumECOC):
     """
     def __init__(
         self,
-        meta_learner = None,
+        meta_learner=None,
         n_learners: int | None = None,
         templates: int | str | list[int | str] | None = None,
         ecoc_depth: int = 2,
@@ -722,12 +962,14 @@ class StackedECOC(QuantumECOC):
         **kwargs
     ):
         super().__init__(n_learners=n_learners, templates=templates, ecoc_depth=ecoc_depth, device=device, **kwargs)
-        self.meta_learner = meta_learner if meta_learner is not None else SVC(kernel="rbf", random_state=2)
+        self.meta_learner = meta_learner if meta_learner is not None else SVC(kernel="rbf", random_state=2, probability=True)
 
     def reset_ensemble(self):
-        for i, clf in enumerate(self.classifiers):
+        for i, _ in enumerate(self.classifiers):
             clf = VQC(self.qml_device, len(set(self.ecoc[i])), self.templates[i]).to(self.cuda_device)
+            clf.code = self.ecoc[i]
             clf.feats = self.feat_map[i]
+            self.classifiers[i] = clf
 
     def fit(
         self,
@@ -737,6 +979,8 @@ class StackedECOC(QuantumECOC):
         y_test: Series | None = None,
         k_folds: int = 5,
         bagging: tuple[float, int, int] | None = (0.5, 512, 2048),
+        parallel: bool = False,
+        n_jobs: int = -1,
         plot: bool = False,
         verbose: bool = False,
         **fit_params
@@ -746,10 +990,12 @@ class StackedECOC(QuantumECOC):
 
         class_samples = y.value_counts()
         k_folds = min(k_folds, int(class_samples.min()))
+
         if k_folds > 1:
             X_meta = []
             y_meta = []
             skf = StratifiedKFold(n_splits=k_folds, shuffle=True, random_state=2)
+
             for f, (train_index, val_index) in enumerate(skf.split(X, y)):
                 if verbose:
                     print(f"\nFold {f + 1}/{k_folds}")
@@ -758,19 +1004,31 @@ class StackedECOC(QuantumECOC):
                 y_train, y_val = y.iloc[train_index], y.iloc[val_index]
 
                 fold_scaler = MinMaxScaler(feature_range=self.scaler.feature_range)
-                X_train = fold_scaler.fit_transform(X_train)
-                X_val = fold_scaler.transform(X_val)
+                X_train_s = fold_scaler.fit_transform(X_train)
+                X_val_s = fold_scaler.transform(X_val)
 
-                y_train = y_train.map(self.label_to_int)
-                y_val = y_val.map(self.label_to_int)
+                y_train_m = y_train.map(self.label_to_int)
+                y_val_m = y_val.map(self.label_to_int)
 
-                self.train_ensemble(X_train, y_train, X_val, y_val, fold=f, bagging=bagging, plot=False, verbose=False, **fit_params)
+                self.train_ensemble(
+                    X_train_s,
+                    y_train_m,
+                    X_val_s,
+                    y_val_m,
+                    fold=f,
+                    bagging=bagging,
+                    parallel=parallel,
+                    n_jobs=n_jobs,
+                    plot=False,
+                    verbose=False,
+                    **fit_params,
+                )
 
                 X_fold = np.array([clf.val_probs for clf in self.classifiers]).T
                 X_fold = X_fold[1:, :].transpose((1, 0, 2)).reshape(len(X_val), -1)
                 
                 X_meta.extend(X_fold)
-                y_meta.extend(y_val)
+                y_meta.extend(y_val_m)
 
                 self.reset_ensemble()
 
@@ -782,33 +1040,54 @@ class StackedECOC(QuantumECOC):
                 print("\nTraining final ensemble on full dataset...")
 
             X_s = self.scaler.fit_transform(X)
-            if X_test is not None:
-                X_test_s = self.scaler.transform(X_test)
+            X_test_s = self.scaler.transform(X_test) if X_test is not None else None
 
             y_m = y.map(self.label_to_int)
-            if y_test is not None:
-                y_test_m = y_test.map(self.label_to_int)
+            y_test_m = y_test.map(self.label_to_int) if y_test is not None else None
 
-            self.train_ensemble(X_s, y_m, X_test_s, y_test_m, bagging=bagging, plot=plot, verbose=verbose, **fit_params)
+            self.train_ensemble(
+                X_s,
+                y_m,
+                X_test_s,
+                y_test_m,
+                bagging=bagging,
+                parallel=parallel,
+                n_jobs=n_jobs,
+                plot=plot,
+                verbose=verbose,
+                **fit_params,
+            )
         else:
             if verbose:
                 print(f"\nNot enough samples for {k_folds} folds. Training on a single train/validation split...")
+
             X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3, random_state=2, stratify=y)
             
-            X_train = self.scaler.fit_transform(X_train)
-            X_val = self.scaler.transform(X_val)
+            X_train_s = self.scaler.fit_transform(X_train)
+            X_val_s = self.scaler.transform(X_val)
 
-            y_train = y_train.map(self.label_to_int)
-            y_val = y_val.map(self.label_to_int)
+            y_train_m = y_train.map(self.label_to_int)
+            y_val_m = y_val.map(self.label_to_int)
 
-            self.train_ensemble(X_train, y_train, X_val, y_val, plot, verbose, **fit_params)
+            self.train_ensemble(
+                X_train_s,
+                y_train_m,
+                X_val_s,
+                y_val_m,
+                bagging=bagging,
+                parallel=parallel,
+                n_jobs=n_jobs,
+                plot=plot,
+                verbose=verbose,
+                **fit_params,
+            )
 
             X_meta = np.array([clf.val_probs for clf in self.classifiers]).T
             X_meta = X_meta[1:, :].transpose((1, 0, 2)).reshape(len(X_val), -1)
 
             if verbose:
                 print("\nTraining meta-learner...")
-            self.meta_learner.fit(X_meta, np.array(y_val))
+            self.meta_learner.fit(X_meta, np.array(y_val_m))
 
         self.training_time = TimeInt(time.time() - start_time)
         if verbose:
@@ -817,34 +1096,39 @@ class StackedECOC(QuantumECOC):
     def predict(self, X: DataFrame) -> np.ndarray:
         X_s = self.scaler.transform(X)
         X_meta = np.array([
-            clf.predict_proba(
-                np.array([X_s[:, feat] for feat in clf.feats]).T
-            ) for clf in self.classifiers
+            clf.predict_proba(X_s[:, clf.feats])
+            for clf in self.classifiers
         ]).T
         X_meta = X_meta[1:, :].transpose((1, 0, 2)).reshape(len(X), -1)
         return np.array([self.int_to_label[pred] for pred in self.meta_learner.predict(X_meta)])
     
     def predict_proba(self, X: DataFrame) -> np.ndarray:
         X_s = self.scaler.transform(X)
-        meta_X = np.array(
-            [
-                clf.predict_proba(
-                    np.array([X_s[:, feat] for feat in clf.feats]).T
-                ) for clf in self.classifiers
-            ]
-        ).T
-        return self.meta_learner.predict_proba(meta_X)
+        X_meta = np.array([
+            clf.predict_proba(X_s[:, clf.feats])
+            for clf in self.classifiers
+        ]).T
+        X_meta = X_meta[1:, :].transpose((1, 0, 2)).reshape(len(X), -1)
+
+        if hasattr(self.meta_learner, "predict_proba"):
+            return self.meta_learner.predict_proba(X_meta)
+
+        preds = self.meta_learner.predict(X_meta)
+        probs = np.zeros((len(preds), len(self.labels)))
+        probs[np.arange(len(preds)), preds] = 1.0
+        return probs
     
     def score(self, X: DataFrame, y: Series) -> float:
         preds = self.predict(X)
         return accuracy_score(y.values, preds)
 
+
 class CoherentECOC(QuantumECOC):
     """
     Measurement Free Quantum Ensemble that extends QuantumECOC by combining the outputs of the base learners without collapsing their quantum states.
     """
-    def __init__(self, n_learners: int = None, templates: list[int | str] = None, device: qml.devices.Device = None, **kwargs):
-        super().__init__(n_learners, templates, device, **kwargs)
+    def __init__(self, n_learners: int = None, templates: list[int | str] = None, device: str = "default.qubit", **kwargs):
+        super().__init__(n_learners=n_learners, templates=templates, device=device, **kwargs)
 
 if __name__ == "__main__":
     import pandas as pd
