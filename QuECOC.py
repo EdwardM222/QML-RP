@@ -523,14 +523,6 @@ class VQC(nn.Module):
         preds = self.predict(X)
         return accuracy_score(y, preds)
 
-def _series_or_array_to_numpy(values):
-    """Return a NumPy array without requiring pandas objects in worker jobs."""
-    if values is None:
-        return None
-    if hasattr(values, "to_numpy"):
-        return values.to_numpy()
-    return np.asarray(values)
-
 def _fit_vqc_job(job: dict) -> dict:
     """
     Multiprocessing-safe VQC training job.
@@ -789,9 +781,9 @@ class QuantumECOC:
     def train_ensemble(
         self,
         X: np.ndarray,
-        y: Series | np.ndarray,
+        y: Series,
         X_test: np.ndarray | None = None,
-        y_test: Series | np.ndarray | None = None,
+        y_test: Series | None = None,
         bagging: tuple[float, int, int] | None = None,
         parallel: bool = False,
         n_jobs: int = -1,
@@ -946,7 +938,6 @@ class QuantumECOC:
         preds = self.predict(X)
         return accuracy_score(y.values, preds)
 
-
 @typechecked
 class StackedECOC(QuantumECOC):
     """
@@ -954,7 +945,7 @@ class StackedECOC(QuantumECOC):
     """
     def __init__(
         self,
-        meta_learner=None,
+        meta_learner = None,
         n_learners: int | None = None,
         templates: int | str | list[int | str] | None = None,
         ecoc_depth: int = 2,
@@ -965,7 +956,7 @@ class StackedECOC(QuantumECOC):
         self.meta_learner = meta_learner if meta_learner is not None else SVC(kernel="rbf", random_state=2, probability=True)
 
     def reset_ensemble(self):
-        for i, _ in enumerate(self.classifiers):
+        for i in range(len(self.classifiers)):
             clf = VQC(self.qml_device, len(set(self.ecoc[i])), self.templates[i]).to(self.cuda_device)
             clf.code = self.ecoc[i]
             clf.feats = self.feat_map[i]
@@ -1004,17 +995,17 @@ class StackedECOC(QuantumECOC):
                 y_train, y_val = y.iloc[train_index], y.iloc[val_index]
 
                 fold_scaler = MinMaxScaler(feature_range=self.scaler.feature_range)
-                X_train_s = fold_scaler.fit_transform(X_train)
-                X_val_s = fold_scaler.transform(X_val)
+                X_train = fold_scaler.fit_transform(X_train)
+                X_val = fold_scaler.transform(X_val)
 
-                y_train_m = y_train.map(self.label_to_int)
-                y_val_m = y_val.map(self.label_to_int)
+                y_train = y_train.map(self.label_to_int)
+                y_val = y_val.map(self.label_to_int)
 
                 self.train_ensemble(
-                    X_train_s,
-                    y_train_m,
-                    X_val_s,
-                    y_val_m,
+                    X_train,
+                    y_train,
+                    X_val,
+                    y_val,
                     fold=f,
                     bagging=bagging,
                     parallel=parallel,
@@ -1028,7 +1019,7 @@ class StackedECOC(QuantumECOC):
                 X_fold = X_fold[1:, :].transpose((1, 0, 2)).reshape(len(X_val), -1)
                 
                 X_meta.extend(X_fold)
-                y_meta.extend(y_val_m)
+                y_meta.extend(y_val)
 
                 self.reset_ensemble()
 
@@ -1063,17 +1054,17 @@ class StackedECOC(QuantumECOC):
 
             X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3, random_state=2, stratify=y)
             
-            X_train_s = self.scaler.fit_transform(X_train)
-            X_val_s = self.scaler.transform(X_val)
+            X_train = self.scaler.fit_transform(X_train)
+            X_val = self.scaler.transform(X_val)
 
-            y_train_m = y_train.map(self.label_to_int)
-            y_val_m = y_val.map(self.label_to_int)
+            y_train = y_train.map(self.label_to_int)
+            y_val = y_val.map(self.label_to_int)
 
             self.train_ensemble(
-                X_train_s,
-                y_train_m,
-                X_val_s,
-                y_val_m,
+                X_train,
+                y_train,
+                X_val,
+                y_val,
                 bagging=bagging,
                 parallel=parallel,
                 n_jobs=n_jobs,
@@ -1087,7 +1078,7 @@ class StackedECOC(QuantumECOC):
 
             if verbose:
                 print("\nTraining meta-learner...")
-            self.meta_learner.fit(X_meta, np.array(y_val_m))
+            self.meta_learner.fit(X_meta, np.array(y_val))
 
         self.training_time = TimeInt(time.time() - start_time)
         if verbose:
@@ -1096,8 +1087,7 @@ class StackedECOC(QuantumECOC):
     def predict(self, X: DataFrame) -> np.ndarray:
         X_s = self.scaler.transform(X)
         X_meta = np.array([
-            clf.predict_proba(X_s[:, clf.feats])
-            for clf in self.classifiers
+            clf.predict_proba(X_s[:, clf.feats]) for clf in self.classifiers
         ]).T
         X_meta = X_meta[1:, :].transpose((1, 0, 2)).reshape(len(X), -1)
         return np.array([self.int_to_label[pred] for pred in self.meta_learner.predict(X_meta)])
@@ -1105,8 +1095,7 @@ class StackedECOC(QuantumECOC):
     def predict_proba(self, X: DataFrame) -> np.ndarray:
         X_s = self.scaler.transform(X)
         X_meta = np.array([
-            clf.predict_proba(X_s[:, clf.feats])
-            for clf in self.classifiers
+            clf.predict_proba(X_s[:, clf.feats]) for clf in self.classifiers
         ]).T
         X_meta = X_meta[1:, :].transpose((1, 0, 2)).reshape(len(X), -1)
 
