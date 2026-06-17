@@ -569,11 +569,23 @@ class QuantumECOC:
             self.n_learners = 2 * len(self.labels)
 
         self.ecoc = build_ecoc_matrix(len(self.labels), self.n_learners, self.ecoc_depth)
+        self.feat_map = []
 
-        if isinstance(self.templates, int) or isinstance(self.templates, str):
-            self.templates = [self.templates] * self.n_learners
-        elif len(self.templates) != self.n_learners:
-            raise ValueError(f"Length of templates does not match n_learners. Got {len(self.templates)} templates and n_learners={self.n_learners}.")
+        if self.templates is not None:
+            if isinstance(self.templates, int) or isinstance(self.templates, str):
+                self.templates = [self.templates] * self.n_learners
+            else:
+                if len(self.templates) != self.n_learners:
+                    raise ValueError(f"Length of templates does not match n_learners. Got {len(self.templates)} templates and n_learners={self.n_learners}.")
+            self.classifiers = [VQC(self.qml_device, len(set(self.ecoc[i])), learner).to(self.cuda_device) for i, learner in enumerate(self.templates)]
+        else:
+            self.classifiers = [VQC(self.qml_device, len(set(self.ecoc[i]))).to(self.cuda_device) for i in range(self.n_learners)]
+        
+        for i, clf in enumerate(self.classifiers):
+            clf.code = self.ecoc[i]
+            clf.feats = choices(range(X.shape[1]), k=clf.n_features)
+            self.feat_map.append(clf.feats)
+
 
     def train_ensemble(
         self,
@@ -588,14 +600,9 @@ class QuantumECOC:
         fold: int = 0,
         **fit_params
     ):
-        for i, template in enumerate(self.templates):
+        for i, clf in enumerate(self.classifiers):
             if verbose:
                 print(f"\nTraining classifier {i + 1}/{self.n_learners}")
-
-            clf = VQC(qml_device=self.qml_device, n_classes=len(set(self.ecoc[i])), template=template)
-            
-            clf.code = self.ecoc[i]
-            clf.feats = choices(range(X.shape[1]), k=clf.n_features)
 
             y_train = y.apply(lambda x: clf.code[x])
 
@@ -648,13 +655,14 @@ class QuantumECOC:
     ):
         start_time = time.time()
         self.initialise_ensemble(X, y, verbose)
-        self.initialise_classifiers()
 
         X_s = self.scaler.fit_transform(X)
+        X_test_s = None
         if X_test is not None:
             X_test_s = self.scaler.transform(X_test)
 
         y_m = y.map(self.label_to_int)
+        y_test_m = None
         if y_test is not None:
             y_test_m = y_test.map(self.label_to_int)
 
@@ -716,6 +724,11 @@ class StackedECOC(QuantumECOC):
         super().__init__(n_learners=n_learners, templates=templates, ecoc_depth=ecoc_depth, device=device, **kwargs)
         self.meta_learner = meta_learner if meta_learner is not None else SVC(kernel="rbf", random_state=2)
 
+    def reset_ensemble(self):
+        for i, clf in enumerate(self.classifiers):
+            clf = VQC(self.qml_device, len(set(self.ecoc[i])), self.templates[i]).to(self.cuda_device)
+            clf.feats = self.feat_map[i]
+
     def fit(
         self,
         X: DataFrame,
@@ -744,8 +757,6 @@ class StackedECOC(QuantumECOC):
                 X_train, X_val = X.iloc[train_index], X.iloc[val_index]
                 y_train, y_val = y.iloc[train_index], y.iloc[val_index]
 
-                self.initialise_classifiers()
-
                 fold_scaler = MinMaxScaler(feature_range=self.scaler.feature_range)
                 X_train = fold_scaler.fit_transform(X_train)
                 X_val = fold_scaler.transform(X_val)
@@ -761,13 +772,14 @@ class StackedECOC(QuantumECOC):
                 X_meta.extend(X_fold)
                 y_meta.extend(y_val)
 
+                self.reset_ensemble()
+
             if verbose:
                 print("\nTraining meta-learner...")
             self.meta_learner.fit(np.array(X_meta), np.array(y_meta))
 
             if verbose:
                 print("\nTraining final ensemble on full dataset...")
-            self.initialise_classifiers()
 
             X_s = self.scaler.fit_transform(X)
             if X_test is not None:
@@ -789,7 +801,6 @@ class StackedECOC(QuantumECOC):
             y_train = y_train.map(self.label_to_int)
             y_val = y_val.map(self.label_to_int)
 
-            self.initialise_classifiers()
             self.train_ensemble(X_train, y_train, X_val, y_val, plot, verbose, **fit_params)
 
             X_meta = np.array([clf.val_probs for clf in self.classifiers]).T
