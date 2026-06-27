@@ -216,7 +216,7 @@ def reuploading_qlayer(
 class VQC(nn.Module):
     def __init__(
             self,
-            qml_device: str | qml.devices.Device,
+            qml_device: str | qml.devices.Device = "default.qubit",
             n_classes: int = 2,
             template: int | str = 0,
             **kwargs
@@ -579,6 +579,7 @@ class QuantumECOC:
                     raise ValueError(f"Length of templates does not match n_learners. Got {len(self.templates)} templates and n_learners={self.n_learners}.")
             self.classifiers = [VQC(self.qml_device, len(set(self.ecoc[i])), learner).to(self.cuda_device) for i, learner in enumerate(self.templates)]
         else:
+            self.templates = [0] * self.n_learners
             self.classifiers = [VQC(self.qml_device, len(set(self.ecoc[i]))).to(self.cuda_device) for i in range(self.n_learners)]
         
         for i, clf in enumerate(self.classifiers):
@@ -586,17 +587,15 @@ class QuantumECOC:
             clf.feats = choices(range(X.shape[1]), k=clf.n_features)
             self.feat_map.append(clf.feats)
 
-
     def train_ensemble(
         self,
         X: np.ndarray,
         y: Series,
-        X_test: np.ndarray,
-        y_test: Series,
-        bagging: tuple[float, int, int] | None,
-        parallel: bool,
-        n_jobs: int,
-        plot: bool, verbose: bool,
+        X_test: np.ndarray | None = None,
+        y_test: Series | None = None,
+        bagging: tuple[float, int, int] | None = None, 
+        plot: bool = False,
+        verbose: bool = False,
         fold: int = 0,
         **fit_params
     ):
@@ -657,16 +656,21 @@ class QuantumECOC:
         self.initialise_ensemble(X, y, verbose)
 
         X_s = self.scaler.fit_transform(X)
-        X_test_s = None
-        if X_test is not None:
-            X_test_s = self.scaler.transform(X_test)
+        X_test_s = self.scaler.transform(X_test) if X_test is not None else None
 
         y_m = y.map(self.label_to_int)
-        y_test_m = None
-        if y_test is not None:
-            y_test_m = y_test.map(self.label_to_int)
+        y_test_m = y_test.map(self.label_to_int) if y_test is not None else None
 
-        self.train_ensemble(X_s, y_m, X_test_s, y_test_m, bagging=bagging, parallel=parallel, n_jobs=n_jobs, plot=plot, verbose=verbose, **fit_params)
+        self.train_ensemble(
+            X_s,
+            y_m,
+            X_test_s,
+            y_test_m,
+            bagging=bagging,
+            plot=plot,
+            verbose=verbose,
+            **fit_params,
+        )
 
         self.training_time = TimeInt(time.time() - start_time)
         if verbose:
@@ -683,7 +687,7 @@ class QuantumECOC:
 
         final_preds = np.array([[0.0] * len(self.labels)] * len(X_s))
         for clf in self.classifiers:
-            X_clf = np.array([X_s[:, feat] for feat in clf.feats]).T
+            X_clf = X_s[:, clf.feats]
             preds = clf.predict(X_clf)
             for i, pred in enumerate(preds):
                 final_preds[i, clf.code == pred.item()] += clf.weight
@@ -696,7 +700,7 @@ class QuantumECOC:
 
         final_preds = np.array([[0.0] * len(self.labels)] * len(X_s))
         for clf in self.classifiers:
-            X_clf = np.array([X_s[:, feat] for feat in clf.feats]).T
+            X_clf = X_s[:, clf.feats]
             probs = clf.predict_proba(X_clf)
             for i in range(clf.n_classes):
                 final_preds[:, clf.code == i] += probs[:, i][:, None] * clf.weight
@@ -716,18 +720,20 @@ class StackedECOC(QuantumECOC):
         self,
         meta_learner = None,
         n_learners: int | None = None,
-        templates: int | str | list[int | str] | None = None,
+        templates: int | str | list[int | str] = 0,
         ecoc_depth: int = 2,
         device: str = "default.qubit",
         **kwargs
     ):
         super().__init__(n_learners=n_learners, templates=templates, ecoc_depth=ecoc_depth, device=device, **kwargs)
-        self.meta_learner = meta_learner if meta_learner is not None else SVC(kernel="rbf", random_state=2)
+        self.meta_learner = meta_learner if meta_learner is not None else SVC(kernel="rbf", random_state=2, probability=True)
 
     def reset_ensemble(self):
-        for i, clf in enumerate(self.classifiers):
+        for i in range(len(self.classifiers)):
             clf = VQC(self.qml_device, len(set(self.ecoc[i])), self.templates[i]).to(self.cuda_device)
+            clf.code = self.ecoc[i]
             clf.feats = self.feat_map[i]
+            self.classifiers[i] = clf
 
     def fit(
         self,
@@ -750,6 +756,7 @@ class StackedECOC(QuantumECOC):
             X_meta = []
             y_meta = []
             skf = StratifiedKFold(n_splits=k_folds, shuffle=True, random_state=2)
+
             for f, (train_index, val_index) in enumerate(skf.split(X, y)):
                 if verbose:
                     print(f"\nFold {f + 1}/{k_folds}")
@@ -764,7 +771,17 @@ class StackedECOC(QuantumECOC):
                 y_train = y_train.map(self.label_to_int)
                 y_val = y_val.map(self.label_to_int)
 
-                self.train_ensemble(X_train, y_train, X_val, y_val, fold=f, bagging=bagging, plot=False, verbose=False, **fit_params)
+                self.train_ensemble(
+                    X_train,
+                    y_train,
+                    X_val,
+                    y_val,
+                    fold=f,
+                    bagging=bagging,
+                    plot=False,
+                    verbose=False,
+                    **fit_params,
+                )
 
                 X_fold = np.array([clf.val_probs for clf in self.classifiers]).T
                 X_fold = X_fold[1:, :].transpose((1, 0, 2)).reshape(len(X_val), -1)
@@ -782,17 +799,25 @@ class StackedECOC(QuantumECOC):
                 print("\nTraining final ensemble on full dataset...")
 
             X_s = self.scaler.fit_transform(X)
-            if X_test is not None:
-                X_test_s = self.scaler.transform(X_test)
+            X_test_s = self.scaler.transform(X_test) if X_test is not None else None
 
             y_m = y.map(self.label_to_int)
-            if y_test is not None:
-                y_test_m = y_test.map(self.label_to_int)
+            y_test_m = y_test.map(self.label_to_int) if y_test is not None else None
 
-            self.train_ensemble(X_s, y_m, X_test_s, y_test_m, bagging=bagging, plot=plot, verbose=verbose, **fit_params)
+            self.train_ensemble(
+                X_s,
+                y_m,
+                X_test_s,
+                y_test_m,
+                bagging=bagging,
+                plot=plot,
+                verbose=verbose,
+                **fit_params,
+            )
         else:
             if verbose:
                 print(f"\nNot enough samples for {k_folds} folds. Training on a single train/validation split...")
+
             X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3, random_state=2, stratify=y)
             
             X_train = self.scaler.fit_transform(X_train)
@@ -801,7 +826,16 @@ class StackedECOC(QuantumECOC):
             y_train = y_train.map(self.label_to_int)
             y_val = y_val.map(self.label_to_int)
 
-            self.train_ensemble(X_train, y_train, X_val, y_val, plot, verbose, **fit_params)
+            self.train_ensemble(
+                X_train,
+                y_train,
+                X_val,
+                y_val,
+                bagging=bagging,
+                plot=plot,
+                verbose=verbose,
+                **fit_params,
+            )
 
             X_meta = np.array([clf.val_probs for clf in self.classifiers]).T
             X_meta = X_meta[1:, :].transpose((1, 0, 2)).reshape(len(X_val), -1)
@@ -818,7 +852,7 @@ class StackedECOC(QuantumECOC):
         X_s = self.scaler.transform(X)
         X_meta = np.array([
             clf.predict_proba(
-                np.array([X_s[:, feat] for feat in clf.feats]).T
+                X_s[:, clf.feats]
             ) for clf in self.classifiers
         ]).T
         X_meta = X_meta[1:, :].transpose((1, 0, 2)).reshape(len(X), -1)
@@ -826,14 +860,14 @@ class StackedECOC(QuantumECOC):
     
     def predict_proba(self, X: DataFrame) -> np.ndarray:
         X_s = self.scaler.transform(X)
-        meta_X = np.array(
-            [
-                clf.predict_proba(
-                    np.array([X_s[:, feat] for feat in clf.feats]).T
-                ) for clf in self.classifiers
-            ]
-        ).T
-        return self.meta_learner.predict_proba(meta_X)
+        X_meta = np.array([
+            clf.predict_proba(
+                X_s[:, clf.feats]
+            ) for clf in self.classifiers
+        ]).T
+        X_meta = X_meta[1:, :].transpose((1, 0, 2)).reshape(len(X), -1)
+
+        return self.meta_learner.predict_proba(X_meta)
     
     def score(self, X: DataFrame, y: Series) -> float:
         preds = self.predict(X)
@@ -843,8 +877,8 @@ class CoherentECOC(QuantumECOC):
     """
     Measurement Free Quantum Ensemble that extends QuantumECOC by combining the outputs of the base learners without collapsing their quantum states.
     """
-    def __init__(self, n_learners: int = None, templates: list[int | str] = None, device: qml.devices.Device = None, **kwargs):
-        super().__init__(n_learners, templates, device, **kwargs)
+    def __init__(self, n_learners: int = None, templates: list[int | str] = None, device: str = "default.qubit", **kwargs):
+        super().__init__(n_learners=n_learners, templates=templates, device=device, **kwargs)
 
 if __name__ == "__main__":
     import pandas as pd
