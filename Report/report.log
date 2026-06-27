@@ -1,14 +1,14 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.3.31)  1 JUN 2026 17:51
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.3.31)  27 JUN 2026 17:15
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
-**c:/Users/edwar/OneDrive/Edward/UCD/Summer/Report/report.tex
-(c:/Users/edwar/OneDrive/Edward/UCD/Summer/Report/report.tex
+**c:/Users/edwar/OneDrive/Edward/UCD/Summer/QML-RP/Report/report.tex
+(c:/Users/edwar/OneDrive/Edward/UCD/Summer/QML-RP/Report/report.tex
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-01-19>
-(./UCD_CS_FYP_Report.cls
-Document Class: UCD_CS_FYP_Report 
+(./UCD_CS_MSc_AAI_Report.cls
+Document Class: UCD_CS_MSc_AAI_Report 
 (c:/tools/TinyTeX/texmf-dist/tex/latex/base/report.cls
 Document Class: report 2025/01/22 v1.4n Standard LaTeX document class
 (c:/tools/TinyTeX/texmf-dist/tex/latex/base/size11.clo
@@ -925,8 +925,22 @@ Package pdftex.def Info: UCD_Logo.pdf  used on input line 62.
  [0
 
 {c:/tools/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map} <./UCD_Logo.pdf>] (./report.toc
+LaTeX Font Info:    Calculating math sizes for size <11> on input line 1.
+
+
+LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <5.5> not available
+(Font)              size <5> substituted on input line 1.
+
+
+LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <5.5> not available
+(Font)              size <5> substituted on input line 1.
+
+
+LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <5.5> not available
+(Font)              size <5> substituted on input line 1.
+
 LaTeX Font Info:    Trying to load font information for U+msa on input line 1.
- (c:/tools/TinyTeX/texmf-dist/tex/latex/amsfonts/umsa.fd
+(c:/tools/TinyTeX/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
 LaTeX Font Info:    Trying to load font information for U+msb on input line 1.
@@ -953,50 +967,29 @@ Chapter 1.
 
 ] [6]
 Chapter 2.
-LaTeX Font Info:    Calculating math sizes for size <11> on input line 195.
-
-LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <5.5> not available
-(Font)              size <5> substituted on input line 195.
-
-
-LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <5.5> not available
-(Font)              size <5> substituted on input line 195.
-
-
-LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <5.5> not available
-(Font)              size <5> substituted on input line 195.
-
 [7
 
-] [8]
+]
 Chapter 3.
+[8
 
-Overfull \hbox (2.97812pt too wide) in paragraph at lines 260--261
-[]\T1/cmss/m/n/10.95 The pa-per's clas-si-fi-ca-tion of QML sec-tors helps dis-tin-guish the dis-ser-ta-tion's classical-data quantum-
- []
-
+]
+Chapter 4.
 [9
 
-] [10]
-Chapter 4.
-[11
-
-] [12]
+]
 Chapter 5.
-[13
+[10
 
-] [14]
+]
 Chapter 6.
-[15
-
-] [16] [17
+[11
 
 ]
 
-LaTeX Font Warning: Font shape `T1/cmss/m/sc' in size <11> not available
-(Font)              Font shape `T1/cmr/m/sc' tried instead on input line 426.
+LaTeX Warning: Empty bibliography on input line 240.
 
-[18
+[12
 
 ] 
 enddocument/afterlastpage (AED): lastpage setting LastPage.
@@ -1017,18 +1010,18 @@ Package logreq Info: Writing requests to 'report.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 33366 strings out of 469515
- 637366 string characters out of 5467662
- 1456176 words of memory out of 5000000
- 61485 multiletter control sequences out of 15000+600000
- 646269 words of font info for 85 fonts, out of 8000000 for 9000
+ 33098 strings out of 469515
+ 631893 string characters out of 5467662
+ 1455984 words of memory out of 5000000
+ 61233 multiletter control sequences out of 15000+600000
+ 641860 words of font info for 69 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 99i,12n,108p,1414b,1344s stack positions out of 10000i,1000n,20000p,200000b,200000s
- <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/eccc1095.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsi1095.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsx1728.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecss2074.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt1095.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsx1095.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecss1095.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsx1200.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsx2074.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecss1200.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsx1440.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecss1440.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecss1728.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsx2488.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecss2488.600pk><c:/tools/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb><c:/tools/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb><c:/tools/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><c:/tools/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb>
-Output written on report.pdf (19 pages, 235646 bytes).
+ 99i,11n,108p,1421b,803s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsi1095.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsx1728.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecss2074.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsx1200.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt1095.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecss1095.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsx1095.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsx2074.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecss1200.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsx1440.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecss1440.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecss1728.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsx2488.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecss2488.600pk>
+Output written on report.pdf (13 pages, 152374 bytes).
 PDF statistics:
- 934 PDF objects out of 1000 (max. 8388607)
- 417 compressed objects within 5 object streams
- 54 named destinations out of 1000 (max. 500000)
+ 679 PDF objects out of 1000 (max. 8388607)
+ 265 compressed objects within 3 object streams
+ 44 named destinations out of 1000 (max. 500000)
  202 words of extra memory for PDF output out of 10000 (max. 10000000)
 

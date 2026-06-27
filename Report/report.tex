@@ -1,4 +1,4 @@
-\documentclass[]{UCD_CS_FYP_Report}
+\documentclass[]{UCD_CS_MSc_AAI_Report}
 \usepackage{graphicx}
 \usepackage{listings}
 \usepackage{hyperref}
@@ -184,139 +184,15 @@ This dissertation is structured around three specific, falsifiable research ques
 %%%%%%%%
 \chapter{Background}
 
-\motive{Quantum machine learning is motivated by the possibility that quantum computers may accelerate data analysis by exploiting quantum effects such as entanglement, superposition, and interference~\cite{cerezo_challenges_2022}.}
 
-\motive{The paper frames QML as an attempt to understand ``the ultimate limits of data analysis allowed by the laws of physics'', which supports positioning quantum machine learning as a fundamental extension of classical learning theory rather than merely a hardware substitution~\cite{cerezo_challenges_2022}.}
-
-\motive{The authors identify the near-term goal of QML as demonstrating quantum advantage by outperforming classical methods in a data science application, while noting that the most suitable applications may be those involving inherently quantum-mechanical data~\cite{cerezo_challenges_2022}.}
-
-\theory{QML can operate on either classical data encoded into quantum states or quantum data that is already naturally represented in Hilbert space, making the distinction between data origin and model type central to the design of QML experiments~\cite{cerezo_challenges_2022}.}
-
-\theory{For classical data, a quantum embedding maps each input $x_j$ into a quantum state $\ket{\psi(x_j)}$, with the hope that the model can exploit the high-dimensional structure of Hilbert space for learning~\cite{cerezo_challenges_2022}.}
-
-\theory{Quantum data is fundamentally harder to encode classically than classical data is to encode quantum mechanically, since a general $n$-qubit quantum state requires exponentially many complex parameters to specify~\cite{cerezo_challenges_2022}.}
-
-\challenge{Noise from quantum hardware and statistical shot noise can complicate QML training, creating difficulties that do not arise in the same way in classical machine learning~\cite{cerezo_challenges_2022}.}
-
-\challenge{Non-linear operations such as activation functions are natural in classical neural networks, but require more careful design in QML because quantum transformations are linear~\cite{cerezo_challenges_2022}.}
-
-\limitation{The authors caution that achieving quantum advantage for data science remains uncertain at the theoretical level, especially for classical data analysis tasks~\cite{cerezo_challenges_2022}.}
-
-\limitation{The paper notes that most QML architectures are benchmarked on accessible classical datasets such as MNIST, Dogs vs Cats, and Iris, even though it remains unclear how best to encode classical information into quantum states~\cite{cerezo_challenges_2022}.}
-
-\motive{Quantum machine learning can be introduced as learning algorithms executed on quantum computers to accomplish specified tasks with potential advantages over classical implementations~\cite{du_quantum_2025}.}
-
-\motive{The paper frames QML as a bridge between classical machine learning and quantum computing, making it suitable for explaining how classical ML concepts can be translated into quantum models~\cite{du_quantum_2025}.}
-
-\motive{The tutorial argues that the convergence of increasing AI computational demand and the potential computational power of quantum machines motivates the development of quantum machine learning~\cite{du_quantum_2025}.}
-
-\theory{Quantum computation differs from classical computation because the input is a quantum state, computation is performed by quantum circuits, and the output requires quantum measurement to extract information into classical form~\cite{du_quantum_2025}.}
-
-\theory{An $N$-qubit system is represented in a $2^N$-dimensional state space, which provides the representational foundation for quantum information processing and QML~\cite{du_quantum_2025}.}
-
-\theory{The paper classifies QML research according to whether the data and processor are classical or quantum, distinguishing the CC, CQ, QC, and QQ sectors~\cite{du_quantum_2025}.}
-
-\theory{The proposed dissertation belongs primarily to the QC sector because it uses quantum circuits to process classical datasets after quantum encoding~\cite{du_quantum_2025}.}
-
-\challenge{Current quantum computers are described as noisy intermediate-scale quantum devices with error-prone gates, limited coherence times, imperfect qubits, and imperfect measurements~\cite{du_quantum_2025}.}
-
-\limitation{Many QML algorithms with strong theoretical speedups require fault-tolerant, error-corrected quantum computers, while current NISQ devices impose severe limits on circuit depth and reliability~\cite{du_quantum_2025}.}
-
-\limitation{The paper identifies read-in and read-out bottlenecks as important limitations for QML, since preparing classical data as quantum states and extracting classical information from quantum states can reduce or remove claimed speedups~\cite{du_quantum_2025}.}
-
-\motive{Classical ensemble learning is motivated by the idea that consulting multiple trained models can produce a collective prediction that improves on the predictive power of a single classifier~\cite{schuld_quantum_2018}.}
-
-\motive{Quantum ensembles extend this idea by preparing a superposition of quantum classifiers, evaluating them in parallel, and accessing the collective decision through a final qubit measurement~\cite{schuld_quantum_2018}.}
 
 %%%%%%%%
 \chapter{Related Work}
 
-\theory{Parameterized quantum circuits are described as the basic ingredient of quantum neural networks, where trainable gate parameters are optimised to solve a learning task~\cite{cerezo_challenges_2022}.}
 
-\theory{The paper treats quantum neural networks as parameterized quantum circuits used for data science applications, including supervised classification, unsupervised learning, and reinforcement learning~\cite{cerezo_challenges_2022}.}
-
-\theory{In supervised QML classification, the goal of a QNN is to map states from different classes into distinguishable regions of Hilbert space~\cite{cerezo_challenges_2022}.}
-
-\comparison{The paper distinguishes QNNs from quantum kernel methods: QNNs train parameterized circuits directly, whereas quantum kernels compute inner products after mapping data into a high-dimensional quantum feature space~\cite{cerezo_challenges_2022}.}
-
-\comparison{Hybrid quantum-classical models are presented as a practical response to near-term hardware limitations, distributing representational capacity and computational complexity across both classical and quantum processors~\cite{cerezo_challenges_2022}.}
-
-\comparison{The paper's distinction between hybrid models and fully quantum processing helps position the proposed dissertation architecture as testing whether keeping information coherent across the stacking boundary offers a benefit beyond classical post-processing~\cite{cerezo_challenges_2022}.}
-
-\gap{The authors argue that the complete list of useful QML applications is not yet known, leaving space for architectural studies that test where quantum processing provides practical benefit~\cite{cerezo_challenges_2022}.}
-
-\gap{The paper identifies a lack of standardised quantum datasets as a major obstacle for benchmarking QML models on genuinely quantum data~\cite{cerezo_challenges_2022}.}
-
-\gap{The authors state that the complexity of quantum kernel methods is better understood than the complexity of QNNs, indicating that further research is needed on QNN generalisation and scalability~\cite{cerezo_challenges_2022}.}
-
-\theory{Near-term quantum neural networks are presented as hybrid models in which quantum computers implement trainable circuits and classical optimisers update their parameters~\cite{du_quantum_2025}.}
-
-\theory{The paper identifies quantum kernels and QNNs as flexible QML models that can be adapted to the limited quantum resources available in the NISQ era~\cite{du_quantum_2025}.}
-
-\theory{The learnability of QML models can be evaluated through expressivity, trainability, and generalisation, providing a useful framework for analysing whether a quantum model is practically useful~\cite{du_quantum_2025}.}
-
-\comparison{The paper explains that QNNs and classical deep neural networks follow a similar iterative learning structure, with the key difference being that the trainable model is implemented by a quantum circuit rather than a classical neural network~\cite{du_quantum_2025}.}
-
-\comparison{The paper's classification of QML sectors helps distinguish the dissertation's classical-data quantum-processing experiments from settings where both data and processor are quantum~\cite{du_quantum_2025}.}
-
-\comparison{The tutorial positions quantum kernels and QNNs as standard NISQ-era QML baselines, which can be used to contextualise the dissertation's use of variational quantum circuits as base learners and meta-learners~\cite{du_quantum_2025}.}
-
-\gap{Although the paper surveys QNNs, kernels, and quantum transformers, it does not address quantum ensemble stacking or measurement-free aggregation, leaving space for the dissertation's architecture-level contribution~\cite{du_quantum_2025}.}
-
-\gap{The paper highlights that practical QML still depends on resolving issues of trainability, generalisation, read-out cost, and hardware feasibility, which motivates controlled empirical studies of alternative QML architectures~\cite{du_quantum_2025}.}
-
-\theory{Schuld and Petruccione introduce quantum ensembles of quantum classifiers, where ensemble construction corresponds to a state-preparation routine and classifier decisions are evaluated coherently in parallel~\cite{schuld_quantum_2018}.}
-
-\comparison{The paper is closely related to this dissertation because it combines quantum classifiers into an ensemble, but it differs by forming a superposition over classifier parameters rather than stacking separately trained base learners with a quantum meta-learner~\cite{schuld_quantum_2018}.}
-
-\gap{The authors leave open whether other coherent ways of defining quantum ensembles exist for QML algorithms that do not fit their specific quantum-classifier format, which motivates exploring alternative architectures such as measurement-free quantum stacking~\cite{schuld_quantum_2018}.}
 
 %%%%%%%%
 \chapter{Methodology}
-
-\method{The paper emphasises that QML experiments should consider not only model accuracy, but also trainability, gradient scaling, prediction error, and scalability to larger problem sizes~\cite{cerezo_challenges_2022}.}
-
-\method{The authors identify inductive bias as a crucial design criterion for QNNs and quantum kernels, since the model architecture, embedding, loss function, and optimisation method all constrain the functions that can be learned~\cite{cerezo_challenges_2022}.}
-
-\method{The paper argues that adding problem knowledge into QNN design can sharpen the model prior and improve trainability, which supports using deliberately shallow, structured circuits rather than unconstrained deep hardware-efficient ansatzes~\cite{cerezo_challenges_2022}.}
-
-\method{Barren plateaus are described as a central trainability challenge in QML, where the loss landscape becomes exponentially flat with increasing problem size and therefore requires exponential resources to navigate~\cite{cerezo_challenges_2022}.}
-
-\method{The authors identify several sources of barren plateaus, including highly expressive hardware-efficient architectures, global observables, excessive entanglement, and quantum noise~\cite{cerezo_challenges_2022}.}
-
-\method{The paper states that barren plateaus caused by global observables can be avoided by using local observables, which is relevant when designing measurable outputs and cost functions for shallow QML classifiers~\cite{cerezo_challenges_2022}.}
-
-\method{The discussion of barren plateaus supports a staged training strategy in which base learners are trained separately and the quantum meta-learner is trained only after base parameters are fixed~\cite{cerezo_challenges_2022}.}
-
-\validation{The authors argue that high-quality quantum hardware is crucial for QML progress, supporting the inclusion of a hardware validation phase after noiseless and noisy simulation~\cite{cerezo_challenges_2022}.}
-
-\validation{The paper stresses that hardware noise should be explicitly accounted for in QML analysis when claiming near-term compatibility or pursuing quantum advantage on current devices~\cite{cerezo_challenges_2022}.}
-
-\tooling{Noise mitigation and shallow circuit design are presented as practical responses to hardware noise, although the authors caution that error mitigation may not fully solve noise-induced trainability issues~\cite{cerezo_challenges_2022}.}
-
-\method{The paper supports treating QML as a full pipeline consisting of data preprocessing, quantum read-in, parameterised quantum circuit processing, quantum read-out, and classical optimisation~\cite{du_quantum_2025}.}
-
-\method{Classical preprocessing methods such as principal component analysis can be used to reduce high-dimensional data before quantum encoding, lowering quantum resource requirements while preserving relevant information~\cite{du_quantum_2025}.}
-
-\method{The tutorial discusses basis encoding, amplitude encoding, and angle encoding as practical quantum read-in strategies for mapping classical data into quantum states~\cite{du_quantum_2025}.}
-
-\method{The paper's use of PennyLane demonstrations supports implementing the simulation phase with established quantum software libraries rather than building circuits and optimisation routines entirely from scratch~\cite{du_quantum_2025}.}
-
-\method{The quantum classifier demonstration uses the Wine dataset, normalises features to the interval $[0,\pi]$, maps labels into $\{-1,1\}$, constructs a parameterised quantum circuit, and trains/tests the QNN, which provides a useful practical reference for the dissertation's Wine experiments~\cite{du_quantum_2025}.}
-
-\method{Quantum read-out is defined as the process of translating the quantum state resulting from quantum computation into classical data for further processing, interpretation, or optimisation~\cite{du_quantum_2025}.}
-
-\method{The distinction between full-information and partial-information read-out protocols is relevant to the dissertation because Conditions A and B require intermediate quantum-to-classical extraction, whereas Condition C delays measurement until the final output~\cite{du_quantum_2025}.}
-
-\validation{The paper supports evaluating QML models not only through predictive performance but also through trainability, expressivity, generalisation, and resource requirements~\cite{du_quantum_2025}.}
-
-\validation{The tutorial's discussion of NISQ limitations supports reporting circuit depth, gate count, measurement overhead, and hardware feasibility when comparing quantum stacking conditions~\cite{du_quantum_2025}.}
-
-\tooling{PennyLane is used throughout the tutorial for code implementations, while the authors also acknowledge other libraries such as Qiskit, Cirq, and TensorFlow Quantum as viable alternatives~\cite{du_quantum_2025}.}
-
-\method{The proposed quantum ensemble uses a weighted parameter superposition, applies the quantum classifier to evaluate model predictions in parallel, and obtains the ensemble prediction from the measurement statistics of the final output qubit~\cite{schuld_quantum_2018}.}
-
-\method{Their accuracy-weighted ensemble prepares model amplitudes according to training-set accuracy, replacing the search for one optimal parameter setting with an integration-like aggregation over many candidate classifiers~\cite{schuld_quantum_2018}.}
 
 \section{Experimental Conditions}
 
@@ -334,44 +210,6 @@ This dissertation is structured around three specific, falsifiable research ques
 %%%%%%%%
 \chapter{Results and Analysis}
 
-\result{The paper concludes that QML is most likely to achieve early advantage in settings involving quantum data, hidden parameter extraction, quantum sensing, quantum state classification, or quantum regression~\cite{cerezo_challenges_2022}.}
-
-\result{The authors argue that non-local quantum measurements can extract hidden parameters using fewer samples, which supports investigating whether coherent cross-register processing can preserve information that local or intermediate measurements may discard~\cite{cerezo_challenges_2022}.}
-
-\result{Noise is described as corrupting information as it forward-propagates through a quantum circuit, implying that deeper circuits and longer run-times are more vulnerable to performance degradation~\cite{cerezo_challenges_2022}.}
-
-\result{When using QNNs, hardware noise can hinder trainability by causing noise-induced barren plateaus, where useful landscape features are exponentially suppressed as circuit depth increases~\cite{cerezo_challenges_2022}.}
-
-\benchmark{The paper supports reporting circuit depth and two-qubit gate count as analysis metrics, since deeper circuits are more exposed to noise and therefore more likely to suffer trainability and performance degradation~\cite{cerezo_challenges_2022}.}
-
-\benchmark{The paper supports comparing noiseless simulation, noisy simulation, and hardware performance, because it argues that most QML research underestimates hardware noise while still claiming near-term relevance~\cite{cerezo_challenges_2022}.}
-
-\comparison{The warning that quantum advantage for classical data is not straightforward is important for interpreting results from Iris, Wine, or Breast Cancer datasets: any benefit of measurement-free stacking should be reported as an empirical architectural advantage rather than proof of general quantum advantage~\cite{cerezo_challenges_2022}.}
-
-\comparison{The paper's emphasis on non-local measurements provides theoretical support for comparing measured base-learner outputs against a measurement-free meta-learner that acts across the combined quantum state~\cite{cerezo_challenges_2022}.}
-
-\result{The paper concludes that QNNs and quantum kernel methods are among the most practical QML approaches for NISQ devices because they can be adapted to limited quantum resources~\cite{du_quantum_2025}.}
-
-\result{The paper explains that full quantum state tomography becomes computationally infeasible as system size grows because the number of measurements and classical memory required increase exponentially with the number of qubits~\cite{du_quantum_2025}.}
-
-\result{Observable estimation can also become resource-intensive because the required number of measurements grows with the number of Pauli terms in the observable~\cite{du_quantum_2025}.}
-
-\result{The paper identifies trainability, expressivity, and generalisation as the main theoretical dimensions for assessing whether QML models can learn effectively~\cite{du_quantum_2025}.}
-
-\result{The tutorial explains that NISQ-era QML has progressed through model design, application exploration, and theoretical analysis, but that achieving full quantum advantage remains an ongoing challenge~\cite{du_quantum_2025}.}
-
-\benchmark{The Wine dataset classifier demonstration provides a practical benchmark-style example for implementing and evaluating a QNN on a small classical dataset~\cite{du_quantum_2025}.}
-
-\benchmark{The paper supports using low-dimensional or dimensionally reduced datasets in near-term QML because quantum resource requirements are strongly constrained by the number and quality of available qubits~\cite{du_quantum_2025}.}
-
-\comparison{The paper's discussion of read-out bottlenecks supports analysing whether measurement-based stacking loses information or adds overhead compared with a measurement-free quantum stacking condition~\cite{du_quantum_2025}.}
-
-\comparison{The tutorial's framing of QNNs as hybrid quantum-classical models helps distinguish the dissertation's Condition B from Condition C: both use quantum circuits, but only Condition C preserves the intermediate quantum state across the stacking boundary~\cite{du_quantum_2025}.}
-
-\result{For point-symmetric models and symmetric parameter spaces, the accuracy-weighted construction effectively suppresses random guessers and turns poorly performing classifiers into useful contributors by flipping their decisions~\cite{schuld_quantum_2018}.}
-
-\result{Analytical and numerical investigations with simple perceptron models show that the accuracy-weighted ensemble can produce meaningful decision boundaries, although behaviour depends sensitively on the shape of the class distributions~\cite{schuld_quantum_2018}.}
-
 \section{Noiseless Simulation Results}
 
 \section{Noisy Simulation Results}
@@ -383,30 +221,6 @@ This dissertation is structured around three specific, falsifiable research ques
 
 %%%%%%%%
 \chapter{Summary and Conclusions}
-
-\motive{This paper supports the dissertation's central motivation by showing that measurement, noise, trainability, and quantum data representation are not implementation details but core questions in QML model design~\cite{cerezo_challenges_2022}.}
-
-\motive{The paper motivates testing whether preserving quantum state information across model components can offer value, since quantum advantage may depend on access to non-local correlations that are unavailable after local measurement~\cite{cerezo_challenges_2022}.}
-
-\limitation{The authors' caution about classical-data QML provides an important boundary for the dissertation: the proposed architecture should be evaluated as a controlled comparison of stacking mechanisms, not as an assumed route to quantum advantage~\cite{cerezo_challenges_2022}.}
-
-\gap{The paper leaves open how QML architectures should be designed to balance expressivity, trainability, hardware noise, and useful inductive bias, which directly motivates the proposed comparison between classical stacking, quantum re-encoding, and measurement-free quantum stacking~\cite{cerezo_challenges_2022}.}
-
-\gap{Because the effects of quantum noise on QML trainability and classical simulability remain underexplored, the dissertation can contribute by explicitly measuring simulation-to-hardware performance gaps across the three stacking conditions~\cite{cerezo_challenges_2022}.}
-
-\motive{This paper supports the dissertation by providing a practical and theoretical foundation for explaining QML models, quantum encodings, QNNs, NISQ constraints, and quantum measurement~\cite{du_quantum_2025}.}
-
-\motive{The paper's treatment of quantum read-out strengthens the dissertation's motivation for testing whether delaying measurement until the final stage can preserve useful quantum information in an ensemble architecture~\cite{du_quantum_2025}.}
-
-\limitation{The paper cautions that QML faces significant practical constraints from NISQ hardware, read-in and read-out overheads, measurement costs, trainability, and generalisation issues~\cite{du_quantum_2025}.}
-
-\gap{Because the tutorial does not study ensemble stacking or measurement-free meta-learning, the dissertation can build on its QML foundations while contributing a focused comparison of classical, re-encoded quantum, and fully coherent quantum stacking mechanisms~\cite{du_quantum_2025}.}
-
-\gap{The paper's emphasis on pipeline-level evaluation motivates the dissertation's use of multiple metrics, including accuracy, F1-score, circuit depth, two-qubit gate count, convergence behaviour, simulation-to-hardware gap, and gradient variance~\cite{du_quantum_2025}.}
-
-\motive{The paper supports the dissertation's central motivation that ensemble aggregation can be performed coherently within a quantum circuit, with measurement delayed until the final collective decision~\cite{schuld_quantum_2018}.}
-
-\limitation{The proposal depends on efficient preparation of the weighted parameter superposition and low-depth implementation of the core classifier, and the authors identify overfitting, provable speedup, and broader coherent ensemble definitions as unresolved questions~\cite{schuld_quantum_2018}.}
 
 \section{Summary of Findings}
 
