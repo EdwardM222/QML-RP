@@ -369,13 +369,17 @@ OUTPUT report.toc
 INPUT c:/tools/TinyTeX/texmf-dist/fonts/tfm/jknappen/ec/ectt1095.tfm
 INPUT c:/tools/TinyTeX/texmf-dist/fonts/tfm/jknappen/ec/ecsx1200.tfm
 INPUT c:/tools/TinyTeX/texmf-dist/fonts/tfm/jknappen/ec/ecsx1728.tfm
+INPUT c:/tools/TinyTeX/texmf-dist/fonts/tfm/jknappen/ec/tcss1095.tfm
 INPUT c:/tools/TinyTeX/texmf-dist/fonts/tfm/jknappen/ec/ecsi1095.tfm
+INPUT c:/tools/TinyTeX/texmf-dist/fonts/tfm/jknappen/ec/eccc1095.tfm
 INPUT report.aux
 INPUT ./report.out
 INPUT ./report.out
 INPUT report.run.xml
 OUTPUT report.run.xml
+INPUT c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/eccc1095.600pk
 INPUT c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsi1095.600pk
+INPUT c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/tcss1095.600pk
 INPUT c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsx1728.600pk
 INPUT c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecss2074.600pk
 INPUT c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsx1200.600pk
@@ -389,3 +393,9 @@ INPUT c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecss1440.600pk
 INPUT c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecss1728.600pk
 INPUT c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsx2488.600pk
 INPUT c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecss2488.600pk
+INPUT c:/tools/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb
+INPUT c:/tools/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb
+INPUT c:/tools/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb
+INPUT c:/tools/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb
+INPUT c:/tools/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb
+INPUT c:/tools/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb

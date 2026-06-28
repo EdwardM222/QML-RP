@@ -18,13 +18,13 @@
 \newcommand{\challenge}[1]{{\color{red}#1}}
 \newcommand{\limitation}[1]{{\color{orange}#1}}
 \newcommand{\method}[1]{{\color{cyan!80!black}#1}}
-\newcommand{\result}[1]{{\color{yellow!60!olive}#1}}
+\newcommand{\result}[1]{{\color{green!60!black}#1}}
 \newcommand{\benchmark}[1]{{\color{violet}#1}}
 \newcommand{\comparison}[1]{{\color{pink!70!violet}#1}}
 \newcommand{\theory}[1]{{\color{gray}#1}}
 \newcommand{\tooling}[1]{{\color{brown}#1}}
 \newcommand{\gap}[1]{{\color{black}#1}}
-\newcommand{\validation}[1]{{\color{green!60!black}#1}}
+\newcommand{\validation}[1]{{\color{yellow!60!olive}#1}}
 
 \usepackage{subcaption}
 \usepackage{pgfgantt}
@@ -91,13 +91,13 @@ This chapter is a \textbf{temporary reference} to be removed before final submis
 \challenge{text}  % Red    - Challenge
 \limitation{text} % Orange - Limitation
 \method{text}     % Cyan   - Method
-\result{text}     % Yellow - Result
+\result{text}     % Green  - Result
 \benchmark{text}  % Purple - Benchmark
 \comparison{text} % Pink   - Comparison
 \theory{text}     % Grey   - Theory
 \tooling{text}    % Brown  - Tooling
 \gap{text}        % Black  - Gap
-\validation{text} % Green  - Validation
+\validation{text} % Yellow - Validation
 \end{verbatim}
 
 \noindent\rule{\textwidth}{0.4pt}
@@ -162,9 +162,106 @@ This chapter is a \textbf{temporary reference} to be removed before final submis
 
 \section{Motivation}
 
+\paragraph{Research notes.}
+\begin{itemize}
+    \motive{\item ``Quantum ensembles of quantum classifiers'' establishes quantum ensemble learning as a relevant research direction rather than only a classical ensemble idea~\cite{schuld_quantum_2018}.}
+    \motive{\item Combining multiple classifiers can preserve useful expert knowledge that may be lost when selecting only one final trained model~\cite{schuld_quantum_2018}.}
+    \motive{\item Weak but accurate classifiers can form strong ensembles, supporting the use of simple VQC base learners rather than one large monolithic quantum classifier~\cite{schuld_quantum_2018}.}
+    \motive{\item QML is framed as learning algorithms executed on quantum computers with potential advantages over classical implementations, supporting the general motivation for testing VQC-based classification~\cite{du_quantum_2025}.}
+    \motive{\item QML is positioned as a response to the computational limits of classical AI scaling, where larger models and datasets create increasing training and runtime costs~\cite{du_quantum_2025}.}
+    \motive{\item QNNs and quantum kernels are described as flexible NISQ-compatible approaches, supporting the use of near-term variational quantum classifiers rather than fault-tolerant algorithms~\cite{du_quantum_2025}.}
+    \motive{\item Quantum machine learning is motivated by the possibility that quantum systems can generate statistical patterns that are difficult for classical computers to reproduce, and may therefore help recognise patterns that are difficult to recognise classically~\cite{biamonte_quantum_2017}.}
+    \motive{\item The review frames QML as a search for quantum algorithms that can serve as machine-learning building blocks, while emphasising that hardware and software challenges remain substantial~\cite{biamonte_quantum_2017}.}
+
+    \motive{\item Ensemble learning is motivated by the limits of single traditional learners on complex data, including imbalanced, high-dimensional, and noisy datasets, where multiple data characteristics may be difficult for one model to capture~\cite{dong_survey_2020}.}
+    \motive{\item Ensemble methods aim to combine complementary information from multiple weak or diverse learners so that the overall model performs better than any constituent model alone~\cite{dong_survey_2020}.}
+
+    \motive{\item Quantum ensemble learning is motivated by the difficulty of scaling individual quantum models to complex datasets, with AdaBoost.Q proposed as a near-term-compatible way to improve quantum classifier performance~\cite{song_quantum_2024}.}
+    \motive{\item Quantum ensemble VQCs are motivated as a modular response to NISQ-era limits in noise, scalability, and trainability, using multiple smaller circuits rather than one monolithic VQC~\cite{park_addressing_2025}.}
+
+    \motive{\item Early QML is framed as using quantum computing either to accelerate costly machine-learning subroutines or to translate stochastic/probabilistic learning models into quantum-theoretic language~\cite{schuld_introduction_2015}.}
+    \motive{\item Araujo and da Silva extend the earlier quantum ensemble idea by testing whether trained classifiers are more effective than optimisation-free classifier superpositions, directly motivating trained base learners rather than relying on untrained weak models~\cite{araujo_quantum_2020}.}
+    \motive{\item Stacking is described as a general ensemble framework in which base-model predictions are learned by a second-level combiner, motivating its use as a flexible aggregation baseline for comparing quantum and classical meta-learners~\cite{demir_modified_2018}.}
+    \motive{\item Classical ensembles of single-qubit variational quantum classifiers are proposed as a way to scale the expressive QAUM architecture without increasing circuit depth beyond NISQ coherence limits~\cite{mcfarthing_classical_2024}.}
+
+    \motive{\item QBoost performance is framed as depending jointly on weak-classifier quality and optimisation efficiency, reinforcing that ensemble design cannot be reduced to the final combiner alone~\cite{liu_construction_2025}.}
+    \motive{\item SEQSVM is motivated by combining strong classical ensemble learners with a quantum meta-learner, using the ensemble outputs as compact high-level features for quantum classification~\cite{akrom_bloodbrain_2025}.}
+    \motive{\item Quantum amplitude amplification is presented as a way to estimate an ensemble model's total class probability with theoretical quadratic prediction speed-up over querying all base classifiers classically~\cite{safina_quantum_2023}.}
+
+    \motive{\item Kang and Shin use a stacking-style meta-model to combine ML, DNN, and QNN predictions, arguing that different learners capture independent features, hierarchical interactions, and higher-order nonlinear dependencies respectively~\cite{kang_amino_2025}.}
+    \motive{\item The paper presents one of the first applications of QNNs to intrinsically disordered region classification, motivating QNNs as a way to model feature interactions in biological sequence data~\cite{kang_amino_2025}.}
+
+
+    \motive{\item Quantum ensemble learning is motivated by using quantum superposition and entanglement to evaluate multiple data paths or weak learners in parallel, rather than constructing every ensemble member sequentially~\cite{rathi_enhanced_2025}.}
+    \motive{\item The proposed QEL framework is presented as a shallow-circuit ensemble method in which quantum parallelism may improve prediction accuracy, scalability, and resource use for ensemble classification~\cite{rathi_enhanced_2025}.}
+    \motive{\item Quantum stacking is motivated for Industrial Control Systems security by combining QVC, QSVC, and QNN outputs to improve detection accuracy while limiting qubit usage on constrained quantum hardware~\cite{vasan_exploring_2025}.}
+
+    \motive{\item Xiong et al. motivate hybrid quantum ensemble learning from the observation that individual quantum classifiers remain limited by circuit depth, quantum noise, and data-encoding choices, so ensemble methods may improve weak quantum classifier performance~\cite{xiong_hybrid_2024}.}
+    \motive{\item Malicious-code growth is used as a domain motivation for quantum-assisted classification, with ensemble learning proposed to improve detection precision while quantum methods address the scaling pressure of large cybersecurity datasets~\cite{xiong_hybrid_2024}.}
+
+
+    \motive{\item Quantum bagging with unsupervised base learners is motivated by noisy labels and NISQ instability: the ensemble reduces variance while QMeans avoids directly fitting corrupted targets during base-learner training~\cite{rathi_quantum_2025}.}
+
+
+    \motive{\item Classical ensemble methods are presented as a NISQ-compatible way to reduce quantum resource requirements: several compact quantum classifiers trained on smaller subsets can match or improve a single larger classifier while improving robustness~\cite{tolotti_ensembles_2024}.}
+
+
+    \motive{\item Abdulsalam et al. motivate a healthcare quantum ensemble by arguing that QML may improve medical prediction while bagging can improve classifier reliability, supporting domain evidence for measured quantum ensembles beyond toy datasets~\cite{abdulsalam_explainable_2023}.}
+
+
+    \motive{\item RSM-VQC ensembling is motivated by the same NISQ-era pressure identified in the wider literature: reducing each learner's feature dimensionality can make VQC training more feasible while preserving ensemble-level performance~\cite{incudini_resource_2023,radojicic_reducing_2026}.}
+    \motive{\item A systematic student FYP frames ensembles of small, architecturally diverse VQCs as a practical response to barren plateaus and the ansatz lottery, supporting this dissertation's decision to treat single-VQC architecture as unstable and aggregation as the main research focus~\cite{pinto_composing_2026}.}
+\end{itemize}
+
+
+
 Quantum Machine Learning (QML) occupies an unsettled frontier in which the NISQ era has produced a family of hybrid quantum-classical algorithms, most notably Variational Quantum Circuits (VQCs), whose theoretical promise has yet to be confirmed in practice. A structural limitation shared by virtually all current QML pipelines is their universal application of a measurement step before any aggregation, combination, or further learning takes place. In classical machine learning, reading a neuron's activation leaves its value unchanged; in quantum mechanics, measurement is irreversible, collapsing the superposition state into a definite classical outcome and discarding all phase and amplitude information encoded in that state. This asymmetry between the two computational paradigms motivates the central inquiry of this dissertation: whether, in an ensemble of quantum classifiers, deferring measurement until after the meta-learner has acted on the full quantum state is both feasible and beneficial.
 
 \section{Problem Statement}
+
+\paragraph{Research notes.}
+\begin{itemize}
+    \theory{\item A quantum state over $n$ qubits contains $2^n$ amplitudes, but amplitudes cannot be directly measured; measurement collapses the state to at most $n$ classical bits and destroys the quantum information, so useful quantum algorithms must shape measurement probabilities before readout~\cite{resch_quantum_2019}.}
+    \challenge{\item Quantum data cannot be copied because of the no-cloning theorem, and quantum states usually persist only for the duration of a program, making the idea of storing intermediate quantum meta-features fundamentally different from storing classical stacking features~\cite{resch_quantum_2019}.}
+    \challenge{\item Quantum states are fragile, naturally decay, and are corrupted by environmental interaction, so larger coherent circuits face increasing constraints from noise, coherence time, and error correction overhead~\cite{resch_quantum_2019}.}
+    \challenge{\item The review notes that quantum neural networks require non-linearity, while quantum computation is inherently linear; measurements can introduce non-linearity but destroy quantum information, directly supporting the tension behind measurement-free stacking~\cite{resch_quantum_2019}.}
+    \challenge{\item Current NISQ devices remain sensitive to environmental noise and decoherence, with imperfect qubits, gates, and measurements producing incorrect outputs~\cite{du_quantum_2025}.}
+    \challenge{\item NISQ processors are restricted by error-prone gates and limited coherence times, supporting the need for shallow, low-width circuits~\cite{du_quantum_2025}.}
+    \challenge{\item Read-in and read-out bottlenecks are major caveats for QML speedup claims, especially when classical data must be loaded into quantum states and quantum outputs must be extracted classically~\cite{du_quantum_2025}.}
+    \challenge{\item The input, output, costing, and benchmarking problems are identified as fundamental obstacles to practical QML, supporting caution when interpreting theoretical speedups as experimental advantages~\cite{biamonte_quantum_2017}.}
+    \gap{\item Schuld and Petruccione explicitly leave open whether there are other coherent ways of defining quantum ensembles for quantum machine learning algorithms, supporting the novelty of measurement-free quantum stacking~\cite{schuld_quantum_2018}.}
+    \gap{\item The QML tutorial surveys QNNs, quantum kernels, trainability, and implementation, but does not address measurement-free stacking of multiple trained VQC base learners through a coherent meta-circuit~\cite{du_quantum_2025}.}
+    
+    \challenge{\item Vanishing gradients/barren plateaus and cost function concentration are presented as persistent obstacles to QNN trainability, motivating ensemble-style circuit decomposition rather than simply increasing circuit depth~\cite{friedrich_quantum_2025}.}
+    \challenge{\item Multi-chip ensemble VQCs are framed as a response to three practical limitations of single-chip VQCs: limited scalability, barren-plateau trainability problems, and accumulated hardware noise~\cite{park_addressing_2025}.}
+    \gap{\item Existing distributed QML strategies are described as lacking sufficient theoretical analysis of trainability, generalisation, noise resilience, and hardware compatibility, leaving room for more principled ensemble architectures~\cite{park_addressing_2025}.}
+
+    \gap{\item The paper states that a comprehensive theory of quantum learning was still in its early stages, including open questions about quantum decision functions, quantum strategies, and genuinely quantum representations of classical data~\cite{schuld_introduction_2015}.}
+    \challenge{\item It identifies a tension between common machine-learning optimisation methods, such as iterative gradient descent, and coherent reversible quantum computation~\cite{schuld_introduction_2015}.}
+    \challenge{\item The paper notes that measuring the ensemble answer collapses the classifier superposition, requiring the ensemble-building process to be repeated for further classifications~\cite{araujo_quantum_2020}.}
+
+    \challenge{\item The paper identifies insufficient weak-classifier diversity and accuracy-only optimisation as key weaknesses in standard QBoost, especially for noisy, high-dimensional, or distribution-shifted data~\cite{liu_construction_2025}.}
+    \challenge{\item Existing BBBP prediction methods are described as limited by class imbalance, scalability, high computational demand, and limited exploration of hybrid quantum--classical stacking approaches~\cite{akrom_bloodbrain_2025}.}
+    \challenge{\item The random-forest simulation highlights a probability-aggregation issue: overconfident or overfitted trees can produce near-binary amplitudes, making a single measurement vulnerable to selecting an unrepresentative classifier state~\cite{safina_quantum_2023}.}
+
+    \limitation{\item The Uversky plot, based only on scaled hydrophobicity and net charge, achieves only 0.63 accuracy for IDR classification, illustrating the limitation of using too few independent features for complex classification boundaries~\cite{kang_amino_2025}.}
+    \challenge{\item The authors report that QNN interpretability and computational cost remain challenges, and that the QNN contribution to overall meta-model performance was smaller than expected despite revealing useful feature interactions~\cite{kang_amino_2025}.}
+
+
+    \challenge{\item Prior quantum ensemble approaches based on Bayesian model averaging are described as limited by weak practical adoption, while quantum boosting is constrained by the need to efficiently generate many identical quantum training states and by reliance on fault-tolerant procedures such as quantum phase estimation~\cite{rathi_enhanced_2025}.}
+    \challenge{\item Individual quantum classifiers in the ICS study struggled to scale with larger sampled datasets: QSVM, VQC, and QNN frequently collapsed to zero F1 scores at 512 samples, while the stacked ensemble preserved non-zero minority-class performance~\cite{vasan_exploring_2025}.}
+    \challenge{\item Variational quantum classifiers are described as sensitive to initial parameters and difficult to optimise as dataset size increases, reinforcing the need to control training complexity in VQC-based experiments~\cite{vasan_exploring_2025}.}
+    \limitation{\item The experiments are conducted on Qiskit statevector simulation with small binary datasets and low-dimensional feature encodings, so the reported performance does not demonstrate noisy-hardware feasibility~\cite{rathi_enhanced_2025}.}
+
+    \challenge{\item The paper explicitly notes that amplitude-encoded values are not directly observable and must be estimated by repeated measurements, which makes measured quantum ensemble pipelines sensitive to shot noise and readout precision~\cite{tolotti_ensembles_2024}.}
+    \limitation{\item The quantum cosine, distance, and k-NN classifiers considered assume QRAM for efficient state preparation, but the authors note that working QRAM prototypes do not yet exist and that their study therefore evaluates accuracy rather than practical quantum time advantage~\cite{tolotti_ensembles_2024}.}
+
+
+    \challenge{\item In the RSM-VQC study, the main practical bottleneck is that higher feature dimensionality increases circuit width/depth and can make full-feature VQC training prohibitive on student-scale hardware; this supports feature subspacing as a necessary base-ensemble control rather than only an accuracy trick~\cite{radojicic_reducing_2026}.}
+    \challenge{\item The VQC composition study treats ansatz choice as an empirical ``lottery'': architectures with similar depth and parameter counts can differ substantially, so evaluating only one template risks overfitting the dissertation's conclusions to an arbitrary circuit family~\cite{pinto_composing_2026}.}
+\end{itemize}
+
+
 
 Ensemble learning is among the most reliably effective paradigms in classical machine learning, with stacking enabling a meta-learner to exploit the combined outputs of diverse base learners and frequently achieve higher accuracy than any constituent model alone. In quantum computing, ensemble methods have begun to receive attention, yet virtually all proposed architectures follow a measure-then-combine pipeline that is structurally identical to its classical counterpart: base classifiers produce classical probability vectors, which a classical or quantum meta-learner subsequently processes, discarding the quantum nature of the base classifiers at the point of measurement. This work proposes and evaluates a measurement-free stacking architecture, referred to throughout as Condition C, in which base VQC circuits execute in parallel on spatially separated qubit registers of a single IBM quantum processor, with their output states routed directly into a quantum meta-learner circuit without intermediate measurement. The complete classification pipeline, from input encoding through to final prediction, is executed as a single unitary transformation, with measurement occurring only at the terminal stage.
 
@@ -181,13 +278,65 @@ This dissertation is structured around three specific, falsifiable research ques
 \section{Scope and Contributions}
 
 
-%%%%%%%%
-\chapter{Background}
-
-
 
 %%%%%%%%
 \chapter{Related Work}
+
+\paragraph{Research notes.}
+\begin{itemize}
+    \comparison{\item Quantum machine-learning approaches are described as ranging from translations of classical ML models into quantum algorithms to genuinely new models based on quantum-computing principles, supporting a distinction between quantum re-encoding baselines and more state-preserving coherent architectures~\cite{resch_quantum_2019}.}
+    \method{\item Near-term variational algorithms are framed as hybrid loops in which classical optimisation steers parameterised quantum subroutines through repeated measurement, matching the general VQC training paradigm used in the measured ensemble stages~\cite{resch_quantum_2019}.}
+    \method{\item Schuld and Petruccione define a quantum ensemble by preparing a weighted superposition over classifier parameter states, evaluating classifiers in parallel, and extracting the collective decision through measurement of the output qubit~\cite{schuld_quantum_2018}.}
+    \method{\item The accuracy-weighted quantum ensemble weights each classifier according to its performance on the training data~\cite{schuld_quantum_2018}.}
+    \theory{\item Large weighted ensembles are connected to Bayesian-style integration over possible models, replacing selection of a single optimal parameter setting with aggregation over many candidates~\cite{schuld_quantum_2018}.}
+    \theory{\item For point-symmetric model families, accuracy weighting can suppress random guessers and flip the contribution of inaccurate classifiers, making the ensemble behave as if it contains accurate weak learners~\cite{schuld_quantum_2018}.}
+    \comparison{\item FTQC-based QML algorithms can offer stronger theoretical speedups but require large error-corrected devices, whereas NISQ approaches such as QNNs and quantum kernels are more flexible and experimentally accessible~\cite{du_quantum_2025}.}
+    \comparison{\item The review distinguishes learning from classical data encoded into quantum states from learning directly on quantum data, with quantum data presented as a more immediate and technically natural application because it avoids some classical-input bottlenecks~\cite{biamonte_quantum_2017}.}
+    \method{\item Linear-algebra-based QML algorithms use quantum subroutines such as HHL, quantum PCA, and quantum support vector machines to manipulate high-dimensional state vectors, but they typically depend on restrictive input and readout assumptions~\cite{biamonte_quantum_2017}.}
+    \comparison{\item DNNs and QNNs follow similar iterative learning workflows, with the key difference being that QNNs implement the trainable model through quantum circuits~\cite{du_quantum_2025}.}
+    \limitation{\item Schuld and Petruccione's demonstrations are limited to simple perceptron-style models and synthetic low-dimensional data, rather than realistic VQC architectures or benchmark classification datasets~\cite{schuld_quantum_2018}.}
+    \limitation{\item Many FTQC-based QML algorithms require error-corrected quantum computers and strong input assumptions, making them unsuitable for near-term experimental work~\cite{du_quantum_2025}.}
+
+    \method{\item A standard supervised ensemble classification model has two stages: generating predictions from multiple weak classifiers and integrating those predictions through a voting or consensus scheme~\cite{dong_survey_2020}.}
+    \method{\item The stacking pipeline uses a first layer of base models to generate prediction features and a second-layer combiner to learn from those predictions, matching the measured stacking structure used as a baseline in this dissertation~\cite{demir_modified_2018}.}
+    \method{\item The survey identifies bagging, AdaBoost, random forests, random subspace methods, and gradient boosting as mainstream supervised ensemble approaches, distinguishing parallel member generation from sequential boosting-style training~\cite{dong_survey_2020}.}
+    \method{\item Ensemble diversity can be introduced at several levels, including sample subsets, feature subspaces, base-classifier selection, classifier weighting, and ensemble-level optimisation~\cite{dong_survey_2020}.}
+
+    \comparison{\item Quantum ensemble methods are divided into coherent-superposition approaches, which promise speedups but are generally fault-tolerant rather than near-term, and classical-style ensemble approaches, which are more compatible with noisy quantum devices~\cite{song_quantum_2024}.}
+    \method{\item AdaBoost.Q adapts classical boosting to quantum classifiers by using prediction probabilities from quantum measurement as confidence information when reweighting samples and combining base classifiers~\cite{song_quantum_2024}.}
+    
+    \method{\item Friedrich and Maziero propose an ensemble quantum layer in which one depth-$L$ circuit is replaced by $L$ independent depth-1 circuits, whose expectation-value outputs are summed before being passed to the next classical layer~\cite{friedrich_quantum_2025}.}
+    \comparison{\item Unlike AdaBoost.Q, which sequentially trains measured weak classifiers, this method decomposes a single hybrid quantum-classical neural-network layer into multiple shallow circuits to reduce trainability problems~\cite{song_quantum_2024,friedrich_quantum_2025}.}
+    \method{\item A multi-chip ensemble VQC partitions the input into subvectors, processes each subvector with an independent small VQC, and combines the measured outputs through a classical function~$g$~\cite{park_addressing_2025}.}
+    \comparison{\item The paper contrasts multi-chip ensemble VQCs with circuit cutting, communication-based distributed QML, feature-partitioned QML, and quantum federated learning, arguing that prior approaches either introduce overhead, communication latency, limited aggregation, or weak theoretical grounding~\cite{park_addressing_2025}.}
+
+    \method{\item The review organises early QML work around quantum versions of k-nearest neighbours, support vector machines, clustering, neural networks, decision trees, Bayesian theory, and hidden Markov models, showing that the field was initially fragmented across algorithm families~\cite{schuld_introduction_2015}.}
+    \comparison{\item Distance-based methods such as kNN, SVMs, and k-means are mainly linked to quantum routines for evaluating similarities, inner products, and distances, whereas probabilistic methods are linked to open quantum systems~\cite{schuld_introduction_2015}.}
+    \limitation{\item The review notes that neural networks and decision trees lacked convincing quantum versions at the time, with no fully functioning efficient quantum pattern-classification neural network identified~\cite{schuld_introduction_2015}.}
+    \method{\item The quantum ensemble uses registers for the input sample, classifier parameters, classifier output, correct label, and an ancilla; classifier accuracy is encoded into amplitudes so that better classifiers have greater influence~\cite{araujo_quantum_2020}.}
+    \comparison{\item Unlike Schuld and Petruccione's optimisation-free proposal, Araujo and da Silva explicitly compare untrained and trained classifier ensembles, finding that optimisation is crucial on benchmark datasets~\cite{schuld_quantum_2018,araujo_quantum_2020}.}
+    \method{\item The paper combines single-qubit QAUM base classifiers using classical bagging and boosting, with a logistic-regression metalearner used to learn weighted voting rather than relying on simple majority or plurality voting~\cite{mcfarthing_classical_2024}.}
+    \comparison{\item The approach differs from coherent quantum ensembles by measuring each single-qubit classifier and combining the outputs classically, making it a useful measured-ensemble contrast for a measurement-free stack~\cite{mcfarthing_classical_2024}.}
+
+    \method{\item The proposed QBoost variant constructs weak classifiers from pruned random decision trees using random feature subspaces and adaptive pruning, aiming to balance diversity, accuracy, and overfitting control~\cite{liu_construction_2025}.}
+    \method{\item Its multi-objective QBoost loss jointly minimises classification loss, rewards pairwise classifier disagreement, and regularises classifier weights, making diversity an explicit optimisation target rather than a post-hoc diagnostic~\cite{liu_construction_2025}.}
+    \method{\item Safina maps each random-forest tree's class probabilities into amplitudes over $2N$ states, marks Class1 states as ``Good'', and applies amplitude amplification/QSearch to estimate the ensemble Class1 probability~\cite{safina_quantum_2023}.}
+
+    \method{\item Xiong et al. propose a two-layer hybrid quantum ensemble: a classical stacking layer using SVM, MLPC, AdaBoost, Random Forests, and GBDT to produce reduced learned features, followed by a quantum layer using QSVM, QKNN, and VQC whose predictions are combined by voting~\cite{xiong_hybrid_2024}.}
+    \method{\item The quantum layer enhances weak quantum classifiers through Bayesian hyperparameter optimisation for QSVM, small-scale parameter search for QKNN and VQC, and bagging for QSVM and VQC~\cite{xiong_hybrid_2024}.}
+    \comparison{\item Unlike measured quantum stacking papers that use quantum outputs as meta-features, this model first uses classical stacking for feature reduction and then applies a heterogeneous quantum voting ensemble, making it a useful hybrid baseline but not a coherent measurement-free stack~\cite{xiong_hybrid_2024}.}
+
+
+    \method{\item The Quantum Bootstrapped Bagging framework uses CQRAM-inspired sampling to prepare bootstrapped quantum subsamples, trains delta-$k^{++}$ QMeans base learners, assigns cluster labels by majority vote over training labels, and aggregates base predictions by majority voting or averaging~\cite{rathi_quantum_2025}.}
+    \comparison{\item Unlike supervised quantum bagging and stacking methods, the base learners are unsupervised clusters rather than trainable classifiers, making the method mainly relevant to robustness and variance reduction rather than coherent VQC meta-learning~\cite{rathi_quantum_2025}.}
+
+
+
+    \method{\item Abdulsalam et al. implement a Bagging--QSVC model in which 100 bootstrap samples train separate QSVC base classifiers and final prediction is selected by majority vote~\cite{abdulsalam_explainable_2023}.}
+    \comparison{\item The model is a measured bagging ensemble rather than stacking: each QSVC produces a classical prediction before aggregation, making it a useful measured-output baseline but not a coherent quantum meta-learner~\cite{abdulsalam_explainable_2023}.}
+\end{itemize}
+
+
 
 
 
@@ -196,15 +345,296 @@ This dissertation is structured around three specific, falsifiable research ques
 
 \section{Experimental Conditions}
 
+\paragraph{Research notes.}
+\begin{itemize}
+    \comparison{\item The contrast between FTQC and NISQ approaches supports evaluating near-term VQC-based conditions rather than assuming fault-tolerant quantum algorithms are experimentally relevant~\cite{du_quantum_2025}.}
+    \gap{\item Existing QML surveys do not compare measured stacking, quantum re-encoding, and coherent measurement-free stacking for finite trained VQC ensembles~\cite{du_quantum_2025}.}
+
+    \method{\item Random subspace ensembles train base learners on different feature subsets, directly supporting feature-subspace variation as a controlled source of diversity in the VQC base ensemble~\cite{dong_survey_2020}.}
+    \method{\item The modified stacking approach generates 100 base models using random feature subsets, then selects the best models before training the combiner, supporting feature-subspace diversity combined with learner pruning~\cite{demir_modified_2018}.}
+    \method{\item Model selection is tested using accuracy, information gain, and recall mean, providing classical precedent for selecting base learners by validation behaviour rather than using every trained learner~\cite{demir_modified_2018}.}
+    \method{\item Classifier selection and pruning are used to remove redundant or harmful base models, supporting the idea that the coherent ensemble may need learner selection rather than simply maximising the number of VQCs~\cite{dong_survey_2020}.}
+
+    \method{\item AdaBoost.Q trains weak quantum classifiers sequentially on reweighted data and combines their class-probability outputs using learned classifier weights, providing a quantum ensemble baseline based on measured classifier outputs~\cite{song_quantum_2024}.}
+    \method{\item Multi-chip ensemble VQCs compare single-chip VQCs, dimension-reduced multi-chip VQCs, and full-dimensional multi-chip ensembles, making the framework useful for separating the effects of circuit partitioning from those of classical dimension reduction~\cite{park_addressing_2025}.}
+    \method{\item The simulations compare untrained and trained quantum ensembles across ensemble sizes $|E|\in\{100,200,300,400,500\}$ using MLP classifiers, hold-out validation, and accuracy-weighted probability amplitudes~\cite{araujo_quantum_2020}.}
+    \method{\item Bagging is tested with 7 QAUM learners trained for 1714 iterations each, while boosting uses shallow weak learners with one embedding layer and one training iteration per learner, capped at 100 learners~\cite{mcfarthing_classical_2024}.}
+
+    \method{\item Each weak classifier uses a random 50\% feature subspace before tree training, providing a classical precedent for feature-subspace diversity in the base ensemble~\cite{liu_construction_2025}.}
+
+    \method{\item The dataset is taken from DisProt and downsampled to 2296 balanced sequences, with 1596 sequences for training/validation and 700 for independent testing~\cite{kang_amino_2025}.}
+    \method{\item The stacking ensemble combines an AutoML-derived soft-voting ML ensemble, an AutoKeras/TensorFlow DNN, and a PennyLane QNN, with a $K=5$ KNN model used as the final meta-learner~\cite{kang_amino_2025}.}
+
+
+    \method{\item Rathi and Kumar propose a quantum bagging-style ensemble using data, control, and test registers; the control register is placed in superposition so that $d$ control qubits generate $2^d$ transformed training subsamples in parallel~\cite{rathi_enhanced_2025}.}
+    \method{\item Vasan et al. implement measured quantum stacking with QSVC, QVC, and QNN as base classifiers and a Random Forest meta-learner trained on the quantum classifiers' posterior probabilities plus the reduced input features~\cite{vasan_exploring_2025}.}
+    \method{\item The ICS experiment reduces more than 129 original features to two principal components using PCA to reduce qubit usage and accelerate training/testing, showing how qubit constraints can directly shape the experimental feature space~\cite{vasan_exploring_2025}.}
+    \method{\item The algorithm is organised into state preparation, superposition-based sampling, learning through quantum interference, and final measurement, with measurement aggregating the ensemble prediction analogously to majority voting or averaging~\cite{rathi_enhanced_2025}.}
+    \method{\item Their implementation realises the classifier gate using a QSVM with a PauliFeatureMap quantum kernel, while noting that the base classifier could be replaced by other quantum learners such as QNNs or variational models~\cite{rathi_enhanced_2025}.}
+
+    \method{\item The malicious-code task uses static features extracted from opcode sequences, string statistics, and PE file structure, then converts the classical stacking outputs into the quantum layer input features~\cite{xiong_hybrid_2024}.}
+    \method{\item The classical stacking layer uses five-fold cross-validation predictions from heterogeneous classical learners as new features, preserving feature validity while reducing dimensionality before quantum classification~\cite{xiong_hybrid_2024}.}
+
+
+    \method{\item The proposed QBB algorithm separates quantum-inspired subsampling and QMeans clustering from classical aggregation; each hypothesis predicts by the majority label of the nearest cluster, so labels influence the learner only after clustering rather than during the cluster-formation step~\cite{rathi_quantum_2025}.}
+    \theory{\item Prediction variance across base learners is used as a stability measure, supporting ensemble-size analysis beyond accuracy alone when judging whether additional learners are worth the added quantum resource cost~\cite{rathi_quantum_2025}.}
+
+
+    \method{\item The empirical study combines three classical ensemble schemes---bootstrap, boosting, and stacking---with three quantum classifiers: quantum cosine, quantum distance, and quantum k-NN, evaluated across no normalisation, standardisation, and min--max normalisation~\cite{tolotti_ensembles_2024}.}
+
+
+    \method{\item The heart-disease experiment uses the Cleveland dataset with 303 instances and 14 attributes, applies RFE feature selection, PCA where required, and min--max normalisation before comparing classical and quantum classifiers~\cite{abdulsalam_explainable_2023}.}
+    \method{\item QSVC uses a five-qubit feature map based on five selected features, while QNN and VQC use two-qubit feature maps after PCA reduction, showing how qubit limits directly shape preprocessing and feature dimensionality~\cite{abdulsalam_explainable_2023}.}
+
+
+    \method{\item The RSM-VQC project varies feature subset ratios of 25\%, 50\%, and 75\%, with overlapping feature windows and ensemble methods including bagging, stacking, and simulated boosting, providing direct precedent for a controlled feature-subspace search before larger stacking experiments~\cite{radojicic_reducing_2026}.}
+    \method{\item The VQC composition project decouples individual model training from ensemble construction by first training a large model pool and then assembling ensembles from saved outputs, supporting a cached two-stage workflow for reducing repeated training cost in the dissertation~\cite{pinto_composing_2026}.}
+    \method{\item Roniya Pinto's framework evaluates ensemble composition through member-selection strategy, ensemble size, aggregation method, feature ratio, qubit count, depth, and ansatz family; this supports treating the final dissertation search as a structured design study rather than an unbounded hyperparameter sweep~\cite{pinto_composing_2026}.}
+\end{itemize}
+
+
+
 \section{Circuit Architecture}
+
+\paragraph{Research notes.}
+\begin{itemize}
+    \theory{\item Entanglement stores information in relationships between qubits rather than in each qubit independently, supporting the premise that measuring base learners before aggregation may discard relational quantum information unavailable to classical stacking~\cite{resch_quantum_2019}.}
+    \challenge{\item Qubit topology determines which qubits can interact directly; architectures with limited connectivity require SWAP operations for distant two-qubit gates, increasing gate count, latency, and error exposure~\cite{resch_quantum_2019}.}
+    \method{\item The review identifies topology, connectivity, control, and integration as architectural constraints, supporting a shallow structured meta-circuit or readout-register design instead of unrestricted all-to-all coherent aggregation~\cite{resch_quantum_2019}.}
+    \method{\item The standard QNN workflow consists of data encoding, trainable quantum processing, measurement-based output, loss evaluation, and classical parameter updates~\cite{du_quantum_2025}.}
+    \method{\item Data re-uploading strategies are identified as a way to encode classical data into more expressive quantum feature maps~\cite{du_quantum_2025}.}
+    \challenge{\item Loading large classical datasets into quantum form can dominate the runtime of linear-algebra-based QML algorithms unless strong qRAM or state-preparation assumptions are made~\cite{biamonte_quantum_2017}.}
+    \theory{\item QNN learnability is framed through the interaction between expressivity, trainability, and generalisation, providing a useful structure for evaluating ansatz choices~\cite{du_quantum_2025}.}
+    \challenge{\item Global measurements, high entanglement, and quantum system noise are listed as causes of barren plateaus, directly motivating shallow and structured meta-circuit design~\cite{du_quantum_2025}.}
+    \challenge{\item Near-term usefulness requires weighted state preparation and classifier inference routines to be implementable with low-depth and low-width circuits~\cite{schuld_quantum_2018}.}
+
+    \method{\item The MNIST experiment uses a shallow ten-qubit QNN with three layers of single-qubit gates and two entangling layers, while the quantum-phase task uses a 15-qubit QCNN with convolutional, pooling, and fully connected layers~\cite{song_quantum_2024}.}
+    \method{\item The QCNN compresses the register through pooling and measures two final qubits, supporting readout-register or compressed-readout designs as a practical alternative to global full-register measurement~\cite{song_quantum_2024}.}
+    
+    \method{\item The proposed ensemble layer keeps each quantum circuit at depth 1, using several shallow circuits instead of one deeper circuit, supporting shallow parallel subcircuits as a practical alternative to deeper monolithic quantum layers~\cite{friedrich_quantum_2025}.}
+    \theory{\item Since cost function concentration is linked to increasing parametrisation expressivity and depth, reducing each quantum subcircuit to depth 1 is used as an architectural mitigation strategy~\cite{friedrich_quantum_2025}.}
+    \method{\item The multi-chip architecture uses independent subcircuits with no cross-chip entangling gates, deliberately restricting entanglement to improve trainability, generalisation, and noise resilience~\cite{park_addressing_2025}.}
+    \comparison{\item This measured multi-chip architecture is a useful contrast to a measurement-free coherent stack: it improves scalability by avoiding inter-register quantum coupling, whereas the proposed dissertation model intentionally introduces a quantum meta-circuit across base learner registers~\cite{park_addressing_2025}.}
+
+    \method{\item The swap test is presented as a basic quantum routine for estimating state overlap or fidelity, allowing similarities between quantum-encoded feature vectors to be estimated through measurement~\cite{schuld_introduction_2015}.}
+    \method{\item The paper contrasts direct binary-basis encoding of classical data with amplitude/norm-based encodings, emphasising that useful QML may require representations that preserve structural information such as distance metrics~\cite{schuld_introduction_2015}.}
+    \method{\item QAUM circuits use a single qubit with alternating trainable rotation blocks and feature-encoding $R_z$ gates; increasing encoding repetitions increases accessible Fourier frequencies and hence expressivity~\cite{mcfarthing_classical_2024}.}
+    \method{\item The trainable QAUM block is modified from $R_zR_xR_y$ to $R_zR_xR_z$ to simplify optimisation while preserving the ability to map any initial single-qubit state to any final state~\cite{mcfarthing_classical_2024}.}
+    \method{\item The SEQSVM quantum feature map uses Hadamard, phase, and rotation gates to encode the stacked base-learner outputs into a quantum feature space before quantum-kernel evaluation~\cite{akrom_bloodbrain_2025}.}
+    \theory{\item For an ensemble with $N$ classifiers, the amplitude-amplification simulation represents $2N$ class-probability states using $O(\lceil\log N\rceil)$ qubits, contrasting with linear classical aggregation over all classifier outputs~\cite{safina_quantum_2023}.}
+
+    \method{\item The QNN uses 13 qubits with AngleEmbedding for the 13 amino-acid features and three StronglyEntanglingLayers to introduce trainable rotations and entanglement~\cite{kang_amino_2025}.}
+    \method{\item The paper analyses QNN feature interactions by removing selected qubit entanglements and measuring the resulting accuracy/AUC drop, providing a useful precedent for ablation-based analysis of quantum interactions~\cite{kang_amino_2025}.}
+
+
+    \method{\item The ensemble circuit uses controlled-SWAP operations to entangle control-qubit states with transformed feature-label pairs, creating multiple quantum trajectories before a single classifier operation is applied across the superposed ensemble~\cite{rathi_enhanced_2025}.}
+    \comparison{\item Unlike measured classical bagging, where each bootstrap model must be trained and evaluated separately, the proposed circuit applies the classifier operation once across all superposed trajectories, making ensemble growth additive in the circuit construction rather than sequential model replication~\cite{rathi_enhanced_2025}.}
+
+    \method{\item For QSVM and VQC, the paper uses a quantum state-coding circuit with block structure, neighbouring entanglement, and shifted long-distance entanglement, described as having good data expression and entanglement ability in the NISQ era~\cite{xiong_hybrid_2024}.}
+    \method{\item The VQC circuit uses RY and CNOT gates with depth 6 and 10 trainable parameters, while the QKNN polar-distance circuit has depth 21 and the Qiskit QSVM circuit has depth 68~\cite{xiong_hybrid_2024}.}
+    \method{\item QKNN uses polar distance, combining cosine similarity and module-length similarity through a tunable weight, to provide a distance metric better suited to quantum-state comparisons~\cite{xiong_hybrid_2024}.}
+
+
+    \method{\item The quantum cosine and quantum k-NN classifiers rely on SWAP-test-based similarity estimation, while the quantum distance classifier uses a Hadamard-plus-measurement circuit; all are measured-output quantum classifiers rather than state-preserving VQC blocks~\cite{tolotti_ensembles_2024}.}
+
+
+    \method{\item Ana Radojicic uses feature subsets to reduce the number of qubits and gates required by each VQC base learner, reinforcing that the base ensemble should remain deliberately small so that the stacking layer, not the base circuit, is the central experimental variable~\cite{radojicic_reducing_2026}.}
+    \method{\item Pinto uses shallow angle embedding with one feature mapped to one $R_y$ rotation, with entanglement introduced only by the ansatz, supporting simple interpretable encodings when the experiment already contains many ensemble-level variables~\cite{pinto_composing_2026}.}
+    \method{\item The VQC composition study compares ring, CZ, and hardware-efficient style ansatz families across depths and qubit counts, suggesting that ansatz choice should be represented by a small set of qualitatively different templates rather than a large unconstrained template search~\cite{pinto_composing_2026}.}
+\end{itemize}
+
+
 
 \section{Training Strategy}
 
+\paragraph{Research notes.}
+\begin{itemize}
+    \method{\item NISQ algorithms such as QAOA and VQE are described as hybrid quantum-classical procedures that alternate quantum subroutines with classical optimisation, reinforcing staged training of a frozen-base coherent meta-circuit as a near-term-compatible strategy~\cite{resch_quantum_2019}.}
+    \method{\item QNNs are defined as hybrid models that use quantum computers to implement trainable models while relying on classical optimisers for training~\cite{du_quantum_2025}.}
+    \method{\item Logistic regression, decision tree, and na\"ive Bayes are compared as stacking combiners, reinforcing that the meta-learner itself is an experimental variable rather than a neutral implementation detail~\cite{demir_modified_2018}.}
+    \theory{\item Trainability is described in terms of gradient magnitude and convergence rate, linking circuit design directly to optimisation behaviour~\cite{du_quantum_2025}.}
+    \challenge{\item Barren plateaus are identified as a trainability problem where gradient magnitudes can scale exponentially small with quantum system size~\cite{du_quantum_2025}.}
+    \challenge{\item Circuit and parameter initialisation, cost-function design, proper circuit structure, and regularisation are presented as strategies for mitigating barren plateaus~\cite{du_quantum_2025}.}
+    \challenge{\item Coherent training is described as more resource-intensive than inference, motivating hybrid or staged training strategies~\cite{schuld_quantum_2018}.}
+    \gap{\item The tutorial motivates careful circuit design through expressivity, trainability, and generalisation, but does not provide a specific method for training a meta-learner on unmeasured intermediate quantum states~\cite{du_quantum_2025}.}
+
+    \method{\item AdaBoost.Q uses the maximum measured class probability as a confidence score so that misclassified and low-confidence samples receive greater attention in later base classifiers~\cite{song_quantum_2024}.}
+    \limitation{\item The authors warn that AdaBoost.Q can overfit noisy data and suggest early stopping, learning-rate adjustment, and data cleaning as mitigations~\cite{song_quantum_2024}.}
+    
+    \method{\item The study trains hybrid quantum-classical models with Adam and parameter-shift gradients, while comparing ten random initialisations to test sensitivity to parameter initialisation~\cite{friedrich_quantum_2025}.}
+    \challenge{\item The effectiveness of the shallow-ensemble construction depends on the chosen parametrisation, so ansatz choice remains a key experimental control rather than a purely secondary implementation detail~\cite{friedrich_quantum_2025}.}
+    \method{\item Gradients for each multi-chip subcircuit can be computed independently and in parallel, giving a training advantage over monolithic circuits as the number of subcircuits increases~\cite{park_addressing_2025}.}
+    \challenge{\item The framework reinforces that controlling entanglement is a trainability choice: balanced local entanglement can reduce barren-plateau risk, while global entanglement may worsen optimisation and generalisation~\cite{park_addressing_2025}.}
+
+    \challenge{\item The review argues that many early QML proposals accelerate subroutines of classical algorithms rather than improving the learning process itself, motivating research into genuinely quantum learning procedures~\cite{schuld_introduction_2015}.}
+    \limitation{\item Quantum neural-network proposals are described as lacking a clear analogue of nonlinear activation functions and practical learning schemes based on quantum superposition and parallelism~\cite{schuld_introduction_2015}.}
+    \method{\item The models are trained with the gradient-free COBYLA optimiser on a noiseless simulator, and the authors use $5\times2$ cross-validation with paired $t$-tests for validation~\cite{mcfarthing_classical_2024}.}
+    \challenge{\item The authors explicitly trade representational power for trainability: single-qubit circuits minimise high-dimensional parameter spaces and entanglement, reducing barren-plateau risk but limiting individual classifier capacity~\cite{mcfarthing_classical_2024}.}
+
+    \method{\item The QBoost weights are optimised with a modified AdamW procedure using weight decay, with the authors reporting faster convergence and improved regularisation in noisy settings~\cite{liu_construction_2025}.}
+    \method{\item SEQSVM trains AdaBoost, XGBoost, and CatBoost as classical base learners, concatenates their predictions into a three-dimensional meta-feature vector, and feeds this representation to a QSVM meta-learner~\cite{akrom_bloodbrain_2025}.}
+    \method{\item The QSVM meta-learner uses a fidelity quantum kernel over quantum states generated from the stacked prediction vector, making it a measured-output quantum stacking method rather than a coherent state-preserving ensemble~\cite{akrom_bloodbrain_2025}.}
+
+    \method{\item The QNN is trained using PennyLane's gradient descent optimiser with step size 0.1, batch size 8, 100 training steps, and mean-squared-error loss~\cite{kang_amino_2025}.}
+
+
+    \method{\item For simulation feasibility, datasets are standard-scaled and reduced where necessary with PCA before quantum feature encoding; the authors use a compact setup with low-dimensional post-QFE features, shallow feature-map repetitions, and two control qubits~\cite{rathi_enhanced_2025}.}
+
+    \method{\item QSVM hyperparameters are optimised over $C\in\{0.1,0.5,1,5,10,100\}$ and $\gamma\in\{0.01,0.05,0.1,0.5,1,3,5\}$, with best values $C=0.1$ and $\gamma=3.0$~\cite{xiong_hybrid_2024}.}
+    \method{\item VQC parameter search selects CrossEntropyLoss and COBYLA, while QKNN selects $k=6$ and polar-distance weight $w=0.38$~\cite{xiong_hybrid_2024}.}
+
+
+    \method{\item Experiments vary the number of base learners from $4$ to $32$, set $k=10$ clusters, use $50\%$ bootstrapped training samples per base learner, test $\delta\in\{0.1,0.2,0.3,0.4\}$ for Delta-$k^{++}$ initialisation, and inject $5\%$ label noise~\cite{rathi_quantum_2025}.}
+
+
+    \method{\item Bootstrap and boosting are tuned over internal classifier count $N\in\{5,10,30,50\}$ and per-classifier sample count $S\in\{6,8,10,20\}$, with $N=30$ and $S=8$ selected as a trade-off between accuracy and runtime~\cite{tolotti_ensembles_2024}.}
+    \method{\item The stacking configuration uses heterogeneous quantum base classifiers with classifier-specific normalisation and a quantum 5-NN meta-classifier that receives both predicted classes and confidence values~\cite{tolotti_ensembles_2024}.}
+
+
+    \method{\item Both student projects reinforce a staged workflow: train compact VQC base learners first, store their outputs/weights, and then construct ensembles or stacking models afterwards; this aligns with freezing base learners before training the coherent meta-circuit~\cite{radojicic_reducing_2026,pinto_composing_2026}.}
+    \method{\item Pinto's pipeline trains 1,728 individual VQC configurations and 864 ensembles, showing that model-pool reuse is practical for analysing many ensemble combinations without retraining the base VQCs for each aggregation strategy~\cite{pinto_composing_2026}.}
+    \challenge{\item Radojicic limits experiments to three repetitions and 100 training epochs because VQC training is time-intensive, reinforcing the need to cap the dissertation's search space and prioritise parameters most likely to affect stacking behaviour~\cite{radojicic_reducing_2026}.}
+\end{itemize}
+
+
+
 \section{Simulation Framework}
+
+
+\paragraph{Research notes.}
+\begin{itemize}
+    \tooling{\item The hybrid scheme is implemented in Python with Qiskit Aer, using both statevector simulation for exact probabilities and local shot-based simulation with 8192 shots to emulate measurement sampling~\cite{tolotti_ensembles_2024}.}
+    \limitation{\item The simulations use no explicit hardware noise model, so the reported results are best-case estimates rather than noisy-device validation~\cite{tolotti_ensembles_2024}.}
+\end{itemize}
+
 
 \section{Hardware Deployment}
 
+\paragraph{Research notes.}
+\begin{itemize}
+    \benchmark{\item Hardware feasibility should consider coherence time, gate latency, gate fidelity, qubit mobility/connectivity, and qubit count together; qubit count alone is not a sufficient scalability measure~\cite{resch_quantum_2019}.}
+    \challenge{\item With physical error rates close to 1\%, surface-code error correction may require thousands of physical qubits for a single logical qubit, making fault-tolerant versions of wide ensemble circuits far beyond near-term experiments~\cite{resch_quantum_2019}.}
+    \tooling{\item The review surveys quantum software and compilation stacks including Qiskit/IBM Q Experience, OpenQASM, Quil, ProjectQ, QuTiP, and PennyLane, situating PennyLane-based VQC experiments within a broader tool ecosystem~\cite{resch_quantum_2019}.}
+    \benchmark{\item Recent hardware progress is reported using metrics such as quantum volume, CLOPS, and effective quantum volume, giving context for why qubit count alone is insufficient as a hardware feasibility measure~\cite{du_quantum_2025}.}
+    \tooling{\item PennyLane is used for practical code demonstrations, while Qiskit, Cirq, and TensorFlow Quantum are noted as similar QML implementation frameworks~\cite{du_quantum_2025}.}
+    \validation{\item Some QNN structures have been validated on real quantum platforms, demonstrating feasibility beyond purely theoretical proposals~\cite{du_quantum_2025}.}
+
+    \validation{\item AdaBoost.Q is experimentally demonstrated on a programmable superconducting processor with frequency-tunable transmon qubits arranged in an 11 by 11 lattice, using 20 qubits for parallel QNN training and 15 qubits for QCNN phase classification~\cite{song_quantum_2024}.}
+    \tooling{\item The hardware experiment compiles classifiers into native parameterised single-qubit gates and two-qubit CZ gates, with reported median Pauli error rates of approximately $5\times10^{-4}$ for single-qubit gates and $6\times10^{-3}$ for two-qubit gates~\cite{song_quantum_2024}.}
+
+    \tooling{\item The experiments are implemented using PyTorch and PennyLane, with a reduced MNIST task used for simulated hybrid quantum-classical classification~\cite{friedrich_quantum_2025}.}
+    \tooling{\item The multi-chip approach is presented as compatible with modular hardware roadmaps from IBM, IonQ, and Rigetti because it avoids frequent high-fidelity inter-chip quantum communication and relies on classical aggregation of chip outputs~\cite{park_addressing_2025}.}
+    \limitation{\item The experiments emulate NISQ conditions with calibrated depolarising and amplitude-damping noise rather than running gradient-based training on cloud quantum hardware, due to runtime and queue constraints~\cite{park_addressing_2025}.}
+    \tooling{\item The implementation uses Julia and the Yao quantum-circuit library, and the authors publish the associated code and data repository~\cite{mcfarthing_classical_2024}.}
+    \tooling{\item The QSVM component is implemented with an IBM Qiskit quantum simulator rather than real quantum hardware, due to current qubit-count and noise limitations~\cite{akrom_bloodbrain_2025}.}
+    \tooling{\item Safina implements preprocessing, random-forest prediction, and amplitude-amplification simulation in Python using scikit-learn, Pandas, NumPy, and a custom simulator rather than Qiskit or quantum hardware~\cite{safina_quantum_2023}.}
+
+    \tooling{\item The implementation uses PyCaret for classical model comparison, AutoKeras/TensorFlow for the DNN, PennyLane for the QNN, and SHAP for feature-importance analysis~\cite{kang_amino_2025}.}
+
+
+    \tooling{\item The implementation uses IBM Qiskit for statevector simulation and quantum feature extraction, together with joblib parallelisation to speed up pairwise quantum feature computations~\cite{rathi_enhanced_2025}.}
+
+    \tooling{\item The experimental environment is built using Python, IBM Qiskit, PyQpanda, and TensorFlow Quantum, situating the study within simulator-based hybrid QML tooling rather than hardware execution~\cite{xiong_hybrid_2024}.}
+
+
+    \benchmark{\item The experiment uses a balanced DataCon malicious-code dataset with 2000 samples, split 70:30 into training and test data, and evaluates accuracy, precision, recall, and F1-score~\cite{xiong_hybrid_2024}.}
+    \result{\item The proposed hybrid quantum ensemble reports 94.5\% accuracy, 98.9\% precision, 90.0\% recall, and 94.24\% F1-score, outperforming QSVM, VQC, QKNN, HQC-TTN, HQC-MERA, and a DecisionTreeClassifier on accuracy, precision, and F1-score~\cite{xiong_hybrid_2024}.}
+    \comparison{\item Compared with the second-best model, the proposed model improves precision, accuracy, and F1-score by approximately 3.0, 0.5, and 0.24 percentage points respectively, but its recall is lower than several baselines~\cite{xiong_hybrid_2024}.}
+    \benchmark{\item Resource analysis reports that the proposed model uses 10 qubits, 10 trainable parameters, and 68 quantum layers, giving higher qubit cost than QSVM/VQC but lower or comparable trainable-parameter cost than HQC-TTN and HQC-MERA~\cite{xiong_hybrid_2024}.}
+
+\end{itemize}
+
+
+
 \section{Evaluation Metrics}
+
+\paragraph{Research notes.}
+\begin{itemize}
+    \benchmark{\item Circuit evaluation should include not only accuracy but also width, depth, two-qubit gate count, topology-induced SWAP overhead, gate fidelity, and coherence-time feasibility, because these jointly determine whether a circuit can plausibly run before decoherence dominates~\cite{resch_quantum_2019}.}
+    \theory{\item Sample complexity is discussed as a measure of quantum learning efficiency, distinct from the classical use of sample complexity as only the number of training examples required for generalisation~\cite{du_quantum_2025}.}
+    \result{\item Analytical and numerical examples show that an accuracy-weighted quantum ensemble can produce meaningful decision boundaries on separated data distributions~\cite{schuld_quantum_2018}.}
+
+    \comparison{\item Ensemble performance depends on a trade-off between accuracy, diversity, generalisation, stability, sparsity, and complexity, so base-learner quality and diversity should be analysed alongside final stacked accuracy~\cite{dong_survey_2020}.}
+    \benchmark{\item Ensemble methods are reported as widely used because of advantages in accuracy, stability, and generalisation, and are commonly applied to imbalanced learning, multi-label learning, noisy data, and high-dimensional data~\cite{dong_survey_2020}.}
+
+    \result{\item On full MNIST testing, AdaBoost.Q improves a ten-qubit QNN from about 80.5\% to 86.7\% accuracy, with most of the gain achieved within the first few base classifiers~\cite{song_quantum_2024}.}
+    \result{\item In numerical comparison on the same QNN task, AdaBoost.Q gives an average accuracy improvement of 5.0\%, compared with 1.6\% for conventional AdaBoost.M1~\cite{song_quantum_2024}.}
+    \result{\item On quantum phase recognition, AdaBoost.Q improves a QCNN classifier from 77\% to 100\% test accuracy over 1564 quantum-state test samples using only two base classifiers~\cite{song_quantum_2024}.}
+    \benchmark{\item The MNIST experiment is presented as the first experimental benchmark of a quantum classifier on the full-size 10,000-sample MNIST test set, although the resulting 86.7\% accuracy remains well below classical benchmarks of about 99\%~\cite{song_quantum_2024}.}
+    
+    \result{\item The ensemble quantum layer increases gradient variance relative to the standard depth-$L$ circuit for two of the three tested parametrisations, indicating partial barren-plateau mitigation~\cite{friedrich_quantum_2025}.}
+    \result{\item On the reduced three-class MNIST task, the shallow-ensemble quantum layer generally obtains lower cost values, faster convergence, and stronger accuracy behaviour than the corresponding single deeper quantum layer~\cite{friedrich_quantum_2025}.}
+    \limitation{\item The classification experiment is limited to simulated reduced MNIST using digits 0, 1, and 2, with 4000 training images and 400 test images, so the results should be treated as a small-scale trainability study rather than a broad benchmark~\cite{friedrich_quantum_2025}.}
+    
+    \result{\item Multi-chip ensemble VQCs show faster convergence, lower generalisation error, and lower simulated quantum error than single-chip VQCs on MNIST, with similar trends reported for FashionMNIST and CIFAR-10~\cite{park_addressing_2025}.}
+    
+    \result{\item Increasing chip count reduces global entanglement and increases gradient variance, supporting the claim that partitioned ensemble circuits can reduce barren-plateau risk~\cite{park_addressing_2025}.}
+    \benchmark{\item The paper evaluates MNIST, FashionMNIST, CIFAR-10, and PhysioNet EEG, including high-dimensional settings processed by 98-, 256-, and 272-chip ensemble configurations without classical dimension reduction~\cite{park_addressing_2025}.}
+
+    \benchmark{\item Classical kernel methods and support vector machines are described as computationally expensive because kernel or inner-product evaluation can scale poorly with training-set size, motivating quantum similarity-estimation routines as possible baselines~\cite{schuld_introduction_2015}.}
+    \method{\item The paper evaluates ensembles using mean probability per sample of returning the correct label and an overall accuracy computed with a probability threshold of $0.7$~\cite{araujo_quantum_2020}.}
+    \challenge{\item Accuracy can be misleading on imbalanced datasets because a model can achieve high overall accuracy while failing to detect minority classes, supporting macro-F1 and per-class recall reporting~\cite{demir_modified_2018}.}
+    \challenge{\item Accuracy can be misleading on imbalanced datasets because a model can achieve high overall accuracy while failing to detect minority classes, supporting macro-F1 and per-class recall reporting~\cite{demir_modified_2018,vasan_exploring_2025}.}
+    \benchmark{\item On an imbalanced ICS power-system dataset, the stacked quantum ensemble achieved 87.18\% accuracy and 89.80\% F1 with 128 samples and 6 features, and 90.91\% accuracy and 81.08\% F1 with 256 samples and 6 features~\cite{vasan_exploring_2025}.}
+    \comparison{\item The stacked model consistently outperformed standalone QSVM, QVC, and QNN configurations in the reported ICS experiments, especially at larger sample sizes where individual classifiers often failed to identify the minority class~\cite{vasan_exploring_2025}.}
+    \result{\item Optimisation-free ensembles achieve zero overall accuracy on Iris, Wine, and Breast Cancer under the chosen threshold, while trained ensembles reach up to 0.97 on Iris, 1.00 on Wine, and 0.99 on Breast Cancer~\cite{araujo_quantum_2020}.}
+    \result{\item Modified stacking improves over pure logistic regression across probe, DoS, U2R, R2L, and overall accuracy metrics, increasing overall accuracy from 81.53\% to a best reported 92.55\% on KDD'99 intrusion detection~\cite{demir_modified_2018}.}
+    \comparison{\item Different combiner methods favour different class behaviours: logistic regression gives the best probe recall, decision trees give strong normal/DoS behaviour, and na\"ive Bayes gives the best U2R and R2L detection in this study~\cite{demir_modified_2018}.}
+    \result{\item Boosting improves validation accuracy over a single QAUM classifier by 5.1, 3.1, and 2.0 percentage points on MNIST Digits, Wisconsin Breast Cancer, and HTRU 2 Pulsar respectively, while training in less than half the time~\cite{mcfarthing_classical_2024}.}
+    \result{\item Bagging improves validation accuracy over a single QAUM classifier by 3.1, 0.6, and 1.6 percentage points on MNIST Digits, Wisconsin Breast Cancer, and HTRU 2 Pulsar respectively, with lower training time than the matched single classifier~\cite{mcfarthing_classical_2024}.}
+    \comparison{\item Boosting is presented as preferable when training time is prioritised, whereas bagging is presented as preferable when higher final accuracy is the priority and more training is available~\cite{mcfarthing_classical_2024}.}
+
+    \benchmark{\item The paper evaluates accuracy, F1-score, training time, diversity score, and robustness under 0--15\% feature noise, supporting a multi-metric evaluation beyond accuracy alone~\cite{liu_construction_2025}.}
+    \result{\item On KDD Cup 99, the proposed QBoost variant reports 96.8\% accuracy, compared with 93.5\% for Gradient Boosting, 94.2\% for standard QBoost, and 95.7\% for LightGBM~\cite{liu_construction_2025}.}
+    \result{\item Compared with standard QBoost, the proposed method reports a higher diversity score of 0.32 versus 0.25, a 37\% reduction in training time, and 89.7\% accuracy under 15\% feature noise~\cite{liu_construction_2025}.}
+    \benchmark{\item SEQSVM is evaluated on two BBBP datasets with 1970 and 8153 samples, using accuracy, sensitivity, specificity, ROC/AUC, and confusion matrices rather than accuracy alone~\cite{akrom_bloodbrain_2025}.}
+    \result{\item SEQSVM reports mean accuracies of $0.950\pm0.008$ on D1 and $0.920\pm0.011$ on D2, with sensitivity and specificity remaining similarly high after SMOTE--Tomek balancing~\cite{akrom_bloodbrain_2025}.}
+    \result{\item The reported test-set AUC values are 0.95 for D1 and 0.92 for D2, suggesting good generalisation of the measured-output quantum meta-learner on the BBBP task~\cite{akrom_bloodbrain_2025}.}
+    \comparison{\item The paper positions SEQSVM as outperforming its classical base ensemble models by approximately 3--6 percentage points in accuracy, sensitivity, and specificity, making it a useful benchmark for measured quantum meta-learning after classical stacking~\cite{akrom_bloodbrain_2025}.}
+    \result{\item On the Adult income task, the random-forest baseline reaches about 84--86\% accuracy; the QSearch simulation works well when $p_{Good}\geq0.5$ or $p_{Good}\leq0.2$, while intermediate probabilities require further investigation~\cite{safina_quantum_2023}.}
+
+    \result{\item The individual QNN reaches 0.63 accuracy and 0.72 AUC, while the final ML--DNN--QNN meta-model reaches 0.85 accuracy and 0.91 AUC, close to established IDR tools such as DISOPRED3 and SPOT-Disorder2~\cite{kang_amino_2025}.}
+    \comparison{\item Permutation importance of the meta-model ranks DNN highest, then ML, then QNN, suggesting that the quantum component supplied complementary interaction information but was not the dominant predictor~\cite{kang_amino_2025}.}
+
+
+    \benchmark{\item The paper evaluates the QEL classifier on binary subsets of Iris, MNIST, Wine, and Digits, reporting accuracy, precision, recall, F1-score, AUC-ROC, and Brier score as predictive and calibration metrics~\cite{rathi_enhanced_2025}.}
+    \result{\item The proposed QSVM--PauliFeatureMap ensemble reports high simulated performance, including average Iris accuracy of 97.50\%, MNIST accuracy of 96.75\%, Wine accuracy of 77\%, and Digits accuracy of 100\% under the reported ensemble settings~\cite{rathi_enhanced_2025}.}
+    \comparison{\item Against Macaluso et al.'s cosine-based quantum ensemble at ensemble size $B=8$, the proposed method improves the shared benchmarks from 0.61 to 1.00 on Iris virginica versus versicolor and from 0.84 to 0.99 on MNIST 0 versus 9~\cite{rathi_enhanced_2025}.}
+
+    \benchmark{\item The evaluation compares QBag against classical bagging with $k$-means and supervised decision-tree bagging on Breast Cancer, Iris, Wine, and Real Estate datasets, using accuracy for classification, MSE for regression, and standard deviation bands for stability~\cite{rathi_quantum_2025}.}
+
+
+    \result{\item Increasing the number of internal classifiers improves accuracy and reduces variance for bootstrap and boosting, while increasing samples per classifier does not always help and can hurt binary tasks when the sampled training subset becomes class-imbalanced~\cite{tolotti_ensembles_2024}.}
+    \result{\item Boosting with the quantum cosine classifier and standardised data achieves the best median accuracy across the tested methods, while stacking gives consistent performance across normalisation choices because each internal classifier uses its own normalisation~\cite{tolotti_ensembles_2024}.}
+    \comparison{\item The ensembles mitigate both unsuitable data normalisation and repeated-measurement inaccuracies, providing evidence that measured quantum ensembles can improve robustness even without preserving intermediate quantum states~\cite{tolotti_ensembles_2024}.}
+
+
+    \benchmark{\item The study evaluates SVM, ANN, QSVC, QNN, VQC, and Bagging--QSVC using accuracy, precision, recall, F1-score, confusion matrices, ROC/AUC, and SHAP-based feature importance~\cite{abdulsalam_explainable_2023}.}
+    \result{\item QSVC outperforms the matched classical SVM on the Cleveland dataset, reporting 88.52\% accuracy compared with 85.24\%; Bagging--QSVC further improves performance to 90.16\% accuracy, 0.90 precision, 0.90 recall, and 0.90 F1-score~\cite{abdulsalam_explainable_2023}.}
+
+    \motive{\item ECOC is motivated as a multiclass ensemble strategy that decomposes a $c$-class problem into several simpler learner problems, with class codewords separated by Hamming distance to support robust decoding~\cite{nguyen_optimal_2021}.}
+    \method{\item Each ECOC matrix column defines a partition of classes into superclasses and trains one base learner; final classification decodes the predicted codeword by nearest Hamming distance to the class codewords~\cite{nguyen_optimal_2021}.}
+    \theory{\item Desirable ECOC matrices maximise row distance between class codewords and column distance between learners, while avoiding redundant complement columns and constant columns; these criteria give a principled way to design decomposition matrices rather than choosing them arbitrarily~\cite{nguyen_optimal_2021}.}
+    \method{\item The paper generalises binary Hadamard-style ECOC construction to prime-base $N$-ary matrices, where entries use $\{0,\ldots,N-1\}$ and each column partitions classes into $N$ superclasses instead of two~\cite{nguyen_optimal_2021}.}
+    \result{\item For prime $N$, the constructed square matrices $M_k(N)$ of dimension $n=N^k$ have row and column Hamming distance $d_r(M_k)=d_c(M_k)=\frac{N-1}{N}n$, giving optimal total distance under the paper's definition~\cite{nguyen_optimal_2021}.}
+    \comparison{\item Deterministic $N$-ary ECOC matrices are most competitive with random matrices when the matrix dimension is close to the number of classes, because little truncation is needed and high Hamming distance is preserved~\cite{nguyen_optimal_2021}.}
+    \result{\item Across six multiclass datasets, ternary ECOC often outperforms binary ECOC, and classification accuracy generally increases as $N$ grows, although gains begin to taper after about $N>7$~\cite{nguyen_optimal_2021}.}
+    \benchmark{\item The experiments compare deterministic and best-of-1000 random $N$-ary ECOC matrices using decision trees and SVMs on Pendigits, USPS, Vowel, Letters, Auslan, and ALOI, with codeword lengths $0.5c$, $c$, and $2c$ where feasible~\cite{nguyen_optimal_2021}.}
+    \limitation{\item The method assumes $N$-ary base learners, so moving beyond binary ECOC can increase base-learner complexity; for the dissertation this supports keeping binary ECOC as the main setting and treating depth-3/grouped variants as optional extensions~\cite{nguyen_optimal_2021}.}
+    \gap{\item The paper optimises ECOC coding structure for classical ensemble classification but does not study quantum base learners, VQC trainability, qubit budgets, or coherent stacking, leaving the quantum ECOC design question open~\cite{nguyen_optimal_2021}.}
+
+
+
+    \benchmark{\item Radojicic evaluates RSM-VQC ensembles using F1 score and training time, with Friedman and Wilcoxon tests used to validate observed differences; this supports reporting both performance and cost rather than accuracy alone~\cite{radojicic_reducing_2026}.}
+    \result{\item In the RSM-VQC FYP, the 25\% feature-subset setting is reported as the strongest overall configuration, statistically outperforming larger subsets, while maintaining or improving performance relative to a full-feature VQC~\cite{radojicic_reducing_2026}.}
+    \result{\item The same study reports that RSM ensembling saves 54.8\% of training time on Drug Consumption and 90.2\% on Parkinsons Telemonitoring, while the low-dimensional Raisin dataset shows negative time saving, suggesting that feature subspacing becomes more useful as dimensionality grows~\cite{radojicic_reducing_2026}.}
+    \result{\item Pinto reports that random member selection outperforms top-F1 and architecture-diverse selection by more than a factor of six in mean F1 gain, indicating that individual strength and architectural difference are weaker selection criteria than actual prediction disagreement~\cite{pinto_composing_2026}.}
+    \result{\item Pinto reports that stacking produces roughly three times the F1 gain of bagging, supporting the dissertation's choice to emphasise stacking over simple voting or averaging~\cite{pinto_composing_2026}.}
+    \result{\item Prediction diversity is found to be the strongest predictor of ensemble contribution, while ensembling reduces cross-family F1 variance by 68.3\%, giving direct evidence that aggregation can mitigate ansatz sensitivity~\cite{pinto_composing_2026}.}
+    \result{\item Shallow circuits in Pinto's study provide the best F1-per-second behaviour and tolerate simulated depolarising noise at $p=0.01$ without meaningful degradation, supporting shallow base learners as the default design choice~\cite{pinto_composing_2026}.}
+\end{itemize}
+
+
 
 
 %%%%%%%%
@@ -220,13 +650,121 @@ This dissertation is structured around three specific, falsifiable research ques
 
 
 %%%%%%%%
-\chapter{Summary and Conclusions}
+\chapter{Conclusion and Future Work}
 
 \section{Summary of Findings}
 
 \section{Contributions}
 
 \section{Limitations and Future Work}
+
+\paragraph{Research notes.}
+\begin{itemize}
+    \limitation{\item Quantum RAM and persistent quantum memory are described as impractical for foreseeable devices, so near-term algorithms should not assume stored quantum datasets or repeated access to saved intermediate quantum states~\cite{resch_quantum_2019}.}
+    \limitation{\item Quantum computing is presented as a specialised accelerator rather than a near-term replacement for classical computing, supporting cautious claims focused on controlled empirical comparisons rather than broad quantum advantage~\cite{resch_quantum_2019}.}
+    \limitation{\item The proposed quantum ensemble of parameter superpositions relies on idealised state preparation, making it more theoretical than directly implementable as a near-term VQC ensemble architecture~\cite{schuld_quantum_2018}.}
+    \limitation{\item Full quantum advantage for NISQ QML applications remains an ongoing challenge despite broad exploration across domains~\cite{du_quantum_2025}.}
+    \limitation{\item The ICS stacking study reduces the original 129-feature problem to two PCA components and evaluates sampled subsets of 128--512 instances, so its reported gains should be treated as evidence for small-resource hybrid stacking rather than full-scale deployment~\cite{vasan_exploring_2025}.}
+    \gap{\item The ICS quantum stacking framework uses measured posterior probabilities and a classical Random Forest meta-learner; it does not investigate measurement-free aggregation of unmeasured VQC states~\cite{vasan_exploring_2025}.}
+    \limitation{\item Exponential speedups from algorithms such as HHL are limited by caveats including input-state preparation, full-output reconstruction, matrix conditioning, Hamiltonian simulation requirements, and prohibitive practical resource estimates~\cite{biamonte_quantum_2017}.}
+    \gap{\item The review highlights that the true crossover point where QML becomes practically useful over classical methods remains unclear, making empirical benchmarking against strong classical and quantum baselines essential~\cite{biamonte_quantum_2017}.}
+    \gap{\item Schuld and Petruccione do not study finite trained VQC ensembles, ECOC decomposition, classical stacking, quantum re-encoding, or coherent meta-circuit aggregation, leaving space for near-term empirical comparison of these ensemble designs~\cite{schuld_quantum_2018}.}
+
+    \challenge{\item The survey identifies appropriate ensemble size, model complexity, and training speed as unresolved issues, which directly supports limiting the VQC learner-count search rather than treating more learners as automatically better~\cite{dong_survey_2020}.}
+    \gap{\item The survey is entirely classical and does not address whether ensemble diversity, weighting, pruning, or stacking behave differently when base learners are quantum circuits whose intermediate states may be coherently preserved~\cite{dong_survey_2020}.}
+
+    \limitation{\item Although AdaBoost.Q improves quantum classifier accuracy, the MNIST result remains modest relative to classical models, and the paper does not claim a definitive quantum advantage~\cite{song_quantum_2024}.}
+    \gap{\item AdaBoost.Q improves measured quantum classifiers through probabilistic boosting, but does not investigate coherent measurement-free stacking where base learner states are preserved before meta-level aggregation~\cite{song_quantum_2024}.}
+    
+    \gap{\item Friedrich and Maziero mitigate trainability problems by summing measured expectation-value outputs from multiple shallow circuits, but do not study state-preserving coherent stacking across trained VQC base learners~\cite{friedrich_quantum_2025}.}
+    \limitation{\item The method is evaluated in simulation and does not test whether the proposed ensemble-layer construction remains beneficial under realistic hardware noise or on larger multi-class benchmarks~\cite{friedrich_quantum_2025}.}
+    \gap{\item Multi-chip ensemble VQCs avoid inter-chip quantum entanglement and aggregate measured outputs classically, so they do not address whether preserving base learner states through a coherent meta-circuit improves stacking performance~\cite{park_addressing_2025}.}
+    \limitation{\item The authors identify identical subcircuits and non-optimised aggregation functions as limitations, suggesting future work on heterogeneous subcircuit designs and task-specific aggregation strategies~\cite{park_addressing_2025}.}
+
+    \gap{\item The paper explicitly calls for future QML work to focus on whether the actual learning part of machine-learning methods, not only expensive subroutines, can be improved using quantum information processing~\cite{schuld_introduction_2015}.}
+    \limitation{\item The experiments are classical simulations of probability amplitudes using MLP classifiers, not executions of a quantum circuit on real hardware~\cite{araujo_quantum_2020}.}
+    \gap{\item The work supports training in quantum ensembles but does not study VQC base learners, ECOC decomposition, stacked meta-learners, or measurement-free coherent aggregation of trained base states~\cite{araujo_quantum_2020}.}
+    \limitation{\item The modified stacking study fixes the number of selected models at ten and identifies statistical justification of model-count selection as future work, supporting a limited and justified search over ensemble size rather than arbitrary learner counts~\cite{demir_modified_2018}.}
+    \limitation{\item The ensemble is validated only in noiseless simulation rather than on real quantum hardware, leaving hardware noise resilience and coherence-time benefits as future work~\cite{mcfarthing_classical_2024}.}
+    \gap{\item The paper studies classical aggregation of measured single-qubit classifiers, but does not address whether unmeasured base-circuit states can be coherently aggregated by a quantum meta-circuit~\cite{mcfarthing_classical_2024}.}
+
+    \limitation{\item The method is quantum-inspired rather than a hardware-executed quantum model, so its results are most useful for ensemble-design principles rather than direct VQC implementation evidence~\cite{liu_construction_2025}.}
+    \limitation{\item The authors identify two practical limitations: random subspace selection can discard critical features in very high-dimensional tasks, and the diversity/regularisation hyperparameters $\beta$ and $\lambda$ still require manual tuning~\cite{liu_construction_2025}.}
+    \limitation{\item SEQSVM is tested on a quantum simulator and uses a QSVM on measured classical base-learner predictions, so it does not test coherent aggregation of unmeasured quantum base states~\cite{akrom_bloodbrain_2025}.}
+    \gap{\item The work provides a strong example of quantum meta-learning over stacked classical outputs, but leaves open whether a VQC ensemble can benefit from a measurement-free quantum meta-circuit that receives base learner states directly~\cite{akrom_bloodbrain_2025}.}
+    \limitation{\item Safina's quantum simulation uses classically precomputed tree probabilities as amplitudes rather than running tree inference coherently, so it supports quantum probability-estimation concepts but not a full measurement-free trainable VQC stack~\cite{safina_quantum_2023}.}
+    \gap{\item The paper proposes future use of Qiskit and amplitude estimation to obtain both the prediction and Class1 probability, but does not study stacked quantum meta-learning or training on unmeasured intermediate quantum states~\cite{safina_quantum_2023}.}
+
+    \limitation{\item The model remains slightly below some IDR-specific state-of-the-art methods and does not explicitly include sequence context or environmental influences, limiting its real-world biological generality~\cite{kang_amino_2025}.}
+    \gap{\item The authors identify the need for better QNN feature-importance methods, because classical SHAP values collapsed to zero for QNN features even when entanglement ablations revealed important interactions~\cite{kang_amino_2025}.}
+    \gap{\item The work uses a QNN as one measured component inside a classical stacking ensemble, but does not study coherent measurement-free stacking between quantum base learners and a quantum meta-circuit~\cite{kang_amino_2025}.}
+
+
+    \challenge{\item The authors state that practical deployment would require noise-aware transpilation, qubit-placement optimisation, and error-mitigation methods such as zero-noise extrapolation and readout-error calibration~\cite{rathi_enhanced_2025}.}
+    \validation{\item Unlike many toy quantum-classification examples, the stacking ensemble is evaluated on a real-time imbalanced ICS power-system cybersecurity dataset with tens of thousands of original samples, making it useful as a domain-relevant validation point for measured quantum stacking~\cite{vasan_exploring_2025}.}
+    \gap{\item The paper identifies future work on fully quantum ensemble architectures, hybrid quantum--classical stacking, and robust training on NISQ devices, which overlaps directly with the open design space around coherent quantum meta-learners~\cite{rathi_enhanced_2025}.}
+
+    \limitation{\item The model is evaluated in simulation and depends on classical preprocessing, classical stacking, and measured quantum classifier outputs, so it does not validate coherent aggregation of unmeasured quantum states~\cite{xiong_hybrid_2024}.}
+    \limitation{\item The authors identify incomplete optimisation as future work: Bayesian optimisation is not applied to QKNN or VQC, bagging is not applied to QKNN, and soft/probabilistic voting is left open because some quantum classifiers lack probabilistic output designs~\cite{xiong_hybrid_2024}.}
+    \gap{\item The paper suggests designing measurement methods for probabilistic outputs from VQC-style classifiers, which is relevant to measured quantum stacking but still leaves measurement-free meta-learning unexplored~\cite{xiong_hybrid_2024}.}
+
+
+    \limitation{\item Although the method is framed as quantum bagging, the reported implementation performs distance evaluation and cluster assignment classically because current qubit counts and noise make the full quantum clustering subroutines impractical~\cite{rathi_quantum_2025}.}
+    \limitation{\item The framework assumes CQRAM/QRAM-style access after classical data loading, so any speed-up claim depends on a memory model that remains a significant practical assumption for near-term hardware~\cite{rathi_quantum_2025}.}
+    \gap{\item The method improves robustness through unsupervised bagging and measured/classical aggregation, but does not address training a coherent meta-circuit on unmeasured trained VQC base states~\cite{rathi_quantum_2025}.}
+
+
+    \limitation{\item The implementation supports only binary classification and uses small UCI-derived datasets requiring at most 15 simulated qubits, limiting conclusions about multi-class, high-dimensional, or hardware-scale behaviour~\cite{tolotti_ensembles_2024}.}
+    \gap{\item The study is a measured hybrid pipeline: quantum classifiers are repeatedly measured and combined by classical ensemble logic, so it does not address coherent stacking of unmeasured trained VQC states through a quantum meta-circuit~\cite{tolotti_ensembles_2024}.}
+
+
+    \limitation{\item The Bagging--QSVC experiment is simulator-based, uses a small tabular dataset, and aggregates measured QSVC predictions classically, so it supports measured quantum bagging but not hardware deployment or measurement-free coherent stacking~\cite{abdulsalam_explainable_2023}.}
+    \gap{\item The paper adds explainability through SHAP after measured prediction, but does not investigate how to interpret or train a meta-learner acting on unmeasured quantum states~\cite{abdulsalam_explainable_2023}.}
+
+
+    \method{\item The paper proposes a weighted homogeneous quantum ensemble for instance-based quantum classifiers with indexing registers: a control register indexes internal classifiers, data-selection circuitry creates different training-point and feature subsets in superposition, and learned weights are encoded into control-register amplitudes at test time~\cite{tolotti_weighted_2025}.}
+    \method{\item Ensemble diversity is introduced through controlled permutations over the training-point and feature registers followed by post-selection on an auxiliary qubit, giving each control state a different data composition while retaining quantum-parallel execution~\cite{tolotti_weighted_2025}.}
+    \method{\item The training mode measures the control register to estimate each internal classifier's output on validation data, learns aggregation weights classically with logistic regression, and then re-encodes the learned positive weights into the quantum circuit for test-time aggregation~\cite{tolotti_weighted_2025}.}
+    \result{\item Across 11 UCI-derived binary datasets, the weighted ensemble improves average accuracy over single quantum cosine, distance, and SWAP-test classifiers in statevector simulation, despite each internal classifier being weakened by data selection~\cite{tolotti_weighted_2025}.}
+    \result{\item Increasing the control-register size slightly improves mean accuracy on average, suggesting that additional coherent ensemble diversity can help, although the paper does not establish open-ended scaling behaviour~\cite{tolotti_weighted_2025}.}
+    \comparison{\item Cosine and distance classifiers perform best with standardisation, while the SWAP-test ensemble performs best without normalisation; this reinforces that preprocessing and feature scaling interact strongly with the chosen quantum similarity model~\cite{tolotti_weighted_2025}.}
+    \challenge{\item In shot-based local simulation, the weighted ensemble is more sensitive to shot noise than the single classifier because the weight-optimisation stage depends on accurate estimates of individual internal classifier outputs~\cite{tolotti_weighted_2025}.}
+    \limitation{\item The experiments are simulation-based, use small binary datasets, assume efficient indexed data access and state preparation, and rely on post-selection, so hardware practicality and scaling remain uncertain~\cite{tolotti_weighted_2025}.}
+    \gap{\item The method is a coherent weighted quantum ensemble, but it is built around instance-based quantum classifiers rather than trained VQC base learners; it therefore does not resolve how to train a measurement-free stack formed by appending a meta-VQC to trained VQC output states~\cite{tolotti_weighted_2025}.}
+
+
+    \motive{\item Ensemble QNNs are motivated as a NISQ-compatible alternative to one larger QNN: several smaller, trainable circuits may reduce qubit, gate, parameter, and training-sample demands while retaining or improving predictive performance~\cite{incudini_resource_2023}.}
+    \challenge{\item Increasing QNN depth improves expressibility but can worsen barren plateaus and hardware noise exposure, so layer count should be treated as a controlled experimental variable rather than increased by default~\cite{cerezo_challenges_2022,incudini_resource_2023}.}
+    \method{\item The paper evaluates bagging and AdaBoost ensembles of QNN base predictors, varying feature ratio and sample ratio across seven ensemble configurations, with ten base predictors per ensemble and average or weighted-average output aggregation~\cite{incudini_resource_2023}.}
+    \method{\item The QNN uses an $R_y$ feature map, a layered $R_x$--CNOT--$R_z$--CNOT--$R_x$ ansatz with $3\ell n$ trainable parameters, a local $\sigma_z^{(0)}$ observable, Adam optimisation, and parameter-shift gradients~\cite{incudini_resource_2023}.}
+    \result{\item In the Wine classification experiment, ensemble models reached their accuracy plateau with about three layers, while the full baseline QNN required roughly seven or more layers to exceed 90\% accuracy; this supports testing shallow ensembles before deeper monolithic circuits~\cite{incudini_resource_2023}.}
+    \benchmark{\item The paper reports that random-subspace bagging can save roughly 20--80\% of the qubit budget, but this saving may reduce feature coverage and therefore depends on the data manifold and sampling strategy~\cite{incudini_resource_2023}.}
+    \validation{\item The work evaluates ensemble QNNs not only in noiseless simulation, but also with a noisy IBM Lima simulation and on the IBM Lagos superconducting QPU, making it useful hardware-oriented evidence for ensemble-based noise mitigation~\cite{incudini_resource_2023}.}
+    \comparison{\item Bagging is positioned as especially useful for high-variance QNN settings, while boosting is more suitable for high-bias weak learners; this supports comparing aggregation strategies rather than assuming one ensemble method is universally best~\cite{incudini_resource_2023}.}
+    \limitation{\item The proposed ensembles aggregate measured QNN outputs classically, so the paper supports resource-saving measured ensemble baselines but not coherent measurement-free stacking across trained VQC registers~\cite{incudini_resource_2023}.}
+    \gap{\item The paper leaves open whether the resource-saving and noise-mitigation benefits of measured QNN ensembles persist when the base learners are kept coherent and connected to a trainable quantum meta-circuit before final measurement~\cite{incudini_resource_2023}.}
+
+
+
+    \motive{\item Quantum kernel performance depends strongly on the feature map, and QEKs make this design problem more explicit by adding trainable parameterised layers optimised through kernel-target alignment~\cite{salmenpera_impact_2024}.}
+    \challenge{\item The paper identifies a ``gate erasure bug'': data-independent gates placed after the final feature-dependent layer cancel with their adjoints in kernel inner-product evaluation, making those parameters irrelevant while still adding circuit and optimisation cost~\cite{salmenpera_impact_2024}.}
+    \method{\item Three QEK layer-ordering strategies are compared: data-first $(F,P)$, data-last $(P,F)$, and data-weaved architectures where parameterised layers are placed between feature-encoding layers so that no redundant parameter layer remains at the circuit end~\cite{salmenpera_impact_2024}.}
+    \method{\item The experiments train QEKs with kernel-target alignment, use five qubits, batch size five, 5000 optimisation iterations, 25 trained models per setting, one to five parameter layers, and evaluate SVC accuracy on Hayes-Roth, Heart Disease, Seeds, and Wine~\cite{salmenpera_impact_2024}.}
+    \result{\item Accuracy generally improves with more parameter layers but tends to plateau around three layers on most datasets, suggesting that extra layers may add cost without meaningful performance gain~\cite{salmenpera_impact_2024}.}
+    \result{\item Data-weaved kernels achieve higher accuracies in most test cases with the same number of parameterised layers, and show stronger improvement in target alignment during training, indicating better trainability than the data-first or data-last alternatives~\cite{salmenpera_impact_2024}.}
+    \comparison{\item Data-first kernels with $p$ parameter layers are mathematically equivalent to data-weaved kernels with $p-1$ useful parameter layers because the final parameterised block is erased; data-last avoids erasure but does not consistently outperform data-first at larger layer counts~\cite{salmenpera_impact_2024}.}
+    \benchmark{\item For a ten-feature example using their ansatz, the authors estimate that data-weaved placement can reduce one-qubit gates by about 11\% and two-qubit gates by about 30\% compared with less efficient alternatives~\cite{salmenpera_impact_2024}.}
+    \limitation{\item The study concerns quantum embedding kernels for QSVMs rather than VQC classifiers or ensemble stacking, and is based on small simulated datasets rather than hardware execution~\cite{salmenpera_impact_2024}.}
+    \gap{\item The paper shows that feature-embedding placement materially affects kernel circuits, but does not study whether analogous data-reuploading or parameter-placement choices change the performance of VQC base learners or coherent quantum meta-circuits~\cite{salmenpera_impact_2024}.}
+
+
+
+    \limitation{\item The two supervisor-provided FYPs are internal student projects rather than public peer-reviewed papers, so their unique empirical findings should be treated as design guidance unless replaced by public citations or reproduced directly in this dissertation~\cite{radojicic_reducing_2026,pinto_composing_2026}.}
+    \limitation{\item Radojicic's RSM-VQC experiments are limited to three moderate-dimensional datasets, three independent repeats, and a fixed 100-epoch training budget, so the reported subset-ratio preference should not be treated as universal~\cite{radojicic_reducing_2026}.}
+    \limitation{\item Pinto's noise validation uses an analytic depolarising overlay at $p=0.01$ rather than real hardware execution, leaving open whether the same ensemble gains survive hardware-specific noise, finite queue constraints, and transpilation overhead~\cite{pinto_composing_2026}.}
+    \gap{\item Pinto identifies replacing the classical logistic-regression stacker with a VQC meta-learner as a natural future extension, but does not evaluate a coherent measurement-free stack in which unmeasured base states are passed into a meta-circuit~\cite{pinto_composing_2026}.}
+\end{itemize}
+
 
 
 %%%%%%%%
