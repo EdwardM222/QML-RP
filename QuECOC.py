@@ -1,5 +1,6 @@
 import copy
 import time
+from rustworkx import layers
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
@@ -83,6 +84,49 @@ def build_ecoc_matrix(n_classes: int, n_learners: int, depth: int = 2) -> np.nda
 
     return ecoc
 
+def feature_block(inputs, n_qubits, feats_per_qubit, rot_gates):
+    for f in range(feats_per_qubit):
+        for q in range(n_qubits):
+            feature_idx = (q * feats_per_qubit + f) % inputs.shape[-1]
+            gate = rot_gates[f % len(rot_gates)]
+            gate(inputs[..., feature_idx], wires=q, id=f"f{feature_idx}")
+
+def strongly_entangling_block(weights, trainable_layers, ranges, start_idx, n_qubits, rot_gates, ent_gate):
+    repeats = max(trainable_layers, 1)
+
+    if isinstance(ranges, int):
+        ranges = [ranges] * repeats
+    elif len(ranges) != repeats:
+        raise ValueError(
+            f"`ranges` must be either an int or a list of length equal to `trainable_layers`. "
+            f"Got ranges={ranges} and trainable_layers={trainable_layers}."
+        )
+    
+    for layer in range(repeats):
+        if trainable_layers > 0:
+            if layer == 0:
+                qml.Barrier(wires=range(n_qubits), only_visual=True)
+            for q in range(n_qubits):
+                # Apply trainable Rot gates for this layer
+                for g, gate in enumerate(rot_gates):
+                    gate(weights[start_idx + layer, q, g], wires=q, id=f"l{start_idx + layer}g{g}")
+
+        if n_qubits > 1:
+            for q in range(n_qubits - 1):
+                if ranges[layer] == 0 or ranges[layer] >= n_qubits:
+                    raise ValueError(
+                        f"Invalid range value: {ranges[layer]}. "
+                        f"Range must be between 1 and {n_qubits - 1} (n_qubits-1)."
+                    )
+
+                # Apply entangling pattern for this layer
+                control = q
+                target = (q + ranges[layer]) % n_qubits
+                ent_gate(wires=[control, target])
+
+            if n_qubits > 2:
+                ent_gate(wires=[n_qubits - 1, ranges[layer] - 1])
+
 @typechecked
 def reuploading_qlayer(
     n_qubits: int,
@@ -150,56 +194,13 @@ def reuploading_qlayer(
     if measurement_wires is None:
         measurement_wires = [0]
 
-    def feature_block(inputs):
-        for f in range(feats_per_qubit):
-            for q in range(n_qubits):
-                feature_idx = (q * feats_per_qubit + f) % inputs.shape[-1]
-                gate = rot_gates[f % len(rot_gates)]
-                gate(inputs[..., feature_idx], wires=q, id=f"f{feature_idx}")
-
-    def strongly_entangling_block(weights, trainable_layers, ranges, start_idx):
-        repeats = max(trainable_layers, 1)
-
-        if isinstance(ranges, int):
-            ranges = [ranges] * repeats
-        elif len(ranges) != repeats:
-            raise ValueError(
-                f"`ranges` must be either an int or a list of length equal to `trainable_layers`. "
-                f"Got ranges={ranges} and trainable_layers={trainable_layers}."
-            )
-        
-        for layer in range(repeats):
-            if trainable_layers > 0:
-                if layer == 0:
-                    qml.Barrier(wires=range(n_qubits), only_visual=True)
-                for q in range(n_qubits):
-                    # Apply trainable Rot gates for this layer
-                    for g, gate in enumerate(rot_gates):
-                        gate(weights[start_idx + layer, q, g], wires=q, id=f"l{start_idx + layer}g{g}")
-
-            if n_qubits > 1:
-                for q in range(n_qubits - 1):
-                    if ranges[layer] == 0 or ranges[layer] >= n_qubits:
-                        raise ValueError(
-                            f"Invalid range value: {ranges[layer]}. "
-                            f"Range must be between 1 and {n_qubits - 1} (n_qubits-1)."
-                        )
-
-                    # Apply entangling pattern for this layer
-                    control = q
-                    target = (q + ranges[layer]) % n_qubits
-                    ent_gate(wires=[control, target])
-
-                if n_qubits > 2:
-                    ent_gate(wires=[n_qubits - 1, ranges[layer] - 1])
-
     @qml.qnode(device, interface="torch", diff_method="best")
     def circuit(inputs, weights):
         layer_idx = 0
         for r in range(reuploads):
-            feature_block(inputs)
+            feature_block(inputs, n_qubits, feats_per_qubit, rot_gates)
             if entangle_between_reuploads or r == reuploads - 1:
-                strongly_entangling_block(weights, trainable_layers[r], ranges[r], layer_idx)
+                strongly_entangling_block(weights, trainable_layers[r], ranges[r], layer_idx, n_qubits, rot_gates, ent_gate)
             layer_idx += trainable_layers[r]
 
         return qml.probs(wires=measurement_wires)
@@ -246,6 +247,7 @@ class VQC(nn.Module):
                     trainable_layers=[1, 2, 3],
                     measurement_wires=measurement_wires
                 )
+                self.n_qubits = 2
             case 2:
                 self.qml_device = qml.device(self.qml_device, wires=2)
                 self.qlayer, self.circuit, self.weight_shapes, self.n_features = reuploading_qlayer(
@@ -257,6 +259,7 @@ class VQC(nn.Module):
                     trainable_layers=[3],
                     measurement_wires=measurement_wires
                 )
+                self.n_qubits = 2
             case 3:
                 self.qml_device = qml.device(self.qml_device, wires=3)
                 self.qlayer, self.circuit, self.weight_shapes, self.n_features = reuploading_qlayer(
@@ -268,6 +271,7 @@ class VQC(nn.Module):
                     trainable_layers=[1, 2, 3],
                     measurement_wires=measurement_wires
                 )
+                self.n_qubits = 3
             case 'deep':
                 self.qml_device = qml.device(self.qml_device, wires=2)
                 self.qlayer, self.circuit, self.weight_shapes, self.n_features = reuploading_qlayer(
@@ -279,6 +283,7 @@ class VQC(nn.Module):
                     trainable_layers=[1, 2, 2, 3, 3],
                     measurement_wires=measurement_wires
                 )
+                self.n_qubits = 2
             case 'wide':
                 self.qml_device = qml.device(self.qml_device, wires=4)
                 self.qlayer, self.circuit, self.weight_shapes, self.n_features = reuploading_qlayer(
@@ -290,6 +295,7 @@ class VQC(nn.Module):
                     trainable_layers=[1, 2],
                     measurement_wires=measurement_wires
                 )
+                self.n_qubits = 4
             case 'dense':
                 self.qml_device = qml.device(self.qml_device, wires=2)
                 self.qlayer, self.circuit, self.weight_shapes, self.n_features = reuploading_qlayer(
@@ -301,13 +307,21 @@ class VQC(nn.Module):
                     trainable_layers=[1, 2],
                     measurement_wires=measurement_wires
                 )
-            case 'manual':
+                self.n_qubits = 2
+            case 'custom':
                 self.qml_device = qml.device(self.qml_device, wires=self.kwargs.get("n_qubits", 2))
                 self.qlayer, self.circuit, self.weight_shapes, self.n_features = reuploading_qlayer(
                     device=self.qml_device,
                     measurement_wires=measurement_wires,
                     **self.kwargs
                 )
+                self.n_qubits = self.kwargs.get("n_qubits", 2)
+            case 'manual':
+                self.qlayer = self.kwargs.get("qlayer", None)
+                self.circuit = self.kwargs.get("circuit", None)
+                self.weight_shapes = self.kwargs.get("weight_shapes", None)
+                self.n_features = self.kwargs.get("n_features", None)
+                self.n_qubits = self.kwargs.get("n_qubits", 2)
             case 'meta':
                 self.qml_device = qml.device(self.qml_device, wires=4)
                 self.qlayer, self.circuit, self.weight_shapes, self.n_features = reuploading_qlayer(
@@ -319,6 +333,7 @@ class VQC(nn.Module):
                     trainable_layers=[1, 2, 3],
                     measurement_wires=measurement_wires
                 )
+                self.n_qubits = 4
             case 'meta2':
                 self.qml_device = qml.device(self.qml_device, wires=6)
                 self.qlayer, self.circuit, self.weight_shapes, self.n_features = reuploading_qlayer(
@@ -330,6 +345,7 @@ class VQC(nn.Module):
                     trainable_layers=[1, 2, 3],
                     measurement_wires=measurement_wires
                 )
+                self.n_qubits = 6
             case _:
                 self.qml_device = qml.device(self.qml_device, wires=2)
                 self.qlayer, self.circuit, self.weight_shapes, self.n_features = reuploading_qlayer(
@@ -341,6 +357,7 @@ class VQC(nn.Module):
                     trainable_layers=[1, 2],
                     measurement_wires=measurement_wires
                 )
+                self.n_qubits = 2
 
     def to(self, device):
         self.cuda_device = device
@@ -877,8 +894,222 @@ class CoherentECOC(QuantumECOC):
     """
     Measurement Free Quantum Ensemble that extends QuantumECOC by combining the outputs of the base learners without collapsing their quantum states.
     """
-    def __init__(self, n_learners: int = None, templates: list[int | str] = None, device: str = "default.qubit", **kwargs):
-        super().__init__(n_learners=n_learners, templates=templates, device=device, **kwargs)
+    def __init__(
+        self,
+        meta_layers: int | list[int] = 1,
+        n_learners: int | None = None,
+        templates: int | str | list[int | str] = 0,
+        ecoc_depth: int = 2,
+        device: str = "default.qubit",
+        **kwargs
+    ):
+        super().__init__(n_learners=n_learners, templates=templates, ecoc_depth=ecoc_depth, device=device, **kwargs)
+        if isinstance(meta_layers, int):
+            self.meta_layers = [meta_layers]
+        else:
+            self.meta_layers = meta_layers
+
+    def reset_ensemble(self):
+        for i in range(len(self.classifiers)):
+            clf = VQC(self.qml_device, len(set(self.ecoc[i])), self.templates[i]).to(self.cuda_device)
+            clf.code = self.ecoc[i]
+            clf.feats = self.feat_map[i]
+            self.classifiers[i] = clf
+
+    def build_coherent_circuit(self):
+        total_qubits = 0
+        start_wires = []
+
+        for clf in self.classifiers:
+            start_wires.append(total_qubits)
+            total_qubits += clf.n_qubits
+
+        coherent_device = qml.device(self.qml_device, wires=total_qubits)
+
+        wire_maps = []
+        frozen_weights = []
+        n_features_list = []
+
+        for i, clf in enumerate(self.classifiers):
+            wire_map = {
+                w: w + start_wires[i]
+                for w in range(clf.n_qubits)
+            }
+            wire_maps.append(wire_map)
+
+            # Freeze the trained weights from this base VQC
+            frozen_weights.append(
+                clf.qlayer.weights.detach().clone()
+            )
+
+            n_features_list.append(clf.n_features)
+
+        @qml.qnode(coherent_device, interface="torch", diff_method="best")
+        def coherent_circuit(inputs, weights):
+            prev_idx = 0
+
+            for i, clf in enumerate(self.classifiers):
+                n_features_i = n_features_list[i]
+
+                inputs_i = inputs[..., prev_idx:prev_idx + n_features_i]
+                weights_i = frozen_weights[i].to(inputs.device)
+
+                tape = qml.tape.make_qscript(clf.circuit.func)(inputs_i, weights_i)
+                for op in tape.operations:
+                    qml.apply(qml.map_wires(op, wire_maps[i]))
+
+                prev_idx += n_features_i
+
+            for i in range(len(self.meta_layers)):
+                strongly_entangling_block(weights, 1, self.meta_layers[i], i, total_qubits, [qml.RX, qml.RZ], qml.CZ)
+
+            return qml.probs(wires=list(range(total_qubits)))
+
+        n_features = sum(n_features_list)
+
+        weight_shapes = {
+            "weights": (len(self.meta_layers), total_qubits, 2)
+        }
+
+        coherent_layer = qml.qnn.TorchLayer(
+            coherent_circuit,
+            weight_shapes
+        )
+
+        self.coherent_vqc = VQC(
+            coherent_device,
+            template="manual",
+            qlayer=coherent_layer,
+            circuit=coherent_circuit,
+            weight_shapes=weight_shapes,
+            n_features=n_features
+        ).to(self.cuda_device)
+
+    def fit(
+        self,
+        X: DataFrame,
+        y: Series,
+        X_test: DataFrame | None = None,
+        y_test: Series | None = None,
+        k_folds: int = 5,
+        bagging: tuple[float, int, int] | None = (0.5, 512, 2048),
+        plot: bool = False,
+        verbose: bool = False,
+        **fit_params
+    ):
+        start_time = time.time()
+        self.initialise_ensemble(X, y, verbose=verbose)
+
+        class_samples = y.value_counts()
+        k_folds = min(k_folds, int(class_samples.min()))
+        if k_folds > 1:
+            X_meta = []
+            y_meta = []
+            skf = StratifiedKFold(n_splits=k_folds, shuffle=True, random_state=2)
+
+            for f, (train_index, val_index) in enumerate(skf.split(X, y)):
+                if verbose:
+                    print(f"\nFold {f + 1}/{k_folds}")
+                
+                X_train, X_val = X.iloc[train_index], X.iloc[val_index]
+                y_train, y_val = y.iloc[train_index], y.iloc[val_index]
+
+                fold_scaler = MinMaxScaler(feature_range=self.scaler.feature_range)
+                X_train = fold_scaler.fit_transform(X_train)
+                X_val = fold_scaler.transform(X_val)
+
+                y_train = y_train.map(self.label_to_int)
+                y_val = y_val.map(self.label_to_int)
+
+                self.train_ensemble(
+                    X_train,
+                    y_train,
+                    X_val,
+                    y_val,
+                    fold=f,
+                    bagging=bagging,
+                    plot=False,
+                    verbose=False,
+                    **fit_params,
+                )
+
+                X_fold = np.array([clf.val_probs for clf in self.classifiers]).T
+                X_fold = X_fold[1:, :].transpose((1, 0, 2)).reshape(len(X_val), -1)
+                
+                X_meta.extend(X_fold)
+                y_meta.extend(y_val)
+
+                self.reset_ensemble()
+
+            if verbose:
+                print("\nTraining meta-learner...")
+            self.meta_learner.fit(np.array(X_meta), np.array(y_meta))
+
+            if verbose:
+                print("\nTraining final ensemble on full dataset...")
+
+            X_s = self.scaler.fit_transform(X)
+            X_test_s = self.scaler.transform(X_test) if X_test is not None else None
+
+            y_m = y.map(self.label_to_int)
+            y_test_m = y_test.map(self.label_to_int) if y_test is not None else None
+
+            self.train_ensemble(
+                X_s,
+                y_m,
+                X_test_s,
+                y_test_m,
+                bagging=bagging,
+                plot=plot,
+                verbose=verbose,
+                **fit_params,
+            )
+        else:
+            if verbose:
+                print(f"\nNot enough samples for {k_folds} folds. Training on a single train/validation split...")
+
+            X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3, random_state=2, stratify=y)
+            
+            X_train = self.scaler.fit_transform(X_train)
+            X_val = self.scaler.transform(X_val)
+
+            y_train = y_train.map(self.label_to_int)
+            y_val = y_val.map(self.label_to_int)
+
+            self.train_ensemble(
+                X_train,
+                y_train,
+                X_val,
+                y_val,
+                bagging=bagging,
+                plot=plot,
+                verbose=verbose,
+                **fit_params,
+            )
+
+            X_meta = np.array([clf.val_probs for clf in self.classifiers]).T
+            X_meta = X_meta[1:, :].transpose((1, 0, 2)).reshape(len(X_val), -1)
+
+            if verbose:
+                print("\nTraining meta-learner...")
+            self.meta_learner.fit(X_meta, np.array(y_val))
+
+        self.training_time = TimeInt(time.time() - start_time)
+        if verbose:
+            print(f"\nTotal training time after fitting {self.n_learners} classifiers across {k_folds} folds: {self.training_time}")
+
+    def predict_proba(self, X: np.ndarray) -> np.ndarray:
+        self.eval()
+        with torch.no_grad():
+            X_t = torch.tensor(X, dtype=torch.float32).to(self.cuda_device)
+            return self(X_t.to(self.cuda_device)).cpu().numpy()
+
+    def predict(self, X: np.ndarray) -> np.ndarray:
+        return (self.predict_proba(X).argmax(axis=1))
+
+    def score(self, X: np.ndarray, y: np.ndarray) -> float:
+        preds = self.predict(X)
+        return accuracy_score(y, preds)
 
 if __name__ == "__main__":
     import pandas as pd
