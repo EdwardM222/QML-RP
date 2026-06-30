@@ -91,8 +91,11 @@ def feature_block(inputs, n_qubits, feats_per_qubit, rot_gates):
             gate = rot_gates[f % len(rot_gates)]
             gate(inputs[..., feature_idx], wires=q, id=f"f{feature_idx}")
 
-def strongly_entangling_block(weights, trainable_layers, ranges, start_idx, n_qubits, rot_gates, ent_gate):
+def strongly_entangling_block(weights, trainable_layers, ranges, start_idx, n_qubits, rot_gates, ent_gate, wires=None):
     repeats = max(trainable_layers, 1)
+
+    if wires is None:
+        wires = list(range(n_qubits))
 
     if isinstance(ranges, int):
         ranges = [ranges] * repeats
@@ -105,11 +108,11 @@ def strongly_entangling_block(weights, trainable_layers, ranges, start_idx, n_qu
     for layer in range(repeats):
         if trainable_layers > 0:
             if layer == 0:
-                qml.Barrier(wires=range(n_qubits), only_visual=True)
+                qml.Barrier(wires=wires, only_visual=True)
             for q in range(n_qubits):
                 # Apply trainable Rot gates for this layer
                 for g, gate in enumerate(rot_gates):
-                    gate(weights[start_idx + layer, q, g], wires=q, id=f"l{start_idx + layer}g{g}")
+                    gate(weights[start_idx + layer, q, g], wires=wires[q], id=f"l{start_idx + layer}g{g}")
 
         if n_qubits > 1:
             for q in range(n_qubits - 1):
@@ -120,12 +123,12 @@ def strongly_entangling_block(weights, trainable_layers, ranges, start_idx, n_qu
                     )
 
                 # Apply entangling pattern for this layer
-                control = q
-                target = (q + ranges[layer]) % n_qubits
+                control = wires[q]
+                target = wires[(q + ranges[layer]) % n_qubits]
                 ent_gate(wires=[control, target])
 
             if n_qubits > 2:
-                ent_gate(wires=[n_qubits - 1, ranges[layer] - 1])
+                ent_gate(wires=[wires[-1], wires[ranges[layer] - 1]])
 
 @typechecked
 def reuploading_qlayer(
@@ -256,7 +259,7 @@ class VQC(nn.Module):
                     device=self.qml_device,
                     reuploads=3,
                     entangle_between_reuploads=False,
-                    trainable_layers=[3],
+                    trainable_layers=3,
                     measurement_wires=measurement_wires
                 )
                 self.n_qubits = 2
@@ -896,7 +899,8 @@ class CoherentECOC(QuantumECOC):
     """
     def __init__(
         self,
-        meta_layers: int | list[int] = 1,
+        meta_layers: int | list[int] = 2,
+        meta_design: str = "full",
         n_learners: int | None = None,
         templates: int | str | list[int | str] = 0,
         ecoc_depth: int = 2,
@@ -908,6 +912,7 @@ class CoherentECOC(QuantumECOC):
             self.meta_layers = [meta_layers]
         else:
             self.meta_layers = meta_layers
+        self.meta_design = meta_design
 
     def reset_ensemble(self):
         for i in range(len(self.classifiers)):
@@ -918,11 +923,16 @@ class CoherentECOC(QuantumECOC):
 
     def build_coherent_circuit(self):
         total_qubits = 0
-        start_wires = []
+        main_wires = []
 
         for clf in self.classifiers:
-            start_wires.append(total_qubits)
+            main_wires.append(total_qubits)
             total_qubits += clf.n_qubits
+        
+        if self.meta_design == "full":
+            self.wires = list(range(total_qubits))
+        elif self.meta_design == "main":
+            self.wires = main_wires
 
         coherent_device = qml.device(self.qml_device, wires=total_qubits)
 
@@ -932,7 +942,7 @@ class CoherentECOC(QuantumECOC):
 
         for i, clf in enumerate(self.classifiers):
             wire_map = {
-                w: w + start_wires[i]
+                w: w + main_wires[i]
                 for w in range(clf.n_qubits)
             }
             wire_maps.append(wire_map)
@@ -952,6 +962,7 @@ class CoherentECOC(QuantumECOC):
                 n_features_i = n_features_list[i]
 
                 inputs_i = inputs[..., prev_idx:prev_idx + n_features_i]
+
                 weights_i = frozen_weights[i].to(inputs.device)
 
                 tape = qml.tape.make_qscript(clf.circuit.func)(inputs_i, weights_i)
@@ -961,14 +972,14 @@ class CoherentECOC(QuantumECOC):
                 prev_idx += n_features_i
 
             for i in range(len(self.meta_layers)):
-                strongly_entangling_block(weights, 1, self.meta_layers[i], i, total_qubits, [qml.RX, qml.RZ], qml.CZ)
+                strongly_entangling_block(weights, 1, self.meta_layers[i], i, len(self.wires), [qml.RX, qml.RZ], qml.CZ, wires=self.wires)
 
-            return qml.probs(wires=list(range(total_qubits)))
+            return qml.probs(wires=self.wires)
 
         n_features = sum(n_features_list)
 
         weight_shapes = {
-            "weights": (len(self.meta_layers), total_qubits, 2)
+            "weights": (len(self.meta_layers), len(self.wires), 2)
         }
 
         coherent_layer = qml.qnn.TorchLayer(
