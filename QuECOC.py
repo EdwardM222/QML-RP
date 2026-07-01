@@ -236,6 +236,11 @@ class VQC(nn.Module):
 
         self.initialise()
 
+        self.train_losses = []
+        self.val_losses = []
+        self.best_loss = float("inf")
+        self.optimizer = None
+
     def initialise(self):
         measurement_wires = list(range(int(np.ceil(np.log2(self.n_classes)))))
         match(self.template):
@@ -408,7 +413,8 @@ class VQC(nn.Module):
         
         self.to(self.cuda_device)
 
-        optimizer = optimizer_cls(self.parameters(), lr=lr)
+        if self.optimizer is None:
+            self.optimizer = optimizer_cls(self.parameters(), lr=lr)
 
         best_state = None
         patience_counter = 0
@@ -429,13 +435,13 @@ class VQC(nn.Module):
                 X_batch = X_batch.to(self.cuda_device)
                 y_batch = y_batch.to(self.cuda_device)
 
-                optimizer.zero_grad()
+                self.optimizer.zero_grad()
 
                 probs = self(X_batch)
                 loss = criterion(torch.log(probs.clamp(min=1e-8)), y_batch)
 
                 loss.backward()
-                optimizer.step()
+                self.optimizer.step()
 
                 epoch_loss += loss.item()
 
@@ -515,9 +521,9 @@ class VQC(nn.Module):
         if verbose:
             print(f"Training time: {self.training_time}")
 
-        self.train_losses = train_losses
-        self.val_losses = val_losses
-        self.best_loss = best_loss
+        self.train_losses.extend(train_losses)
+        self.val_losses.extend(val_losses)
+        self.best_loss = min(best_loss, self.best_loss)
         
         if X_test is not None and y_test is not None:
             self.val_probs = self.predict_proba(X_test)
@@ -1196,6 +1202,6 @@ if __name__ == "__main__":
     # plt.grid(True)
     # plt.show()
 
-    model = CoherentECOC(meta_layers=[1],  templates=2).to("cpu")
+    model = CoherentECOC(meta_layers=[1],  templates=1).to("cpu")
     model.fit(X_train, y_train, X_test, y_test, k_folds=5, epochs=200, plot=False, verbose=True)
     print(f"CoherentECOC Classification Report:\n{classification_report(y_test, model.predict(X_test), zero_division=0)}\n")
