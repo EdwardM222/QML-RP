@@ -580,6 +580,7 @@ class QuantumECOC:
             print(f"Feature mapping: {self.features_to_int}")
 
         self.labels = sorted(y.unique())
+        self.n_classes = len(self.labels)
         self.label_to_int = {label: idx for idx, label in enumerate(self.labels)}
         self.int_to_label = {idx: label for idx, label in enumerate(self.labels)}
         if verbose:
@@ -921,10 +922,16 @@ class CoherentECOC(QuantumECOC):
             clf.feats = self.feat_map[i]
             self.classifiers[i] = clf
 
+    def get_base_weights(self, idx: int) -> torch.Tensor:
+        return self.classifiers[idx].qlayer.weights.detach().clone()
+    
+    def get_input(self, X: np.ndarray) -> np.ndarray:
+        inputs = [X[:, clf.feats] for clf in self.classifiers]
+        return np.concatenate(inputs, axis=1)
+
     def build_coherent_circuit(self):
         total_qubits = 0
         main_wires = []
-
         for clf in self.classifiers:
             main_wires.append(total_qubits)
             total_qubits += clf.n_qubits
@@ -934,12 +941,8 @@ class CoherentECOC(QuantumECOC):
         elif self.meta_design == "main":
             self.wires = main_wires
 
-        coherent_device = qml.device(self.qml_device, wires=total_qubits)
-
         wire_maps = []
-        frozen_weights = []
         n_features_list = []
-
         for i, clf in enumerate(self.classifiers):
             wire_map = {
                 w: w + main_wires[i]
@@ -947,13 +950,9 @@ class CoherentECOC(QuantumECOC):
             }
             wire_maps.append(wire_map)
 
-            # Freeze the trained weights from this base VQC
-            frozen_weights.append(
-                clf.qlayer.weights.detach().clone()
-            )
-
             n_features_list.append(clf.n_features)
 
+        coherent_device = qml.device(self.qml_device, wires=total_qubits)
         @qml.qnode(coherent_device, interface="torch", diff_method="best")
         def coherent_circuit(inputs, weights):
             prev_idx = 0
@@ -963,7 +962,7 @@ class CoherentECOC(QuantumECOC):
 
                 inputs_i = inputs[..., prev_idx:prev_idx + n_features_i]
 
-                weights_i = frozen_weights[i].to(inputs.device)
+                weights_i = self.get_base_weights(i).to(inputs.device)
 
                 tape = qml.tape.make_qscript(clf.circuit.func)(inputs_i, weights_i)
                 for op in tape.operations:
@@ -989,6 +988,7 @@ class CoherentECOC(QuantumECOC):
 
         self.coherent_vqc = VQC(
             coherent_device,
+            n_classes=self.n_classes,
             template="manual",
             qlayer=coherent_layer,
             circuit=coherent_circuit,
@@ -1010,20 +1010,21 @@ class CoherentECOC(QuantumECOC):
     ):
         start_time = time.time()
         self.initialise_ensemble(X, y, verbose=verbose)
+        self.build_coherent_circuit()
 
         class_samples = y.value_counts()
         k_folds = min(k_folds, int(class_samples.min()))
         if k_folds > 1:
-            X_meta = []
-            y_meta = []
             skf = StratifiedKFold(n_splits=k_folds, shuffle=True, random_state=2)
 
-            for f, (train_index, val_index) in enumerate(skf.split(X, y)):
+            X_main, X_tune, y_main, y_tune = train_test_split(X, y, test_size=0.1, random_state=2, stratify=y)
+
+            for f, (train_index, val_index) in enumerate(skf.split(X_main, y_main)):
                 if verbose:
                     print(f"\nFold {f + 1}/{k_folds}")
                 
-                X_train, X_val = X.iloc[train_index], X.iloc[val_index]
-                y_train, y_val = y.iloc[train_index], y.iloc[val_index]
+                X_train, X_val = X_main.iloc[train_index], X_main.iloc[val_index]
+                y_train, y_val = y_main.iloc[train_index], y_main.iloc[val_index]
 
                 fold_scaler = MinMaxScaler(feature_range=self.scaler.feature_range)
                 X_train = fold_scaler.fit_transform(X_train)
@@ -1044,25 +1045,19 @@ class CoherentECOC(QuantumECOC):
                     **fit_params,
                 )
 
-                X_fold = np.array([clf.val_probs for clf in self.classifiers]).T
-                X_fold = X_fold[1:, :].transpose((1, 0, 2)).reshape(len(X_val), -1)
-                
-                X_meta.extend(X_fold)
-                y_meta.extend(y_val)
+                if verbose:
+                    print(f"\nTraining final circuit on fold {f + 1}")
+                self.coherent_vqc.fit(self.get_input(X_val), y_val.values, plot=plot, verbose=verbose, **fit_params)
 
                 self.reset_ensemble()
 
             if verbose:
-                print("\nTraining meta-learner...")
-            self.meta_learner.fit(np.array(X_meta), np.array(y_meta))
-
-            if verbose:
                 print("\nTraining final ensemble on full dataset...")
 
-            X_s = self.scaler.fit_transform(X)
+            X_s = self.scaler.fit_transform(X_main)
             X_test_s = self.scaler.transform(X_test) if X_test is not None else None
 
-            y_m = y.map(self.label_to_int)
+            y_m = y_main.map(self.label_to_int)
             y_test_m = y_test.map(self.label_to_int) if y_test is not None else None
 
             self.train_ensemble(
@@ -1075,9 +1070,16 @@ class CoherentECOC(QuantumECOC):
                 verbose=verbose,
                 **fit_params,
             )
+
+            X_tune_s = self.scaler.transform(X_tune)
+            y_tune_m = y_tune.map(self.label_to_int)
+
+            if verbose:
+                print("\nFine tuning final circuit...")
+            self.coherent_vqc.fit(self.get_input(X_tune_s), y_tune_m.values, self.get_input(X_test_s), y_test_m.values, plot=plot, verbose=verbose, **fit_params)
         else:
             if verbose:
-                print(f"\nNot enough samples for {k_folds} folds. Training on a single train/validation split...")
+                print(f"\nTraining on a single train/validation split...")
 
             X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3, random_state=2, stratify=y)
             
@@ -1098,25 +1100,25 @@ class CoherentECOC(QuantumECOC):
                 **fit_params,
             )
 
-            X_meta = np.array([clf.val_probs for clf in self.classifiers]).T
-            X_meta = X_meta[1:, :].transpose((1, 0, 2)).reshape(len(X_val), -1)
+            X_meta = self.get_input(X_val)
 
             if verbose:
                 print("\nTraining meta-learner...")
-            self.meta_learner.fit(X_meta, np.array(y_val))
+            self.coherent_vqc.fit(X_meta, y_val.values, plot=plot, verbose=verbose, **fit_params)
 
         self.training_time = TimeInt(time.time() - start_time)
         if verbose:
             print(f"\nTotal training time after fitting {self.n_learners} classifiers across {k_folds} folds: {self.training_time}")
 
     def predict_proba(self, X: np.ndarray) -> np.ndarray:
-        self.eval()
+        self.coherent_vqc.eval()
         with torch.no_grad():
-            X_t = torch.tensor(X, dtype=torch.float32).to(self.cuda_device)
-            return self(X_t.to(self.cuda_device)).cpu().numpy()
+            X_t = torch.tensor(self.get_input(self.scaler.transform(X)), dtype=torch.float32).to(self.cuda_device)
+            return self.coherent_vqc(X_t.to(self.cuda_device)).cpu().numpy()
 
     def predict(self, X: np.ndarray) -> np.ndarray:
-        return (self.predict_proba(X).argmax(axis=1))
+        preds = self.predict_proba(X).argmax(axis=1)
+        return np.array([self.int_to_label[pred] for pred in preds])
 
     def score(self, X: np.ndarray, y: np.ndarray) -> float:
         preds = self.predict(X)
@@ -1166,10 +1168,10 @@ if __name__ == "__main__":
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=2, stratify=y)
 
-    ens = QuantumECOC().to("cpu")
-    ens.fit(X_train, y_train, X_test, y_test, parallel=True, n_jobs=4, epochs=100, plot=False, verbose=True)
-    preds = ens.predict(X_test)
-    print(f"QuantumECOC Classification Report:\n{classification_report(y_test, preds, zero_division=0)}\n")
+    # ens = QuantumECOC().to("cpu")
+    # ens.fit(X_train, y_train, X_test, y_test, parallel=True, n_jobs=4, epochs=100, plot=False, verbose=True)
+    # preds = ens.predict(X_test)
+    # print(f"QuantumECOC Classification Report:\n{classification_report(y_test, preds, zero_division=0)}\n")
 
     # ens = StackedECOC().to("cpu")
     # ens.fit(X_train, y_train, X_test, y_test, epochs=100, plot=False, verbose=True)
@@ -1193,3 +1195,7 @@ if __name__ == "__main__":
     # plt.legend()
     # plt.grid(True)
     # plt.show()
+
+    model = CoherentECOC(meta_layers=[1],  templates=2).to("cpu")
+    model.fit(X_train, y_train, X_test, y_test, k_folds=5, epochs=200, plot=False, verbose=True)
+    print(f"CoherentECOC Classification Report:\n{classification_report(y_test, model.predict(X_test), zero_division=0)}\n")
