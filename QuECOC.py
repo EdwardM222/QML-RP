@@ -15,6 +15,8 @@ from IPython.display import clear_output
 from pandas import DataFrame, Series
 from itertools import product
 from random import sample, choices
+import json
+from pathlib import Path
 import  warnings
 warnings.filterwarnings(
     "ignore",
@@ -29,6 +31,17 @@ warnings.filterwarnings(
     module=r"pennylane\.operation",
 )
 from typeguard import typechecked
+
+GATE_MAP = {
+    "rx": qml.RX,
+    "rz": qml.RZ,
+    "cz": qml.CZ,
+    "rzz": qml.IsingZZ,
+    "zz": qml.IsingZZ,
+    "x": qml.PauliX,
+    "sx": qml.SX,
+    "id": qml.Identity,
+}
 
 class ValReport(dict):
     def __str__(self):
@@ -84,12 +97,48 @@ def build_ecoc_matrix(n_classes: int, n_learners: int, depth: int = 2) -> np.nda
 
     return ecoc
 
-def feature_block(inputs, n_qubits, feats_per_qubit, rot_gates):
+def feature_block(
+    inputs,
+    n_qubits,
+    feats_per_qubit,
+    rot_gates,
+    reupload_idx=0,
+    feature_strategy="same",
+):
+    n_input_features = inputs.shape[-1]
+
     for f in range(feats_per_qubit):
         for q in range(n_qubits):
-            feature_idx = (q * feats_per_qubit + f) % inputs.shape[-1]
+
+            base_idx = q * feats_per_qubit + f
+
+            if feature_strategy == "same":
+                feature_idx = base_idx
+
+            elif feature_strategy == "cyclic_shift":
+                feature_idx = base_idx + reupload_idx
+
+            elif feature_strategy == "block_shift":
+                feature_idx = base_idx + reupload_idx * n_qubits * feats_per_qubit
+
+            elif feature_strategy == "reverse_alternate":
+                if reupload_idx % 2 == 0:
+                    feature_idx = base_idx
+                else:
+                    feature_idx = (n_qubits * feats_per_qubit - 1) - base_idx
+
+            elif feature_strategy == "qubit_shift":
+                shifted_q = (q + reupload_idx) % n_qubits
+                feature_idx = shifted_q * feats_per_qubit + f
+
+            else:
+                raise ValueError(f"Unknown feature_strategy: {feature_strategy}")
+
+    for f in range(feats_per_qubit):
+        for q in range(n_qubits):
+            feature_idx = feature_idx % n_input_features
             gate = rot_gates[f % len(rot_gates)]
-            gate(inputs[..., feature_idx], wires=q, id=f"f{feature_idx}")
+            gate(inputs[..., feature_idx], wires=q, id=f"r{reupload_idx}f{feature_idx}")
 
 def entangling_block(weights, trainable_layers, ranges, start_idx, n_qubits, rot_gates, ent_gate, wires=None):
     repeats = max(trainable_layers, 1)
@@ -145,6 +194,7 @@ def reuploading_qlayer(
     feats_per_qubit: int,
     device: qml.devices.Device,
     reuploads: int = 2,
+    feature_strategy: str = "same",
     entangle_between_reuploads: bool = True,
     trainable_layers: int | list[int] = 1,
     ranges: int | list[int] | list[list[int]] = 1,
@@ -215,7 +265,7 @@ def reuploading_qlayer(
     def circuit(inputs, weights):
         layer_idx = 0
         for r in range(reuploads):
-            feature_block(inputs, n_qubits, feats_per_qubit, rot_gates)
+            feature_block(inputs, n_qubits, feats_per_qubit, rot_gates, reupload_idx=r, feature_strategy=feature_strategy)
             if entangle_between_reuploads or r == reuploads - 1:
                 entangling_block(weights, trainable_layers[r], ranges[r], layer_idx, n_qubits, rot_gates, ent_gate)
             layer_idx += trainable_layers[r]
@@ -254,6 +304,34 @@ class VQC(nn.Module):
         self.val_losses = []
         self.best_loss = float("inf")
         self.optimizer = None
+
+    def resolve_vqc_template(template, kwargs, template_path="vqc_templates.json"):
+        template = str(template)
+        kwargs = dict(kwargs)
+
+        if "rot_gates" in kwargs:
+            kwargs["rot_gates"] = [GATE_MAP[gate] for gate in kwargs["rot_gates"]]
+
+        if "ent_gate" in kwargs:
+            kwargs["ent_gate"] = GATE_MAP[kwargs["ent_gate"]]
+
+        if template == "custom":
+            return kwargs
+
+        path = Path(template_path)
+        with path.open("r", encoding="utf-8") as f:
+            templates = json.load(f)
+
+        if template not in templates:
+            raise ValueError(
+                f"Unknown VQC template '{template}'. "
+                f"Available templates: {list(templates.keys())}"
+            )
+
+        config = templates[template].copy()
+        config.update(kwargs)
+
+        return config
 
     def initialise(self):
         measurement_wires = list(range(int(np.ceil(np.log2(self.n_classes)))))
