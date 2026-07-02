@@ -91,7 +91,7 @@ def feature_block(inputs, n_qubits, feats_per_qubit, rot_gates):
             gate = rot_gates[f % len(rot_gates)]
             gate(inputs[..., feature_idx], wires=q, id=f"f{feature_idx}")
 
-def strongly_entangling_block(weights, trainable_layers, ranges, start_idx, n_qubits, rot_gates, ent_gate, wires=None):
+def entangling_block(weights, trainable_layers, ranges, start_idx, n_qubits, rot_gates, ent_gate, wires=None):
     repeats = max(trainable_layers, 1)
 
     if wires is None:
@@ -121,14 +121,23 @@ def strongly_entangling_block(weights, trainable_layers, ranges, start_idx, n_qu
                         f"Invalid range value: {ranges[layer]}. "
                         f"Range must be between 1 and {n_qubits - 1} (n_qubits-1)."
                     )
+                
+                if n_qubits / ranges[layer] == 2.0 and q == n_qubits // 2 - 1:
+                    break
 
                 # Apply entangling pattern for this layer
                 control = wires[q]
                 target = wires[(q + ranges[layer]) % n_qubits]
-                ent_gate(wires=[control, target])
+                if ent_gate.num_params == 0:
+                    ent_gate(wires=[control, target])
+                else:
+                    ent_gate(weights[start_idx + layer, q, -1], wires=[control, target], id=f"l{start_idx + layer}e{q}")
 
             if n_qubits > 2:
-                ent_gate(wires=[wires[-1], wires[ranges[layer] - 1]])
+                if ent_gate.num_params == 0:
+                    ent_gate(wires=[wires[-1], wires[ranges[layer] - 1]])
+                else:
+                    ent_gate(weights[start_idx + layer, -1, -1], wires=[wires[-1], wires[ranges[layer] - 1]], id=f"l{start_idx + layer}e{n_qubits - 1}")
 
 @typechecked
 def reuploading_qlayer(
@@ -138,9 +147,9 @@ def reuploading_qlayer(
     reuploads: int = 2,
     entangle_between_reuploads: bool = True,
     trainable_layers: int | list[int] = 1,
-    ranges: int | list[int] = 1,
-    rot_gates: list[type[qml.RX]] | None = None,
-    ent_gate: type[qml.CZ] = qml.CZ,
+    ranges: int | list[int] | list[list[int]] = 1,
+    rot_gates: list[qml.capture.capture_meta.ABCCaptureMeta] | None = None,
+    ent_gate: qml.capture.capture_meta.ABCCaptureMeta = qml.CZ,
     measurement_wires: list[int] | None = None,
 ):
     """
@@ -182,13 +191,18 @@ def reuploading_qlayer(
     
     if isinstance(ranges, int):
         ranges = [ranges] * reuploads
-    elif not entangle_between_reuploads and len(ranges) == trainable_layers[-1]:
-        ranges = [0] * (reuploads - 1) + [ranges] 
-    
-    if len(ranges) != reuploads:
+    elif isinstance(ranges, list):
+        if not entangle_between_reuploads and len(ranges) == trainable_layers[-1]:
+            ranges = [0] * (reuploads - 1) + [ranges]
+        if len(ranges) != reuploads:
+            raise ValueError(
+                f"`ranges` must be a list with length equal to `reuploads`. "
+                f"Got len(ranges)={len(ranges)} and reuploads={reuploads}."
+            )
+    else:
         raise ValueError(
-            f"`ranges` must be either an int or a list of length equal to `reuploads`. "
-            f"Got len(ranges)={len(ranges)} and reuploads={reuploads}."
+            f"`ranges` must be either an int or a list of ints or lists of ints. "
+            f"Got ranges={ranges}."
         )
     
     if rot_gates is None:
@@ -203,13 +217,13 @@ def reuploading_qlayer(
         for r in range(reuploads):
             feature_block(inputs, n_qubits, feats_per_qubit, rot_gates)
             if entangle_between_reuploads or r == reuploads - 1:
-                strongly_entangling_block(weights, trainable_layers[r], ranges[r], layer_idx, n_qubits, rot_gates, ent_gate)
+                entangling_block(weights, trainable_layers[r], ranges[r], layer_idx, n_qubits, rot_gates, ent_gate)
             layer_idx += trainable_layers[r]
 
         return qml.probs(wires=measurement_wires)
 
     weight_shapes = {
-        "weights": (sum(trainable_layers), n_qubits, len(rot_gates))
+        "weights": (sum(trainable_layers), n_qubits, len(rot_gates) + ent_gate.num_params)
     }
 
     qlayer = qml.qnn.TorchLayer(circuit, weight_shapes)
@@ -977,7 +991,7 @@ class CoherentECOC(QuantumECOC):
                 prev_idx += n_features_i
 
             for i in range(len(self.meta_layers)):
-                strongly_entangling_block(weights, 1, self.meta_layers[i], i, len(self.wires), [qml.RX, qml.RZ], qml.CZ, wires=self.wires)
+                entangling_block(weights, 1, self.meta_layers[i], i, len(self.wires), [qml.RX, qml.RZ], qml.CZ, wires=self.wires)
 
             return qml.probs(wires=self.wires)
 

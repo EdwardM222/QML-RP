@@ -30,6 +30,10 @@ def train_model(name, dataset, model_args, fit_args=None):
     elif name.startswith("Random Forest"):
         model = RandomForestClassifier(**model_args)
         model.fit(X_train, y_train, **fit_args)
+    elif name.startswith("VQC"):
+        c = len(np.unique(y_train))
+        model = VQC(n_classes=c, **model_args).to(DEVICE)
+        model.fit(X_train, y_train, X_test, y_test, **fit_args)
     elif name.startswith("QuantumECOC"):
         model = QuantumECOC(**model_args).to(DEVICE)
         model.fit(X_train, y_train, X_test, y_test, **fit_args)
@@ -72,6 +76,8 @@ def create_search_jobs(model_name, dataset_path, param_grid, fit_args=None):
         jobs.append((f"{model_name}", dataset_path, params, fit_args))
 
     return jobs
+
+
 
 if __name__ == "__main__":
     jobs = []
@@ -124,6 +130,9 @@ if __name__ == "__main__":
             try:
                 report_df, training_time = future.result()
                 results.append((report_df, training_time))
+
+                # Save the report to a file at the end of each job
+                
             except Exception:
                 print(f"Error occurred while processing {job_name}: {traceback.format_exc()}")
     final_time = TimeInt(time.time() - start_time)
