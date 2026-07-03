@@ -13,15 +13,9 @@ import pennylane as qml
 import  warnings
 warnings.filterwarnings(
     "ignore",
-    message=r"The 'id' argument is deprecated and will be removed in v0\.46\.",
+    message=r".*id.*deprecated.*",
     category=qml.exceptions.PennyLaneDeprecationWarning,
-    module=r"pennylane\.operation",
-)
-warnings.filterwarnings(
-    "ignore",
-    message=r"Using 'id' to add a custom label to your operator is deprecated\.",
-    category=qml.exceptions.PennyLaneDeprecationWarning,
-    module=r"pennylane\.operation",
+    module=r"pennylane\..*",
 )
 
 GATE_MAP = {
@@ -562,6 +556,36 @@ class AnsatzSpec:
             ),
         )
 
+    @classmethod
+    def from_template(
+        cls,
+        template: str | list[dict[str, Any]] | dict[str, Any],
+        *,
+        wires: list[int],
+        input_dim: int,
+        template_path: str | Path = "ansatze.json",
+        measurement_wires: list[int] | None = None,
+        name: str | None = None,
+    ) -> "AnsatzSpec":
+        """Create an AnsatzSpec from a template name or inline layer list."""
+        resolved_name, raw_layers = resolve_layer_template(
+            template=template,
+            template_path=template_path,
+        )
+
+        layer_specs = [
+            LayerSpec.from_dict(layer_config)
+            for layer_config in raw_layers
+        ]
+
+        return cls(
+            name=name or resolved_name,
+            layers=layer_specs,
+            wires=list(wires),
+            input_dim=int(input_dim),
+            measurement_wires=measurement_wires,
+        )
+
     def summary(self) -> dict[str, Any]:
         """Return useful experiment metadata."""
         return {
@@ -679,6 +703,7 @@ class AnsatzSpec:
     def draw_mpl(
         self,
         decimals: int | None = None,
+        weights: np.ndarray | None = None,
         interface: str = "autograd",
     ):
         """Return qml.draw_mpl figure and axis."""
@@ -689,7 +714,8 @@ class AnsatzSpec:
         )
 
         x = np.zeros(self.input_dim)
-        weights = np.zeros(self.n_params)
+        if weights is None:
+            weights = np.zeros(self.n_params)
 
         drawer = qml.draw_mpl(circuit, decimals=decimals)(x, weights)
         plt.show()
