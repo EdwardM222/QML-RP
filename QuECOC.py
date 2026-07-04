@@ -96,6 +96,7 @@ class VQC(nn.Module):
             feats: list[int] | None = None,
             qml_device: str | qml.devices.Device = "default.qubit",
             template: int | str = 0,
+            measurement_mode: str = "min",
             **kwargs
         ):
         super().__init__()
@@ -103,6 +104,7 @@ class VQC(nn.Module):
         self.feats = feats
         self.qml_device = qml_device
         self.template = template
+        self.measurement_mode = measurement_mode
 
         self.cuda_device = "cpu"
 
@@ -117,8 +119,6 @@ class VQC(nn.Module):
         return super().to(device)
     
     def initialise(self):
-        measurement_wires = list(range(int(np.ceil(np.log2(self.n_classes)))))
-
         if self.template == "manual":
             self.qlayer = self.kwargs.get("qlayer", None)
             self.circuit = self.kwargs.get("circuit", None)
@@ -129,18 +129,16 @@ class VQC(nn.Module):
             return
 
         n_qubits = self.kwargs.get("n_qubits", 2)
-        wires = self.kwargs.get("wires", list(range(n_qubits)))
 
         self.ansatz_spec = AnsatzSpec.from_template(
             template=self.template,
-            wires=wires,
-            input_dim=len(self.feats),
-            measurement_wires=measurement_wires,
+            n_qubits=n_qubits,
+            input_dim=len(self.feats)
         )
 
         self.weight_shapes = self.ansatz_spec.weight_shapes
         self.n_features = self.ansatz_spec.n_features
-        self.n_qubits = len(self.ansatz_spec.wires)
+        self.n_qubits = self.ansatz_spec.n_qubits
 
         self.train_losses = []
         self.val_losses = []
@@ -156,7 +154,8 @@ class VQC(nn.Module):
 
         self.qlayer, self.circuit, self.weight_shapes, self.n_features = (
             self.ansatz_spec.build_qlayer(
-                device_name=self.qml_device
+                device_name=self.qml_device,
+                measurement_wires=self.n_qubits if self.measurement_mode == "full" else int(np.ceil(np.log2(self.n_classes)))
             )
         )
 

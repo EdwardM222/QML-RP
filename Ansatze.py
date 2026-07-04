@@ -453,9 +453,8 @@ def count_total_params(layers: list[LayerSpec], n_qubits: int) -> int:
 class AnsatzSpec:
     name: str
     layers: list[LayerSpec]
-    wires: list[int]
+    n_qubits: int
     input_dim: int
-    measurement_wires: list[int] | None = None
 
     def __post_init__(self) -> None:
         self.layers = copy.deepcopy(self.layers)
@@ -472,27 +471,22 @@ class AnsatzSpec:
 
                     layer.args["features"] = feature_indices(
                         input_dim=self.input_dim,
-                        n_qubits=len(self.wires),
+                        n_qubits=self.n_qubits,
                         upload_idx=upload_idx,
                         strategy=strategy,
                         wrap=wrap,
                     )
                 else:
-                    if len(layer.args["features"]) != len(self.wires):
-                        raise ValueError(f"{layer.name} expected {len(self.wires)} features, but got {len(layer.args['features'])}: {layer.args['features']}")
+                    if len(layer.args["features"]) != self.n_qubits:
+                        raise ValueError(f"{layer.name} expected {self.n_qubits} features, but got {len(layer.args['features'])}: {layer.args['features']}")
                 upload_idx += 1
-
-        if self.measurement_wires is None:
-            self.measurement_wires = list(self.wires)
-        else:
-            self.measurement_wires = self.measurement_wires
 
     @property
     def weight_shapes(self) -> dict[str, tuple[int]]:
         """Weight shapes compatible with qml.qnn.TorchLayer."""
         return {
             "weights": (
-                count_total_params(self.layers, n_qubits=len(self.wires)),
+                count_total_params(self.layers, n_qubits=self.n_qubits),
             )
         }
 
@@ -521,25 +515,23 @@ class AnsatzSpec:
         return {
             "name": self.name,
             "layers": [layer.to_dict() for layer in self.layers],
-            "wires": list(self.wires),
-            "input_dim": self.input_dim,
-            "measurement_wires": list(self.measurement_wires)
+            "n_qubits": self.n_qubits,
+            "input_dim": self.input_dim
         }
 
     @classmethod
     def from_config(
         cls,
         config: dict[str, Any],
-        name: str | None = None,
-        measurement_wires: list[int] | None = None,
+        name: str | None = None
     ) -> AnsatzSpec:
         """Create an AnsatzSpec from a dictionary configuration."""
 
         if "layers" not in config:
             raise ValueError("Ansatz config must contain 'layers'.")
         
-        if "wires" not in config:
-            raise ValueError("Ansatz config must contain 'wires'.")
+        if "n_qubits" not in config:
+            raise ValueError("Ansatz config must contain 'n_qubits'.")
 
         if "input_dim" not in config:
             raise ValueError("Ansatz config must contain 'input_dim'.")
@@ -547,13 +539,8 @@ class AnsatzSpec:
         return cls(
             name=name or config.get("name", "unnamed_ansatz"),
             layers=[LayerSpec.from_dict(layer_config) for layer_config in config["layers"]],
-            wires=list(config["wires"]),
-            input_dim=int(config["input_dim"]),
-            measurement_wires=(
-                measurement_wires
-                if measurement_wires is not None
-                else config.get("measurement_wires", None)
-            ),
+            n_qubits=int(config["n_qubits"]),
+            input_dim=int(config["input_dim"])
         )
 
     @classmethod
@@ -561,11 +548,10 @@ class AnsatzSpec:
         cls,
         template: str | list[dict[str, Any]] | dict[str, Any],
         *,
-        wires: list[int],
+        n_qubits: int,
         input_dim: int,
         template_path: str | Path = "ansatze.json",
-        measurement_wires: list[int] | None = None,
-        name: str | None = None,
+        name: str | None = None
     ) -> "AnsatzSpec":
         """Create an AnsatzSpec from a template name or inline layer list."""
         resolved_name, raw_layers = resolve_layer_template(
@@ -581,15 +567,15 @@ class AnsatzSpec:
         return cls(
             name=name or resolved_name,
             layers=layer_specs,
-            wires=list(wires),
-            input_dim=int(input_dim),
-            measurement_wires=measurement_wires,
+            n_qubits=int(n_qubits),
+            input_dim=int(input_dim)
         )
 
     def summary(self) -> dict[str, Any]:
         """Return useful experiment metadata."""
         return {
             "name": self.name,
+            "n_qubits": self.n_qubits,
             "n_layers": len(self.layers),
             "layer_sequence": [layer.name for layer in self.layers],
             "trainable_params": self.n_params,
@@ -598,16 +584,18 @@ class AnsatzSpec:
             "used_features": self.used_features,
             "n_used_features": len(self.used_features),
             "feature_coverage": self.feature_coverage,
-            "wires": list(self.wires),
-            "measurement_wires": list(self.measurement_wires),
         }
 
     def apply_ansatz(
         self,
         inputs: Any,
-        weights: Any
+        weights: Any,
+        wires: list[int] | None = None
     ) -> None:
         """Apply the layered ansatz to the active circuit."""
+
+        if wires is None:
+            wires = list(range(self.n_qubits))
 
         idx = 0
         for layer in self.layers:
@@ -615,11 +603,11 @@ class AnsatzSpec:
                 inputs=inputs,
                 weights=weights,
                 idx=idx,
-                wires=self.wires,
+                wires=wires,
                 **layer.args,
             )
 
-        expected = count_total_params(self.layers, n_qubits=len(self.wires))
+        expected = count_total_params(self.layers, n_qubits=self.n_qubits)
         if idx != expected:
             raise RuntimeError(
                 f"Ansatz consumed {idx} parameters, but expected {expected}."
@@ -632,14 +620,19 @@ class AnsatzSpec:
         diff_method: str = "best",
         shots: int | None = None,
         device_kwargs: dict[str, Any] | None = None,
+        wires: list[int] | None = None,
+        measurement_wires: int | None = None,
     ):
         """Build a PennyLane QNode from this ansatz."""
 
         device_kwargs = dict(device_kwargs or {})
-        device_kwargs["wires"] = self.wires
+        device_kwargs["wires"] = list(range(self.n_qubits))
 
         if shots is not None:
             device_kwargs["shots"] = shots
+
+        if wires is None:
+            wires = list(range(self.n_qubits))
 
         dev = qml.device(device_name, **device_kwargs)
 
@@ -654,10 +647,11 @@ class AnsatzSpec:
         def circuit(inputs, weights):
             self.apply_ansatz(
                 inputs=inputs,
-                weights=weights
+                weights=weights,
+                wires=wires
             )
 
-            return [qml.probs(wires=self.measurement_wires)]
+            return [qml.probs(wires=wires if measurement_wires is None else wires[:measurement_wires])]
 
         return circuit
 
@@ -668,6 +662,8 @@ class AnsatzSpec:
         shots: int | None = None,
         diff_method: str = "best",
         device_kwargs: dict[str, Any] | None = None,
+        wires: list[int] | None = None,
+        measurement_wires: int | None = None,
     ):
         """Build a PennyLane TorchLayer from this ansatz."""
 
@@ -677,6 +673,8 @@ class AnsatzSpec:
             shots=shots,
             diff_method=diff_method,
             device_kwargs=device_kwargs,
+            wires=wires,
+            measurement_wires=measurement_wires
         )
 
         qlayer = qml.qnn.TorchLayer(circuit, self.weight_shapes)
