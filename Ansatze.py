@@ -586,7 +586,7 @@ class AnsatzSpec:
             "feature_coverage": self.feature_coverage,
         }
 
-    def apply_ansatz(
+    def apply(
         self,
         inputs: Any,
         weights: Any,
@@ -645,7 +645,7 @@ class AnsatzSpec:
 
         @qml.qnode(dev, **qnode_kwargs)
         def circuit(inputs, weights):
-            self.apply_ansatz(
+            self.apply(
                 inputs=inputs,
                 weights=weights,
                 wires=wires
@@ -679,7 +679,7 @@ class AnsatzSpec:
 
         qlayer = qml.qnn.TorchLayer(circuit, self.weight_shapes)
 
-        return qlayer, circuit, self.weight_shapes, self.n_features
+        return qlayer, circuit
 
     def draw_text(
         self,
