@@ -92,6 +92,7 @@ def build_ecoc_matrix(n_classes: int, n_learners: int, depth: int = 2) -> np.nda
 class VQC(nn.Module):
     def __init__(
             self,
+            n_qubits: int = 2,
             n_classes: int = 2,
             feats: list[int] | None = None,
             template: str = "default",
@@ -100,6 +101,7 @@ class VQC(nn.Module):
             **kwargs
         ):
         super().__init__()
+        self.n_qubits = n_qubits
         self.n_classes = n_classes
         self.feats = feats
         self.template = template
@@ -122,8 +124,6 @@ class VQC(nn.Module):
         return super().to(device)
     
     def initialise(self):
-        self.n_qubits = self.kwargs.get("n_qubits", 2)
-
         self.train_losses = []
         self.val_losses = []
         self.best_loss = float("inf")
@@ -146,7 +146,6 @@ class VQC(nn.Module):
 
         self.n_params = self.ansatz.n_params
         self.n_features = self.ansatz.n_features
-        self.n_qubits = self.ansatz.n_qubits
 
     def materialise(self):
         if hasattr(self, "qlayer") and self.qlayer is not None:
@@ -375,7 +374,7 @@ class QuantumECOC:
     def __init__(
         self,
         n_learners: int | None = None,
-        templates: int | str | list[int | str] = "default",
+        templates: str | list[str] = "default",
         measurement_mode: str = "min",
         feature_density: int | float = 1.0,
         ecoc_depth: int = 2,
@@ -405,6 +404,9 @@ class QuantumECOC:
         return self
     
     def initialise_ensemble(self, X: DataFrame, y: Series, verbose: bool):
+        if len(self.classifiers) > 0:
+            raise RuntimeError("Ensemble has already been initialised. Please reset the ensemble before re-initialising.")
+
         self.features = X.columns.tolist()
         self.features_to_int = {feat: idx for idx, feat in enumerate(self.features)}
         self.int_to_features = {idx: feat for idx, feat in enumerate(self.features)}
@@ -449,6 +451,10 @@ class QuantumECOC:
                     measurement_mode=self.measurement_mode
                 ).to(self.cuda_device)
             )
+
+    def reset_ensemble(self):
+        for clf in self.classifiers:
+            clf.reset_model()
 
     def train_ensemble(
         self,
@@ -583,7 +589,7 @@ class StackedECOC(QuantumECOC):
         self,
         meta_learner = None,
         n_learners: int | None = None,
-        templates: int | str | list[int | str] = "default",
+        templates: str | list[str] = "default",
         measurement_mode: str = "min",
         feature_density: int = 1,
         ecoc_depth: int = 2,
@@ -593,10 +599,6 @@ class StackedECOC(QuantumECOC):
         super().__init__(n_learners=n_learners, templates=templates, measurement_mode=measurement_mode, feature_density=feature_density, ecoc_depth=ecoc_depth, device=device, **kwargs)
         
         self.meta_learner = meta_learner if meta_learner is not None else SVC(kernel="rbf", random_state=2, probability=True)
-
-    def reset_ensemble(self):
-        for clf in self.classifiers:
-            clf.reset_model()
 
     def fit(
         self,
@@ -747,7 +749,7 @@ class CoherentECOC(QuantumECOC):
         meta_measurement: str = "min",
         measurement_mode: str = "min",
         n_learners: int | None = None,
-        templates: int | str | list[int | str] = "default",
+        templates: str | list[str] = "default",
         feature_density: int | float = 1.0,
         ecoc_depth: int = 2,
         device: str = "default.qubit",
@@ -765,7 +767,7 @@ class CoherentECOC(QuantumECOC):
             raise ValueError(f"Unknown meta_measurement '{meta_measurement}'. Supported values are 'min' and 'full'.")
         self.meta_measurement = meta_measurement
 
-    def intialise_ensemble(self, X: DataFrame, y: Series, verbose: bool = False):
+    def initialise_ensemble(self, X: DataFrame, y: Series, verbose: bool = False):
         super().initialise_ensemble(X, y, verbose)
         self.meta_spec = AnsatzSpec.from_template(
             template=self.meta_template,
@@ -822,11 +824,11 @@ class CoherentECOC(QuantumECOC):
         )
 
         self.coherent_vqc = VQC(
+            n_qubits=self.n_qubits,
             n_classes=self.n_classes,
             feats=list(range(len(self.features))),
             template="manual",
             qml_device=coherent_device,
-            n_qubits=self.n_qubits,
             qlayer=coherent_layer,
             circuit=coherent_circuit,
             weight_shapes=weight_shapes,
@@ -840,6 +842,9 @@ class CoherentECOC(QuantumECOC):
         X_test: DataFrame | None = None,
         y_test: Series | None = None,
         k_folds: int = 5,
+        tune_size: float = 0.1,
+        freeze_base_main: bool = True,
+        freeze_base_tune: bool = False,
         bagging: tuple[float, int, int] | None = (0.5, 512, 2048),
         plot: bool = False,
         verbose: bool = False,
@@ -847,14 +852,21 @@ class CoherentECOC(QuantumECOC):
     ):
         start_time = time.time()
         self.initialise_ensemble(X, y, verbose=verbose)
-        self.build_coherent_circuit()
 
-        class_samples = y.value_counts()
-        k_folds = min(k_folds, int(class_samples.min()))
+        if tune_size > 0.0 and tune_size < 1.0:
+            X_main, X_tune, y_main, y_tune = train_test_split(X, y, test_size=tune_size, random_state=2, stratify=y)
+        else:
+            X_main, y_main = X, y
+
+        X_main_s = self.scaler.fit_transform(X_main)
+        y_main_m = y_main.map(self.label_to_int)
+
+        X_test_s = self.scaler.transform(X_test) if X_test is not None else None
+        y_test_m = y_test.map(self.label_to_int) if y_test is not None else None
+
+        k_folds = min(k_folds, int(y.value_counts().min()))
         if k_folds > 1:
             skf = StratifiedKFold(n_splits=k_folds, shuffle=True, random_state=2)
-
-            X_main, X_tune, y_main, y_tune = train_test_split(X, y, test_size=0.1, random_state=2, stratify=y)
 
             for f, (train_index, val_index) in enumerate(skf.split(X_main, y_main)):
                 if verbose:
@@ -883,23 +895,19 @@ class CoherentECOC(QuantumECOC):
                 )
 
                 if verbose:
-                    print(f"\nTraining final circuit on fold {f + 1}")
-                self.coherent_vqc.fit(self.get_input(X_val), y_val.values, plot=plot, verbose=verbose, **fit_params)
+                    print(f"\nTraining full circuit on fold {f + 1}")
+
+                self.build_coherent_circuit(freeze_base=True)
+                self.coherent_vqc.fit(X_val, y_val.values, plot=plot, verbose=verbose, **fit_params)
 
                 self.reset_ensemble()
 
             if verbose:
                 print("\nTraining final ensemble on full dataset...")
 
-            X_s = self.scaler.fit_transform(X_main)
-            X_test_s = self.scaler.transform(X_test) if X_test is not None else None
-
-            y_m = y_main.map(self.label_to_int)
-            y_test_m = y_test.map(self.label_to_int) if y_test is not None else None
-
             self.train_ensemble(
-                X_s,
-                y_m,
+                X_main_s,
+                y_main_m,
                 X_test_s,
                 y_test_m,
                 bagging=bagging,
@@ -908,17 +916,16 @@ class CoherentECOC(QuantumECOC):
                 **fit_params,
             )
 
-            X_tune_s = self.scaler.transform(X_tune)
-            y_tune_m = y_tune.map(self.label_to_int)
-
             if verbose:
-                print("\nFine tuning final circuit...")
-            self.coherent_vqc.fit(self.get_input(X_tune_s), y_tune_m.values, self.get_input(X_test_s), y_test_m.values, plot=plot, verbose=verbose, **fit_params)
+                print(f"\nTraining full circuit with {'frozen' if freeze_base_main else 'tunable'} base circuits...")
+            
+            self.build_coherent_circuit(freeze_base=freeze_base_main)
+            self.coherent_vqc.fit(X_main_s, y_main_m.values, X_test_s, y_test_m.values, plot=plot, verbose=verbose, **fit_params)
         else:
             if verbose:
                 print(f"\nTraining on a single train/validation split...")
 
-            X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3, random_state=2, stratify=y)
+            X_train, X_val, y_train, y_val = train_test_split(X_main, y_main, test_size=0.3, random_state=2, stratify=y)
             
             X_train = self.scaler.fit_transform(X_train)
             X_val = self.scaler.transform(X_val)
@@ -937,20 +944,30 @@ class CoherentECOC(QuantumECOC):
                 **fit_params,
             )
 
-            X_meta = self.get_input(X_val)
-
             if verbose:
-                print("\nTraining meta-learner...")
-            self.coherent_vqc.fit(X_meta, y_val.values, plot=plot, verbose=verbose, **fit_params)
+                print(f"\nTraining full circuit with {'frozen' if freeze_base_main else 'tunable'} base circuits...")
+            
+            self.build_coherent_circuit(freeze_base=freeze_base_main)
+            self.coherent_vqc.fit(X_val, y_val.values, X_test_s, y_test_m.values, plot=plot, verbose=verbose, **fit_params)
+        
+        if tune_size > 0.0 and tune_size < 1.0:
+            if verbose:
+                print(f"\nFine tuning full circuit with {'frozen' if freeze_base_tune else 'tunable'} base circuits...")
+            
+            X_tune_s = self.scaler.transform(X_tune)
+            y_tune_m = y_tune.map(self.label_to_int)
+
+            self.build_coherent_circuit(freeze_base=freeze_base_tune)
+            self.coherent_vqc.fit(X_tune_s, y_tune_m.values, X_test_s, y_test_m.values, plot=plot, verbose=verbose, **fit_params)
 
         self.training_time = TimeInt(time.time() - start_time)
         if verbose:
-            print(f"\nTotal training time after fitting {self.n_learners} classifiers across {k_folds} folds: {self.training_time}")
+            print(f"\nTotal training time after fitting {self.n_learners} base classifiers across {k_folds} fold(s): {self.training_time}")
 
     def predict_proba(self, X: np.ndarray) -> np.ndarray:
         self.coherent_vqc.eval()
         with torch.no_grad():
-            X_t = torch.tensor(self.get_input(self.scaler.transform(X)), dtype=torch.float32).to(self.cuda_device)
+            X_t = torch.tensor(self.scaler.transform(X), dtype=torch.float32).to(self.cuda_device)
             return self.coherent_vqc(X_t.to(self.cuda_device)).cpu().numpy()
 
     def predict(self, X: np.ndarray) -> np.ndarray:
@@ -1051,10 +1068,6 @@ if __name__ == "__main__":
     # plt.grid(True)
     # plt.show()
 
-    model = CoherentECOC(meta_template='hea_cz_ring',  templates='hea_cz_ring').to("cpu")
-    model.intialise_ensemble(X_train, y_train, verbose=True)
-    model.build_coherent_circuit(freeze_base=False)
-    fig, ax = qml.draw_mpl(model.coherent_vqc.circuit)(np.zeros((1, model.coherent_vqc.n_features)), np.zeros(model.n_params))
-    plt.show()
-    model.fit(X_train, y_train, X_test, y_test, k_folds=5, epochs=200, plot=False, verbose=True)
+    model = CoherentECOC(meta_template='hea_cz_ring',  templates='hea_cz_ring').to("cpu") 
+    model.fit(X_train, y_train, X_test, y_test, k_folds=5, epochs=200, plot=False, verbose=True, tune_size=0)
     print(f"CoherentECOC Classification Report:\n{classification_report(y_test, model.predict(X_test), zero_division=0)}\n")
