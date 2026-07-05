@@ -782,10 +782,14 @@ class CoherentECOC(QuantumECOC):
         if len(self.classifiers) == 0:
             raise RuntimeError("Cannot build coherent circuit before initialising the ensemble.")
 
-        self.n_qubits = sum(clf.n_qubits for clf in self.classifiers)
-        self.n_params = self.meta_spec.n_params + (sum(clf.n_params for clf in self.classifiers) if not freeze_base else 0)
-
+        self.n_qubits = 0
+        base_params = 0
         self.main_wires = []
+        for i, clf in enumerate(self.classifiers):
+            self.main_wires.append(self.n_qubits)
+            self.n_qubits += clf.n_qubits
+            base_params += clf.n_params
+        self.n_params = self.meta_spec.n_params + (0 if freeze_base else base_params)
 
         coherent_device = qml.device(self.qml_device, wires=self.n_qubits)
         @qml.qnode(coherent_device, interface="torch", diff_method="best")
@@ -793,8 +797,6 @@ class CoherentECOC(QuantumECOC):
             n_params = 0
             idx = 0
             for i, clf in enumerate(self.classifiers):
-                self.main_wires.append(idx)
-
                 clf.ansatz.apply(
                     inputs=inputs[:, clf.feats],
                     weights=self.get_base_weights(i) if freeze_base else weights[n_params:n_params + clf.n_params],
@@ -823,17 +825,43 @@ class CoherentECOC(QuantumECOC):
             weight_shapes
         )
 
-        self.coherent_vqc = VQC(
-            n_qubits=self.n_qubits,
-            n_classes=self.n_classes,
-            feats=list(range(len(self.features))),
-            template="manual",
-            qml_device=coherent_device,
-            qlayer=coherent_layer,
-            circuit=coherent_circuit,
-            weight_shapes=weight_shapes,
-            n_features=len(self.features)
-        ).to(self.cuda_device)
+        if hasattr(self, "coherent_vqc") and self.coherent_vqc is not None:
+            old_weights = self.coherent_vqc.qlayer.weights.detach().clone()
+
+            if old_weights is not None:
+                with torch.no_grad():
+                    if old_weights.numel() == coherent_layer.weights.numel():
+                        coherent_layer.weights.copy_(old_weights.to(coherent_layer.weights.device))
+                        optimizer = type(self.coherent_vqc.optimizer)(coherent_layer.parameters(), lr=self.coherent_vqc.optimizer.defaults['lr'])
+                        optimizer.load_state_dict(self.coherent_vqc.optimizer.state_dict())
+                        self.coherent_vqc.optimizer = optimizer
+                    elif old_weights.numel() < coherent_layer.weights.numel():
+                        n = old_weights.numel()
+                        coherent_layer.weights[-n:].copy_(old_weights[-n:].to(coherent_layer.weights.device))
+                    else:
+                        param_idx = 0
+                        for clf in self.classifiers:
+                            clf.qlayer.weights.copy_(old_weights[param_idx:param_idx + clf.n_params].to(clf.qlayer.weights.device))
+                            param_idx += clf.n_params
+                        coherent_layer.weights.copy_(old_weights[param_idx:].to(coherent_layer.weights.device))
+
+            self.coherent_vqc.circuit = coherent_circuit
+            self.coherent_vqc.qlayer = coherent_layer
+            if self.coherent_vqc.weight_shapes != weight_shapes:
+                self.coherent_vqc.optimizer = None
+            self.coherent_vqc.weight_shapes = weight_shapes
+        else:
+            self.coherent_vqc = VQC(
+                n_qubits=self.n_qubits,
+                n_classes=self.n_classes,
+                feats=list(range(len(self.features))),
+                template="manual",
+                qml_device=coherent_device,
+                qlayer=coherent_layer,
+                circuit=coherent_circuit,
+                weight_shapes=weight_shapes,
+                n_features=len(self.features)
+            ).to(self.cuda_device)
 
     def fit(
         self,
@@ -866,8 +894,9 @@ class CoherentECOC(QuantumECOC):
 
         k_folds = min(k_folds, int(y.value_counts().min()))
         if k_folds > 1:
-            skf = StratifiedKFold(n_splits=k_folds, shuffle=True, random_state=2)
+            self.build_coherent_circuit(freeze_base=True)
 
+            skf = StratifiedKFold(n_splits=k_folds, shuffle=True, random_state=2)
             for f, (train_index, val_index) in enumerate(skf.split(X_main, y_main)):
                 if verbose:
                     print(f"\nFold {f + 1}/{k_folds}")
@@ -897,7 +926,6 @@ class CoherentECOC(QuantumECOC):
                 if verbose:
                     print(f"\nTraining full circuit on fold {f + 1}")
 
-                self.build_coherent_circuit(freeze_base=True)
                 self.coherent_vqc.fit(X_val, y_val.values, plot=plot, verbose=verbose, **fit_params)
 
                 self.reset_ensemble()

@@ -797,35 +797,6 @@ def resolve_layer_template(
         "or a dictionary containing a 'layers' field."
     )
 
-def resolve_ansatz_spec(
-    template: str | list[dict[str, Any]] | dict[str, Any],
-    *,
-    wires: list[int],
-    input_dim: int,
-    template_path: str | Path = "ansatze.json",
-    measurement_wires: list[int] | None = None,
-    name: str | None = None,
-) -> AnsatzSpec:
-    """Resolve an ansatz template into a full AnsatzSpec."""
-
-    resolved_name, raw_layers = resolve_layer_template(
-        template=template,
-        template_path=template_path,
-    )
-
-    layer_specs = [
-        LayerSpec.from_dict(layer_config)
-        for layer_config in raw_layers
-    ]
-
-    return AnsatzSpec(
-        name=name or resolved_name,
-        layers=layer_specs,
-        wires=wires,
-        input_dim=input_dim,
-        measurement_wires=measurement_wires,
-    )
-
 if __name__ == "__main__":
     # Example usage
     ansatz = resolve_ansatz_spec(
