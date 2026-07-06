@@ -963,7 +963,7 @@ class CoherentECOC(QuantumECOC):
                 if verbosity > 0:
                     print(f"Training full circuit on fold {f + 1}")
 
-                self.coherent_vqc.fit(X_val, y_val.values, plot=plot, verbosity=verbosity-1, **fit_params)
+                self.coherent_vqc.fit(X_val, y_val.values, X_test_s, y_test_m.values, plot=plot, verbosity=verbosity-1, **fit_params)
 
                 self.reset_ensemble()
 
