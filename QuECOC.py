@@ -88,6 +88,43 @@ def build_ecoc_matrix(n_classes: int, n_learners: int, depth: int = 2) -> np.nda
 
     return ecoc
 
+def load_vqc_templates(template_path: str | Path = "vqcs.json") -> dict:
+    path = Path(template_path)
+
+    if not path.exists():
+        raise FileNotFoundError(f"VQC template file not found: {path.resolve()}")
+
+    with path.open("r", encoding="utf-8") as f:
+        templates = json.load(f)
+
+    if not isinstance(templates, dict):
+        raise ValueError(f"VQC template file must contain a dictionary of named templates, got {type(templates)}.")
+
+    return templates
+
+def resolve_vqc_template(template: str | dict, template_path: str | Path = "vqcs.json") -> dict:
+    if isinstance(template, str):
+        templates = load_vqc_templates(template_path)
+
+        if template not in templates:
+            raise ValueError(f"Unknown VQC template '{template}'. Available templates: {list(templates.keys())}")
+
+        config = copy.deepcopy(templates[template])
+    elif isinstance(template, dict):
+        config = copy.deepcopy(template)
+    else:
+        raise TypeError("VQC template must be either a template name or a config dictionary.")
+
+    if config["measurement_mode"] not in {"min", "full"}:
+        raise ValueError(f"Unknown measurement_mode '{config['measurement_mode']}'. Supported values are 'min' and 'full'.")
+
+    return {
+        "n_qubits": config.get("n_qubits", 2),
+        "ansatz": config.get("ansatz", "default"),
+        "feature_density": config.get("feature_density", 0.5),
+        "measurement_mode": config.get("measurement_mode", "min"),
+    }
+
 @typechecked
 class VQC(nn.Module):
     def __init__(
@@ -213,7 +250,7 @@ class VQC(nn.Module):
         plot: bool = False,
         title_prefix: str = "",
         restore_best: bool = True,
-        verbose: bool = False,
+        verbosity: int = 0,
     ):
         X_tr = torch.tensor(X, dtype=torch.float32).to(self.cuda_device)
         y_tr = torch.tensor(y, dtype=torch.long).to(self.cuda_device)
@@ -244,7 +281,7 @@ class VQC(nn.Module):
             epoch_loss = 0.0
             self.train()
             for batch_idx, (X_batch, y_batch) in enumerate(train_loader):
-                if verbose:
+                if verbosity > 1:
                     print(f"[Epoch {epoch + 1}/{epochs}] Batch {batch_idx + 1}/{len(train_loader)}", end="\r")
 
                 X_batch = X_batch.to(self.cuda_device)
@@ -303,7 +340,7 @@ class VQC(nn.Module):
                 plt.xlim(0, max(1, len(train_losses) - 1))
                 plt.show()
 
-            if verbose:
+            if verbosity > 1:
                 print(f"[Epoch {epoch + 1}/{epochs}] Train Loss: {avg_train_loss:.4f} {f'| Val Loss: {avg_val_loss:.4f} | Val Acc: {val_acc:.3f}' if test_loader is not None else ''}")
             
             # Early stopping
@@ -319,7 +356,7 @@ class VQC(nn.Module):
                     patience_counter += 1
 
                 if patience_counter >= patience:
-                    if verbose:
+                    if verbosity > 1:
                         print(f"Early stopping at epoch {epoch + 1}")
                     break
             else:
@@ -333,8 +370,10 @@ class VQC(nn.Module):
             self.load_state_dict(best_state)
 
         self.training_time = TimeInt(time.time() - time_start)
-        if verbose:
-            print(f"Training time: {self.training_time}")
+        if verbosity > 0:
+            if verbosity == 1:
+                print(f"[Epoch {epoch + 1}/{epochs}] Train Loss: {avg_train_loss:.4f} {f'| Val Loss: {avg_val_loss:.4f} | Val Acc: {val_acc:.3f}' if test_loader is not None else ''}")
+            print(f"Training time: {self.training_time}\n")
 
         self.train_losses.extend(train_losses)
         self.val_losses.extend(val_losses)
@@ -375,8 +414,6 @@ class QuantumECOC:
         self,
         n_learners: int | None = None,
         templates: str | list[str] = "default",
-        measurement_mode: str = "min",
-        feature_density: int | float = 1.0,
         ecoc_depth: int = 2,
         device: str = "default.qubit",
         scaler_range: tuple[float, float] = (0, np.pi)
@@ -384,11 +421,6 @@ class QuantumECOC:
         self.n_learners = len(templates) if isinstance(templates, list) else n_learners
         self.templates = templates
 
-        if measurement_mode not in {"min", "full"}:
-            raise ValueError(f"Unknown measurement_mode '{measurement_mode}'. Supported values are 'min' and 'full'.")
-        self.measurement_mode = measurement_mode
-
-        self.feature_density = feature_density
         self.ecoc_depth = ecoc_depth
 
         self.cuda_device = "cpu"
@@ -403,21 +435,21 @@ class QuantumECOC:
             clf.to(device)
         return self
     
-    def initialise_ensemble(self, X: DataFrame, y: Series, verbose: bool):
+    def initialise_ensemble(self, X: DataFrame, y: Series, verbosity: int):
         if len(self.classifiers) > 0:
             raise RuntimeError("Ensemble has already been initialised. Please reset the ensemble before re-initialising.")
 
         self.features = X.columns.tolist()
         self.features_to_int = {feat: idx for idx, feat in enumerate(self.features)}
         self.int_to_features = {idx: feat for idx, feat in enumerate(self.features)}
-        if verbose:
+        if verbosity > 0:
             print(f"Feature mapping: {self.features_to_int}")
 
         self.labels = sorted(y.unique())
         self.n_classes = len(self.labels)
         self.label_to_int = {label: idx for idx, label in enumerate(self.labels)}
         self.int_to_label = {idx: label for idx, label in enumerate(self.labels)}
-        if verbose:
+        if verbosity > 0:
             print(f"Label mapping: {self.label_to_int}")
 
         if self.n_learners is None:
@@ -432,23 +464,28 @@ class QuantumECOC:
         else:
             self.templates = [self.templates] * self.n_learners
         
-        if isinstance(self.feature_density, float):
-            if not (0 < self.feature_density <= 1):
-                raise ValueError(f"feature_density must be in the range (0, 1]. Got {self.feature_density}.")
-            k = max(1, int(self.feature_density * len(self.features)))
-        elif isinstance(self.feature_density, int):
-            if not (1 <= self.feature_density <= len(self.features)):
-                raise ValueError(f"feature_density must be in the range [1, {len(self.features)}]. Got {self.feature_density}.")
-            k = self.feature_density
-            
         for i in range(self.n_learners):
+            config = resolve_vqc_template(
+                self.templates[i]
+            )
+
+            if isinstance(config["feature_density"], float):
+                if not (0 < config["feature_density"] <= 1):
+                    raise ValueError(f"feature_density must be in the range (0, 1]. Got {config['feature_density']}.")
+                k = max(1, int(config["feature_density"] * len(self.features)))
+            elif isinstance(config["feature_density"], int):
+                if not (1 <= config["feature_density"] <= len(self.features)):
+                    raise ValueError(f"feature_density must be in the range [1, {len(self.features)}]. Got {config['feature_density']}.")
+                k = config["feature_density"]
+
             self.classifiers.append(
                 VQC(
+                    n_qubits=config["n_qubits"],
                     n_classes=len(set(self.ecoc[i])),
                     feats=sample(range(len(self.features)), k=k),
-                    template=self.templates[i],
+                    template=config["ansatz"],
                     qml_device=self.qml_device,
-                    measurement_mode=self.measurement_mode
+                    measurement_mode=config["measurement_mode"],
                 ).to(self.cuda_device)
             )
 
@@ -464,13 +501,13 @@ class QuantumECOC:
         y_test: Series | None = None,
         bagging: tuple[float, int, int] | None = None, 
         plot: bool = False,
-        verbose: bool = False,
+        verbosity: int = 0,
         fold: int = 0,
         **fit_params
     ):
         for i, clf in enumerate(self.classifiers):
-            if verbose:
-                print(f"\nTraining classifier {i + 1}/{self.n_learners}")
+            if verbosity > 0:
+                print(f"Training classifier {i + 1}/{self.n_learners}")
 
             y_train = y.apply(lambda x: self.ecoc[i][x])
 
@@ -478,7 +515,7 @@ class QuantumECOC:
                 k = 1.0
             else:
                 k = min(min(max(len(X)*bagging[0], bagging[1]), bagging[2]), len(X)) / len(X)
-            if verbose:
+            if verbosity > 1:
                 print(f"Using {int(k*len(X))}/{len(X)} samples")
             if k >= 1.0:
                 samples = np.arange(len(X))
@@ -490,7 +527,7 @@ class QuantumECOC:
             X_te = np.array([X_test[:, feat] for feat in clf.feats]).T
             y_te = y_test.apply(lambda x: self.ecoc[i][x]).values
 
-            clf.fit(X_tr, y_tr, X_te, y_te, title_prefix=f"Classifier {i + 1}/{self.n_learners}: ", plot=plot, verbose=verbose, **fit_params)
+            clf.fit(X_tr, y_tr, X_te, y_te, title_prefix=f"Classifier {i + 1}/{self.n_learners}: ", plot=plot, verbosity=verbosity, **fit_params)
 
         if plot:
             clear_output(wait=True)
@@ -518,11 +555,11 @@ class QuantumECOC:
         parallel: bool = False,
         n_jobs: int = -1,
         plot: bool = False,
-        verbose: bool = False,
+        verbosity: int = 0,
         **fit_params
     ):
         start_time = time.time()
-        self.initialise_ensemble(X, y, verbose)
+        self.initialise_ensemble(X, y, verbosity)
 
         X_s = self.scaler.fit_transform(X)
         X_test_s = self.scaler.transform(X_test) if X_test is not None else None
@@ -537,12 +574,12 @@ class QuantumECOC:
             y_test_m,
             bagging=bagging,
             plot=plot,
-            verbose=verbose,
+            verbosity=verbosity-1,
             **fit_params,
         )
 
         self.training_time = TimeInt(time.time() - start_time)
-        if verbose:
+        if verbosity > 0:
             print(f"\nTotal training time after fitting {self.n_learners} classifiers: {self.training_time}")
 
     @property
@@ -609,11 +646,11 @@ class StackedECOC(QuantumECOC):
         k_folds: int = 5,
         bagging: tuple[float, int, int] | None = (0.5, 512, 2048),
         plot: bool = False,
-        verbose: bool = False,
+        verbosity: int = 0,
         **fit_params
     ):
         start_time = time.time()
-        self.initialise_ensemble(X, y, verbose=verbose)
+        self.initialise_ensemble(X, y, verbosity=verbosity-1)
 
         class_samples = y.value_counts()
         k_folds = min(k_folds, int(class_samples.min()))
@@ -623,7 +660,7 @@ class StackedECOC(QuantumECOC):
             skf = StratifiedKFold(n_splits=k_folds, shuffle=True, random_state=2)
 
             for f, (train_index, val_index) in enumerate(skf.split(X, y)):
-                if verbose:
+                if verbosity > 0:
                     print(f"\nFold {f + 1}/{k_folds}")
                 
                 X_train, X_val = X.iloc[train_index], X.iloc[val_index]
@@ -644,7 +681,7 @@ class StackedECOC(QuantumECOC):
                     fold=f,
                     bagging=bagging,
                     plot=False,
-                    verbose=False,
+                    verbosity=verbosity-1,
                     **fit_params,
                 )
 
@@ -656,11 +693,11 @@ class StackedECOC(QuantumECOC):
 
                 self.reset_ensemble()
 
-            if verbose:
+            if verbosity > 0:
                 print("\nTraining meta-learner...")
             self.meta_learner.fit(np.array(X_meta), np.array(y_meta))
 
-            if verbose:
+            if verbosity > 0:
                 print("\nTraining final ensemble on full dataset...")
 
             X_s = self.scaler.fit_transform(X)
@@ -676,11 +713,11 @@ class StackedECOC(QuantumECOC):
                 y_test_m,
                 bagging=bagging,
                 plot=plot,
-                verbose=verbose,
+                verbosity=verbosity-1,
                 **fit_params,
             )
         else:
-            if verbose:
+            if verbosity > 0:
                 print(f"\nNot enough samples for {k_folds} folds. Training on a single train/validation split...")
 
             X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3, random_state=2, stratify=y)
@@ -698,19 +735,19 @@ class StackedECOC(QuantumECOC):
                 y_val,
                 bagging=bagging,
                 plot=plot,
-                verbose=verbose,
+                verbosity=verbosity-1,
                 **fit_params,
             )
 
             X_meta = np.array([clf.val_probs for clf in self.classifiers]).T
             X_meta = X_meta[1:, :].transpose((1, 0, 2)).reshape(len(X_val), -1)
 
-            if verbose:
+            if verbosity > 0:
                 print("\nTraining meta-learner...")
             self.meta_learner.fit(X_meta, np.array(y_val))
 
         self.training_time = TimeInt(time.time() - start_time)
-        if verbose:
+        if verbosity > 0:
             print(f"\nTotal training time after fitting {self.n_learners} classifiers across {k_folds} folds: {self.training_time}")
 
     def predict(self, X: DataFrame) -> np.ndarray:
@@ -744,18 +781,16 @@ class CoherentECOC(QuantumECOC):
     """
     def __init__(
         self,
-        meta_template: str | list[dict] | dict = "meta",
-        meta_design: str = "full",
+        meta_template: str | list[dict] | dict = "coherent",
+        meta_design: str = "main",
         meta_measurement: str = "min",
-        measurement_mode: str = "min",
         n_learners: int | None = None,
         templates: str | list[str] = "default",
-        feature_density: int | float = 1.0,
         ecoc_depth: int = 2,
         device: str = "default.qubit",
         **kwargs,
     ):
-        super().__init__(n_learners=n_learners, templates=templates, measurement_mode=measurement_mode, feature_density=feature_density, ecoc_depth=ecoc_depth, device=device, **kwargs)
+        super().__init__(n_learners=n_learners, templates=templates, ecoc_depth=ecoc_depth, device=device, **kwargs)
 
         self.meta_template = meta_template
 
@@ -767,8 +802,8 @@ class CoherentECOC(QuantumECOC):
             raise ValueError(f"Unknown meta_measurement '{meta_measurement}'. Supported values are 'min' and 'full'.")
         self.meta_measurement = meta_measurement
 
-    def initialise_ensemble(self, X: DataFrame, y: Series, verbose: bool = False):
-        super().initialise_ensemble(X, y, verbose)
+    def initialise_ensemble(self, X: DataFrame, y: Series, verbosity: int = 0):
+        super().initialise_ensemble(X, y, verbosity)
         self.meta_spec = AnsatzSpec.from_template(
             template=self.meta_template,
             n_qubits=sum(clf.n_qubits for clf in self.classifiers) if self.meta_design == "full" else len(self.classifiers),
@@ -806,6 +841,8 @@ class CoherentECOC(QuantumECOC):
                 idx += clf.n_qubits
                 if not freeze_base:
                     n_params += clf.n_params
+
+            qml.Barrier(wires=list(range(self.n_qubits)), only_visual=True)
 
             meta_wires = list(range(self.n_qubits)) if self.meta_design == "full" else self.main_wires
             self.meta_spec.apply(
@@ -875,11 +912,11 @@ class CoherentECOC(QuantumECOC):
         freeze_base_tune: bool = False,
         bagging: tuple[float, int, int] | None = (0.5, 512, 2048),
         plot: bool = False,
-        verbose: bool = False,
+        verbosity: int = 0,
         **fit_params
     ):
         start_time = time.time()
-        self.initialise_ensemble(X, y, verbose=verbose)
+        self.initialise_ensemble(X, y, verbosity=verbosity-2)
 
         if tune_size > 0.0 and tune_size < 1.0:
             X_main, X_tune, y_main, y_tune = train_test_split(X, y, test_size=tune_size, random_state=2, stratify=y)
@@ -898,8 +935,8 @@ class CoherentECOC(QuantumECOC):
 
             skf = StratifiedKFold(n_splits=k_folds, shuffle=True, random_state=2)
             for f, (train_index, val_index) in enumerate(skf.split(X_main, y_main)):
-                if verbose:
-                    print(f"\nFold {f + 1}/{k_folds}")
+                if verbosity > 0:
+                    print(f"Fold {f + 1}/{k_folds}\n")
                 
                 X_train, X_val = X_main.iloc[train_index], X_main.iloc[val_index]
                 y_train, y_val = y_main.iloc[train_index], y_main.iloc[val_index]
@@ -919,19 +956,19 @@ class CoherentECOC(QuantumECOC):
                     fold=f,
                     bagging=bagging,
                     plot=False,
-                    verbose=False,
+                    verbosity=verbosity-1,
                     **fit_params,
                 )
 
-                if verbose:
-                    print(f"\nTraining full circuit on fold {f + 1}")
+                if verbosity > 0:
+                    print(f"Training full circuit on fold {f + 1}")
 
-                self.coherent_vqc.fit(X_val, y_val.values, plot=plot, verbose=verbose, **fit_params)
+                self.coherent_vqc.fit(X_val, y_val.values, plot=plot, verbosity=verbosity-1, **fit_params)
 
                 self.reset_ensemble()
 
-            if verbose:
-                print("\nTraining final ensemble on full dataset...")
+            if verbosity > 0:
+                print("Training final ensemble on full dataset...\n")
 
             self.train_ensemble(
                 X_main_s,
@@ -940,18 +977,18 @@ class CoherentECOC(QuantumECOC):
                 y_test_m,
                 bagging=bagging,
                 plot=plot,
-                verbose=verbose,
+                verbosity=verbosity-1,
                 **fit_params,
             )
 
-            if verbose:
-                print(f"\nTraining full circuit with {'frozen' if freeze_base_main else 'tunable'} base circuits...")
+            if verbosity > 0:
+                print(f"Training full circuit with {'frozen' if freeze_base_main else 'tunable'} base circuits...")
             
             self.build_coherent_circuit(freeze_base=freeze_base_main)
-            self.coherent_vqc.fit(X_main_s, y_main_m.values, X_test_s, y_test_m.values, plot=plot, verbose=verbose, **fit_params)
+            self.coherent_vqc.fit(X_main_s, y_main_m.values, X_test_s, y_test_m.values, plot=plot, verbosity=verbosity-1, **fit_params)
         else:
-            if verbose:
-                print(f"\nTraining on a single train/validation split...")
+            if verbosity > 0:
+                print(f"Training on a single train/validation split...\n")
 
             X_train, X_val, y_train, y_val = train_test_split(X_main, y_main, test_size=0.3, random_state=2, stratify=y)
             
@@ -968,29 +1005,29 @@ class CoherentECOC(QuantumECOC):
                 y_val,
                 bagging=bagging,
                 plot=plot,
-                verbose=verbose,
+                verbosity=verbosity-1,
                 **fit_params,
             )
 
-            if verbose:
-                print(f"\nTraining full circuit with {'frozen' if freeze_base_main else 'tunable'} base circuits...")
+            if verbosity > 0:
+                print(f"Training full circuit with {'frozen' if freeze_base_main else 'tunable'} base circuits...")
             
             self.build_coherent_circuit(freeze_base=freeze_base_main)
-            self.coherent_vqc.fit(X_val, y_val.values, X_test_s, y_test_m.values, plot=plot, verbose=verbose, **fit_params)
+            self.coherent_vqc.fit(X_val, y_val.values, X_test_s, y_test_m.values, plot=plot, verbosity=verbosity-1, **fit_params)
         
         if tune_size > 0.0 and tune_size < 1.0:
-            if verbose:
-                print(f"\nFine tuning full circuit with {'frozen' if freeze_base_tune else 'tunable'} base circuits...")
+            if verbosity > 0:
+                print(f"Fine tuning full circuit with {'frozen' if freeze_base_tune else 'tunable'} base circuits...")
             
             X_tune_s = self.scaler.transform(X_tune)
             y_tune_m = y_tune.map(self.label_to_int)
 
             self.build_coherent_circuit(freeze_base=freeze_base_tune)
-            self.coherent_vqc.fit(X_tune_s, y_tune_m.values, X_test_s, y_test_m.values, plot=plot, verbose=verbose, **fit_params)
+            self.coherent_vqc.fit(X_tune_s, y_tune_m.values, X_test_s, y_test_m.values, plot=plot, verbosity=verbosity-1, **fit_params)
 
         self.training_time = TimeInt(time.time() - start_time)
-        if verbose:
-            print(f"\nTotal training time after fitting {self.n_learners} base classifiers across {k_folds} fold(s): {self.training_time}")
+        if verbosity > 0:
+            print(f"Total training time after fitting {self.n_learners} base classifiers across {k_folds} fold(s): {self.training_time}")
 
     def predict_proba(self, X: np.ndarray) -> np.ndarray:
         self.coherent_vqc.eval()
@@ -1017,7 +1054,7 @@ if __name__ == "__main__":
     # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=2, stratify=y)
 
     # ens = CsQuECOC().to("cpu")
-    # ens.fit(X_train, y_train, epochs=200, plot=False, verbose=True)
+    # ens.fit(X_train, y_train, epochs=200, plot=False, verbosity=1)
 
     # train_score = ens.score(X_train, y_train)
     # print(f"Training Accuracy: {train_score:.2f}")
@@ -1037,7 +1074,7 @@ if __name__ == "__main__":
     # famd_cols = [col for col in X_train.columns if col.startswith('C')]
 
     # ens = CsQuECOC(feats_per_qubit=3, reuploads=3, trainable_layers=[1,2,3]).to("cpu")
-    # ens.fit(X_train, y_train, epochs=200, plot=False, verbose=True)
+    # ens.fit(X_train, y_train, epochs=200, plot=False, verbosity=1)
 
     # train_score = ens.score(X_train, y_train)
     # print(f"Training Accuracy: {train_score:.2f}")
@@ -1063,25 +1100,25 @@ if __name__ == "__main__":
     #     template='hea_cz_ring',
     # ).to("cpu")
     # vqc.ansatz.draw_mpl(decimals=2)
-    # vqc.fit(X_tr, y_tr, X_te, y_te, epochs=200, plot=False, verbose=True)
+    # vqc.fit(X_tr, y_tr, X_te, y_te, epochs=200, plot=False, verbosity=1)
     # vqc.ansatz.draw_mpl(decimals=2, weights=vqc.qlayer.weights.detach().cpu().numpy())
     # print(f"VQC Classification Report:\n{classification_report(y_te, vqc.predict(X_te), zero_division=0)}\n")
     # vqc.ansatz.draw_mpl(decimals=2, weights=vqc.qlayer.weights.detach().cpu().numpy())
 
     # ens = QuantumECOC(templates='hea_cz_ring').to("cpu")
-    # ens.fit(X_train, y_train, X_test, y_test, epochs=100, plot=False, verbose=True)
+    # ens.fit(X_train, y_train, X_test, y_test, epochs=100, plot=False, verbosity=1)
     # preds = ens.predict(X_test)
     # print(f"QuantumECOC Classification Report:\n{classification_report(y_test, preds, zero_division=0)}\n")
 
     # ens = StackedECOC(templates='hea_cz_ring').to("cpu")
-    # ens.fit(X_train, y_train, X_test, y_test, epochs=100, plot=False, verbose=True)
+    # ens.fit(X_train, y_train, X_test, y_test, epochs=100, plot=False, verbosity=1)
     # preds = ens.predict(X_test)
     # print(f"StackedECOC Classification Report:\n{classification_report(y_test, preds, zero_division=0)}\n")
 
     # dev = qml.device("default.qubit", wires=4)
     # metaVQC = VQC(dev, len(np.unique(y_train)), template='meta').to("cpu")
     # ens = StackedECOC(meta_learner=metaVQC).to("cpu")
-    # ens.fit(X_train, y_train, X_test, y_test, epochs=200, plot=False, verbose=False)
+    # ens.fit(X_train, y_train, X_test, y_test, epochs=200, plot=False, verbosity=0)
     # preds = ens.predict(X_test)
     # print(f"StackedECOC Classification Report:\n{classification_report(y_test, preds, zero_division=0)}\n")
 
@@ -1096,6 +1133,6 @@ if __name__ == "__main__":
     # plt.grid(True)
     # plt.show()
 
-    model = CoherentECOC(meta_template='hea_cz_ring',  templates='hea_cz_ring').to("cpu") 
-    model.fit(X_train, y_train, X_test, y_test, k_folds=5, epochs=200, plot=False, verbose=True, tune_size=0)
+    model = CoherentECOC().to("cpu") 
+    model.fit(X_train, y_train, X_test, y_test, k_folds=5, epochs=200, plot=False, verbosity=2, tune_size=0.1)
     print(f"CoherentECOC Classification Report:\n{classification_report(y_test, model.predict(X_test), zero_division=0)}\n")

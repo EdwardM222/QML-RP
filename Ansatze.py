@@ -43,18 +43,28 @@ class LayerSpec:
                 self.args['distance'] = self.args.get('range', 1)
             self.args.pop('range', None)
 
-    def to_dict(self) -> dict[str, Any]:
-        """Return a serialisable dictionary representation."""
-        return {self.name: copy.deepcopy(self.args)}
+    def to_config(self) -> list[Any]:
+        return [self.name, copy.deepcopy(self.args)]
 
     @classmethod
-    def from_dict(cls, layer_dict: dict[str, Any]) -> "LayerSpec":
-        """Create a LayerSpec from a dictionary representation."""
+    def from_config(cls, layer_config: list[Any] | tuple[Any, Any]) -> LayerSpec:
+        """Create a LayerSpec from a list/tuple configuration of the form [layer_name, layer_args]."""
 
-        if len(layer_dict) != 1:
-            raise ValueError(f"Layer dictionary must contain exactly one key-value pair, but got {len(layer_dict)} pairs: {layer_dict}")
+        if not isinstance(layer_config, (list, tuple)):
+            raise TypeError(f"Layer config must be a list/tuple of the form [layer_name, layer_args]. Got {type(layer_config)}: {layer_config}")
 
-        name, args = next(iter(layer_dict.items()))
+        name = layer_config[0]
+        args = layer_config[1] if len(layer_config) > 1 else {}
+
+        if not isinstance(name, str):
+            raise TypeError(f"Layer name must be a string, got {type(name)}: {name}")
+
+        if args is None:
+            args = {}
+
+        if not isinstance(args, dict):
+            raise TypeError(f"Layer args must be a dictionary, got {type(args)}: {args}")
+
         return cls(name=name, args=copy.deepcopy(args))
     
 # --- Gate Helper ---
@@ -96,6 +106,8 @@ def get_ring_edges(n_qubits: int, distance: int = 1) -> list[tuple[int, int]]:
 
     if distance < 1:
         raise ValueError(f"Ring distance must be >= 1, got {distance}.")
+    elif distance >= n_qubits:
+        distance = n_qubits - 1
 
     edges = [(i, (i + distance) % n_qubits) for i in range(n_qubits)]
     return unique_edges(edges)
@@ -105,6 +117,11 @@ def get_parallel_ring_edges(n_qubits: int, distance: int = 1) -> list[tuple[int,
 
     if n_qubits < 2:
         return []
+
+    if distance < 1:
+        raise ValueError(f"Ring distance must be >= 1, got {distance}.")
+    elif distance >= n_qubits:
+        distance = n_qubits - 1
 
     edges = []
     for i in range(distance + 1):
@@ -118,7 +135,7 @@ def get_parallel_ring_edges(n_qubits: int, distance: int = 1) -> list[tuple[int,
 def feature_indices(
     input_dim: int,
     n_qubits: int,
-    upload_idx: int = 0,
+    feat_idx: int = 0,
     strategy: str = "same",
     wrap: bool = True,
 ) -> list[int]:
@@ -131,23 +148,24 @@ def feature_indices(
         raise ValueError(f"n_qubits must be positive, got {n_qubits}.")
 
     if strategy == "same":
-        start = 0
+        start = feat_idx
     elif strategy == "cyclic":
-        start = upload_idx
+        start = feat_idx + 1
     elif strategy == "block":
-        start = upload_idx * n_qubits
+        start = feat_idx + n_qubits
     else:
         raise ValueError(f"Unknown feature strategy '{strategy}'. Supported strategies are: same, cyclic, block.")
 
     indices = [start + i for i in range(n_qubits)]
 
     if wrap:
-        return [i % input_dim for i in indices]
+        indices = [i % input_dim for i in indices]
+        start = start % input_dim
 
     if max(indices) >= input_dim:
         raise ValueError(f"Feature indices {indices} exceed input_dim={input_dim}. Use wrap=True or change the strategy.")
 
-    return indices
+    return indices, start
 
 def used_features_from_layers(layers: list[LayerSpec]) -> set[int]:
     """Return all explicitly used feature indices from encoding layers."""
@@ -353,6 +371,17 @@ def parallel_ring(
 
     return idx
 
+def barrier(
+    inputs: Any,
+    weights: Any,
+    idx: int,
+    wires: list[int],
+) -> int:
+    """Apply a visual barrier to the active circuit."""
+
+    qml.Barrier(wires=wires, only_visual=True)
+    return idx
+
 ENCODING_LAYERS = {
     "angle_encoding",
     "linear_pairwise_encoding",
@@ -372,28 +401,10 @@ LAYER_FUNCTIONS: dict[str, Callable[..., int]] = {
     "rotation_layer": rotation_layer,
     "linear_ring": linear_ring,
     "parallel_ring": parallel_ring,
+    "barrier": barrier,
 }
 
 # --- Parameter Counting ---
-
-def count_angle_encoding_params(
-    n_qubits: int,
-    *,
-    gate: str | Any,
-    features: list[int],
-) -> int:
-    return 0
-
-def count_pairwise_encoding_params(
-    n_qubits: int,
-    *,
-    features: list[int],
-    gate: str | Any = "rzz",
-    distance: int = 1,
-    include_single: bool = True,
-    single_gate: str | Any = "rz",
-) -> int:
-    return 0
 
 def count_rotation_layer_params(
     n_qubits: int,
@@ -424,9 +435,6 @@ def count_parallel_ring_params(
     return len(edges) * gate.num_params
 
 LAYER_PARAM_COUNTERS: dict[str, Callable[..., int]] = {
-    "angle_encoding": count_angle_encoding_params,
-    "linear_pairwise_encoding": count_pairwise_encoding_params,
-    "parallel_pairwise_encoding": count_pairwise_encoding_params,
     "rotation_layer": count_rotation_layer_params,
     "linear_ring": count_linear_ring_params,
     "parallel_ring": count_parallel_ring_params,
@@ -436,7 +444,7 @@ def count_layer_params(layer: LayerSpec, n_qubits: int) -> int:
     """Count trainable parameters for a single ansatz layer."""
 
     if layer.name not in LAYER_PARAM_COUNTERS:
-        raise ValueError(f"No parameter counter registered for layer '{layer.name}'. Available counters: {list(LAYER_PARAM_COUNTERS.keys())}" )
+        return 0
 
     return LAYER_PARAM_COUNTERS[layer.name](
         n_qubits=n_qubits,
@@ -459,7 +467,7 @@ class AnsatzSpec:
     def __post_init__(self) -> None:
         self.layers = copy.deepcopy(self.layers)
 
-        upload_idx = 0
+        feat_idx = 0
         for layer in self.layers:
             if layer.name not in LAYER_FUNCTIONS:
                 raise ValueError(f"Unknown layer '{layer.name}'. Available layers: {list(LAYER_FUNCTIONS.keys())}")
@@ -469,17 +477,16 @@ class AnsatzSpec:
                     strategy = layer.args.pop("feature_strategy", "same")
                     wrap = bool(layer.args.pop("wrap", True))
 
-                    layer.args["features"] = feature_indices(
+                    layer.args["features"], feat_idx = feature_indices(
                         input_dim=self.input_dim,
                         n_qubits=self.n_qubits,
-                        upload_idx=upload_idx,
+                        feat_idx=feat_idx,
                         strategy=strategy,
                         wrap=wrap,
                     )
                 else:
                     if len(layer.args["features"]) != self.n_qubits:
                         raise ValueError(f"{layer.name} expected {self.n_qubits} features, but got {len(layer.args['features'])}: {layer.args['features']}")
-                upload_idx += 1
 
     @property
     def weight_shapes(self) -> dict[str, tuple[int]]:
@@ -514,7 +521,7 @@ class AnsatzSpec:
         """Return a serialisable dictionary representation."""
         return {
             "name": self.name,
-            "layers": [layer.to_dict() for layer in self.layers],
+            "layers": [layer.to_config() for layer in self.layers],
             "n_qubits": self.n_qubits,
             "input_dim": self.input_dim
         }
@@ -538,7 +545,7 @@ class AnsatzSpec:
 
         return cls(
             name=name or config.get("name", "unnamed_ansatz"),
-            layers=[LayerSpec.from_dict(layer_config) for layer_config in config["layers"]],
+            layers=[LayerSpec.from_config(layer_config) for layer_config in config["layers"]],
             n_qubits=int(config["n_qubits"]),
             input_dim=int(config["input_dim"])
         )
@@ -552,21 +559,17 @@ class AnsatzSpec:
         input_dim: int,
         template_path: str | Path = "ansatze.json",
         name: str | None = None
-    ) -> "AnsatzSpec":
+    ) -> AnsatzSpec:
         """Create an AnsatzSpec from a template name or inline layer list."""
+
         resolved_name, raw_layers = resolve_layer_template(
             template=template,
             template_path=template_path,
         )
 
-        layer_specs = [
-            LayerSpec.from_dict(layer_config)
-            for layer_config in raw_layers
-        ]
-
         return cls(
             name=name or resolved_name,
-            layers=layer_specs,
+            layers=[LayerSpec.from_config(layer_config) for layer_config in raw_layers],
             n_qubits=int(n_qubits),
             input_dim=int(input_dim)
         )
@@ -796,16 +799,3 @@ def resolve_layer_template(
         "template must be either a template name, a list of layer dictionaries, "
         "or a dictionary containing a 'layers' field."
     )
-
-if __name__ == "__main__":
-    # Example usage
-    ansatz = resolve_ansatz_spec(
-        template="hea_rzz_ring",
-        wires=[0, 1, 2],
-        input_dim=4,
-    )
-
-    print("Ansatz Summary:")
-    print(ansatz.summary())
-
-    ansatz.draw_mpl()

@@ -1,0 +1,68 @@
+{
+    "default": {
+        "n_qubits": 2,
+        "measurement_mode": "min",
+        "ansatz": "default"
+    },
+    "hea_2q_min": {
+        "n_qubits": 2,
+        "measurement_mode": "min",
+        "ansatz": "hea_cz_ring"
+    },
+    "hea_3q_min": {
+        "n_qubits": 3,
+        "measurement_mode": "min",
+        "ansatz": "hea_cz_ring"
+    },
+    "hea_3q_full": {
+        "n_qubits": 3,
+        "measurement_mode": "full",
+        "ansatz": "hea_cz_ring"
+    },
+    "rzz_4q_min": {
+        "n_qubits": 4,
+        "measurement_mode": "min",
+        "ansatz": "hea_rzz_ring"
+    },
+    "1": {
+        "n_qubits": 2,
+        "measurement_mode": "min",
+        "ansatz": "3",
+        "feature_density": 4
+    },
+    "2": {
+        "n_qubits": 2,
+        "measurement_mode": "min",
+        "ansatz": "block"
+    },
+    "3": {
+        "n_qubits": 3,
+        "measurement_mode": "min",
+        "ansatz": "3"
+    },
+    "deep": {
+        "n_qubits": 2,
+        "measurement_mode": "min",
+        "ansatz": "deep"
+    },
+    "wide": {
+        "n_qubits": 4,
+        "measurement_mode": "min",
+        "ansatz": "2"
+    },
+    "dense": {
+        "n_qubits": 2,
+        "measurement_mode": "min",
+        "ansatz": "dense"
+    },
+    "meta": {
+        "n_qubits": 4,
+        "measurement_mode": "min",
+        "ansatz": "3"
+    },
+    "meta2": {
+        "n_qubits": 6,
+        "measurement_mode": "min",
+        "ansatz": "deep"
+    }
+}
