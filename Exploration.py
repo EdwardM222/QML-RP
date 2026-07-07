@@ -208,10 +208,22 @@ if __name__ == "__main__":
             # }))
 
             jobs.extend(create_search_jobs("VQC", path, {
-                "n_qubits": [2, 4, 6],
-                # "n_qubits": [2, 4, 6, 8, 12, 16],
+                "n_qubits": [2, 4, 6, 8],
+                # "n_qubits": [12],
+                # "n_qubits": [16],
                 "measurement_mode": ["min"],
-                "ansatz": ["default", "hea_cz_ring", "1"],
+                "ansatz": [
+                    "zz_feature_map",
+                    "reupload_rxrz",
+                    "reupload_rxrz_cz",
+                    "qcl_rxrz_cz",
+                    "hea_rxrz_cz",
+                    "hea_rxrz_rzz",
+                    "shallow_rxrz_cz",
+                    "default",
+                    "deep",
+                    "dense"
+                ],
                 "feature_density": [0.25, 0.5, 0.75, 1.0, 2, 4, 6, 8],
                 "feature_range": [(0, np.pi)],
             }))
@@ -228,8 +240,9 @@ if __name__ == "__main__":
             #     'templates': ["1"]
             # }))
 
-    jobs = jobs[:10]
+    # jobs = jobs[:20]
     print(f"Total jobs to run: {len(jobs)}\n")
+    exit()
 
     start_time = time.time()
     results = []

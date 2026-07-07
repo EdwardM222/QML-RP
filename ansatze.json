@@ -279,5 +279,71 @@
         [ "rotation_layer", { "gate": "rx" } ],
         [ "rotation_layer", { "gate": "rz" } ],
         [ "linear_ring", { "gate": "cz", "range": 3 } ]
+    ],
+    "reupload_rxrz": [
+        ["angle_encoding", { "gate": "rx", "feature_strategy": "same" }],
+        ["angle_encoding", { "gate": "rz", "feature_strategy": "same" }],
+        ["rotation_layer", { "gate": "rx" }],
+        ["rotation_layer", { "gate": "rz" }],
+
+        ["angle_encoding", { "gate": "rx", "feature_strategy": "same" }],
+        ["angle_encoding", { "gate": "rz", "feature_strategy": "same" }],
+        ["rotation_layer", { "gate": "rx" }],
+        ["rotation_layer", { "gate": "rz" }]
+    ],
+    "reupload_rxrz_cz": [
+        ["angle_encoding", { "gate": "rx", "feature_strategy": "same" }],
+        ["angle_encoding", { "gate": "rz", "feature_strategy": "same" }],
+        ["rotation_layer", { "gate": "rx" }],
+        ["rotation_layer", { "gate": "rz" }],
+        ["linear_ring", { "gate": "cz", "range": 1 }],
+
+        ["angle_encoding", { "gate": "rx", "feature_strategy": "same" }],
+        ["angle_encoding", { "gate": "rz", "feature_strategy": "same" }],
+        ["rotation_layer", { "gate": "rx" }],
+        ["rotation_layer", { "gate": "rz" }],
+        ["linear_ring", { "gate": "cz", "range": 1 }]
+    ],
+    "qcl_rxrz_cz": [
+        ["angle_encoding", { "gate": "rx", "feature_strategy": "same" }],
+        ["rotation_layer", { "gate": "rz" }],
+        ["linear_ring", { "gate": "cz", "range": 1 }],
+
+        ["angle_encoding", { "gate": "rz", "feature_strategy": "same" }],
+        ["rotation_layer", { "gate": "rx" }],
+        ["linear_ring", { "gate": "cz", "range": 1 }]
+    ],
+    "zz_feature_map": [
+        ["linear_pairwise_encoding" ],
+        ["rotation_layer", { "gate": "rx" }],
+        ["rotation_layer", { "gate": "rz" }],
+        ["linear_ring", { "gate": "cz", "distance": 1 }]
+    ],
+        "hea_rxrz_cz": [
+        ["angle_encoding", { "gate": "rx", "feature_strategy": "same" }],
+        ["rotation_layer", { "gate": "rx" }],
+        ["rotation_layer", { "gate": "rz" }],
+        ["linear_ring", { "gate": "cz", "range": 1 }],
+
+        ["rotation_layer", { "gate": "rx" }],
+        ["rotation_layer", { "gate": "rz" }],
+        ["linear_ring", { "gate": "cz", "range": 1 }]
+    ],
+        "hea_rxrz_rzz": [
+        ["angle_encoding", { "gate": "rx", "feature_strategy": "same" }],
+        ["rotation_layer", { "gate": "rx" }],
+        ["rotation_layer", { "gate": "rz" }],
+        ["linear_ring", { "gate": "rzz", "range": 1 }],
+
+        ["rotation_layer", { "gate": "rx" }],
+        ["rotation_layer", { "gate": "rz" }],
+        ["linear_ring", { "gate": "rzz", "range": 1 }]
+    ],
+        "shallow_rxrz_cz": [
+        ["angle_encoding", { "gate": "rx", "feature_strategy": "same" }],
+        ["angle_encoding", { "gate": "rz", "feature_strategy": "same" }],
+        ["rotation_layer", { "gate": "rx" }],
+        ["rotation_layer", { "gate": "rz" }],
+        ["linear_ring", { "gate": "cz", "range": 1 }]
     ]
 }
