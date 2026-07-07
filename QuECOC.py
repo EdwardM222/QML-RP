@@ -1311,14 +1311,14 @@ if __name__ == "__main__":
     y_tr = y_train.map({label: idx for idx, label in enumerate(sorted(y.unique()))}).values
     y_te = y_test.map({label: idx for idx, label in enumerate(sorted(y.unique()))}).values
 
-    vqc = VQC(
+    vqc = VQC.from_template(
         n_classes=len(np.unique(y_train)),
-        feats=list(range(X_train.shape[1])),
-        template='hea_cz_ring',
+        n_total_features=X_train.shape[1],
+        template='meta',
     ).to("cpu")
     vqc.fit(X_tr, y_tr, X_te, y_te, epochs=200, plot=False, verbosity=1)
     print(f"VQC Classification Report:\n{classification_report(y_te, vqc.predict(X_te), zero_division=0)}\n")
-    vqc.ansatz.draw_mpl(decimals=2, weights=vqc.qlayer.weights.detach().cpu().numpy())
+    # vqc.ansatz.draw_mpl(decimals=2, weights=vqc.qlayer.weights.detach().cpu().numpy())
 
     # ens = QuantumECOC(templates='hea_cz_ring').to("cpu")
     # ens.fit(X_train, y_train, X_test, y_test, epochs=100, plot=False, verbosity=1)
