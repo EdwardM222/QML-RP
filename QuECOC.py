@@ -204,9 +204,9 @@ class VQC(nn.Module):
                 raise ValueError(f"feature_density must be in the range (0, 1]. Got {feature_density}.")
             k = max(1, int(feature_density * n_total_features))
         elif isinstance(feature_density, int):
-            if not (1 <= feature_density <= n_total_features):
-                raise ValueError(f"feature_density must be in the range [1, {n_total_features}]. Got {feature_density}.")
-            k = feature_density
+            if feature_density < 1:
+                raise ValueError(f"feature_density must be at least 1 when specified as an integer. Got {feature_density}.")
+            k = min(feature_density, n_total_features)
         else:
             raise TypeError(f"feature_density must be either int or float, got {type(feature_density)}.")
 
