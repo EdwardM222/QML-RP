@@ -42,13 +42,10 @@ def train_model(name, dataset, model_args, fit_args=None):
         model.fit(X_train, y_train, X_test, y_test, **fit_args)
     elif name.startswith("Quantum StackedECOC"):
         c = len(np.unique(y_train))
-        metaVQC = VQC(n_classes=c, template='manual',
-            n_qubits=c // 3 + 1,
-            feats_per_qubit=3,
-            reuploads=3,
-            entangle_between_reuploads=True,
-            trainable_layers=[1, 2, 3],
-            # measurement_wires=[0]
+        metaVQC = VQC.from_template(
+            template='meta',
+            n_classes=c,
+            n_total_features=X_train.shape[1]
         ).to("cpu")
         model = StackedECOC(meta_learner=metaVQC, **model_args).to(DEVICE)
         model.fit(X_train, y_train, X_test, y_test, **fit_args)
@@ -84,15 +81,6 @@ if __name__ == "__main__":
     for tier in [0]:
         for dataset in sorted(os.listdir(f"datasets/{tier}")):
             path = os.path.join(f"datasets/{tier}", dataset)
-            # jobs.append(['SVC', path, {'kernel': 'rbf', 'class_weight': 'balanced', 'random_state': 2}])
-
-            # jobs.append(['Random Forest', path, {'n_estimators': 100, 'class_weight': 'balanced', 'random_state': 2}])
-
-            # jobs.append(['QuantumECOC', path, {'templates': 1}, {'epochs': 200}])
-
-            # jobs.append(['StackedECOC', path, {'templates': 1}, {'epochs': 200}])
-            
-            # jobs.append(['Quantum StackedECOC', path, {'templates': 1}, {'epochs': 200}])
 
             jobs.extend(create_search_jobs("SVC", path, {
                 'kernel': ['rbf'],
@@ -107,19 +95,16 @@ if __name__ == "__main__":
             }))
 
             jobs.extend(create_search_jobs("QuantumECOC", path, {
-                'templates': [1]
-            },
-            {'epochs': [200]}))
+                'templates': ["1"]
+            }))
 
             jobs.extend(create_search_jobs("StackedECOC", path, {
-                'templates': [1]
-            },
-            {'epochs': [200]}))
+                'templates': ["1"]
+            }))
 
             jobs.extend(create_search_jobs("Quantum StackedECOC", path, {
-                'templates': [1]
-            },
-            {'epochs': [200]}))
+                'templates': ["1"]
+            }))
 
     results = []
     start_time = time.time()

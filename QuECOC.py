@@ -154,6 +154,47 @@ class VQC(nn.Module):
 
         self.initialise()
 
+    @classmethod
+    def from_template(
+        cls,
+        template: str | dict,
+        *,
+        n_classes: int,
+        n_total_features: int,
+        qml_device: str | qml.devices.Device = "default.qubit",
+        cuda_device: str = "cpu",
+        template_path: str | Path = "vqcs.json",
+        random_state: int | None = None,
+    ) -> VQC:
+        config = resolve_vqc_template(template=template, template_path=template_path)
+
+        feature_density = config["feature_density"]
+        if isinstance(feature_density, float):
+            if not (0 < feature_density <= 1):
+                raise ValueError(f"feature_density must be in the range (0, 1]. Got {feature_density}.")
+            k = max(1, int(feature_density * n_total_features))
+        elif isinstance(feature_density, int):
+            if not (1 <= feature_density <= n_total_features):
+                raise ValueError(f"feature_density must be in the range [1, {n_total_features}]. Got {feature_density}.")
+            k = feature_density
+        else:
+            raise TypeError(f"feature_density must be either int or float, got {type(feature_density)}.")
+
+        if random_state is None:
+            feats = sample(range(n_total_features), k=k)
+        else:
+            rng = np.random.default_rng(random_state)
+            feats = rng.choice(n_total_features, size=k, replace=False).tolist()
+
+        return cls(
+            n_qubits=config["n_qubits"],
+            n_classes=n_classes,
+            feats=feats,
+            template=config["ansatz"],
+            qml_device=qml_device,
+            measurement_mode=config["measurement_mode"],
+        ).to(cuda_device)
+
     def to(self, device):
         self.cuda_device = device
         if hasattr(self, "qlayer") and self.qlayer is not None:
@@ -240,7 +281,7 @@ class VQC(nn.Module):
         y: np.ndarray,
         X_test: np.ndarray | None = None,
         y_test: np.ndarray | None = None,
-        epochs: int = 100,
+        epochs: int = 200,
         lr: float = 0.01,
         optimizer_cls: type = torch.optim.Adam,
         criterion: nn.Module = nn.NLLLoss(),
@@ -465,27 +506,13 @@ class QuantumECOC:
             self.templates = [self.templates] * self.n_learners
         
         for i in range(self.n_learners):
-            config = resolve_vqc_template(
-                self.templates[i]
-            )
-
-            if isinstance(config["feature_density"], float):
-                if not (0 < config["feature_density"] <= 1):
-                    raise ValueError(f"feature_density must be in the range (0, 1]. Got {config['feature_density']}.")
-                k = max(1, int(config["feature_density"] * len(self.features)))
-            elif isinstance(config["feature_density"], int):
-                if not (1 <= config["feature_density"] <= len(self.features)):
-                    raise ValueError(f"feature_density must be in the range [1, {len(self.features)}]. Got {config['feature_density']}.")
-                k = config["feature_density"]
-
             self.classifiers.append(
-                VQC(
-                    n_qubits=config["n_qubits"],
+                VQC.from_template(
+                    self.templates[i],
                     n_classes=len(set(self.ecoc[i])),
-                    feats=sample(range(len(self.features)), k=k),
-                    template=config["ansatz"],
+                    n_total_features=len(self.features),
                     qml_device=self.qml_device,
-                    measurement_mode=config["measurement_mode"],
+                    random_state=2+i
                 ).to(self.cuda_device)
             )
 
@@ -627,13 +654,11 @@ class StackedECOC(QuantumECOC):
         meta_learner = None,
         n_learners: int | None = None,
         templates: str | list[str] = "default",
-        measurement_mode: str = "min",
-        feature_density: int = 1,
         ecoc_depth: int = 2,
         device: str = "default.qubit",
         **kwargs
     ):
-        super().__init__(n_learners=n_learners, templates=templates, measurement_mode=measurement_mode, feature_density=feature_density, ecoc_depth=ecoc_depth, device=device, **kwargs)
+        super().__init__(n_learners=n_learners, templates=templates, ecoc_depth=ecoc_depth, device=device, **kwargs)
         
         self.meta_learner = meta_learner if meta_learner is not None else SVC(kernel="rbf", random_state=2, probability=True)
 
