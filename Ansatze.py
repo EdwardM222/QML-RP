@@ -580,7 +580,7 @@ class AnsatzSpec:
             "name": self.name,
             "n_qubits": self.n_qubits,
             "n_layers": len(self.layers),
-            "layer_sequence": [layer.name for layer in self.layers],
+            # "layer_sequence": [layer.name for layer in self.layers],
             "trainable_params": self.n_params,
             "weight_shapes": self.weight_shapes,
             "input_dim": self.input_dim,

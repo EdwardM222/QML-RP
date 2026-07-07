@@ -125,6 +125,36 @@ def resolve_vqc_template(template: str | dict, template_path: str | Path = "vqcs
         "measurement_mode": config.get("measurement_mode", "min"),
     }
 
+def to_json_safe(value):
+    if isinstance(value, dict):
+        return {str(k): to_json_safe(v) for k, v in value.items()}
+
+    if isinstance(value, (list, tuple)):
+        return [to_json_safe(v) for v in value]
+
+    if isinstance(value, np.ndarray):
+        return value.tolist()
+
+    if isinstance(value, torch.Tensor):
+        return value.detach().cpu().tolist()
+
+    if isinstance(value, (np.integer,)):
+        return int(value)
+
+    if isinstance(value, (np.floating,)):
+        return float(value)
+
+    if isinstance(value, TimeInt):
+        return float(value)
+
+    if isinstance(value, Path):
+        return str(value)
+
+    return value
+
+def safe_getattr(obj, name, default=None):
+    return getattr(obj, name, default)
+
 @typechecked
 class VQC(nn.Module):
     def __init__(
@@ -445,6 +475,55 @@ class VQC(nn.Module):
     def score(self, X: np.ndarray, y: np.ndarray) -> float:
         preds = self.predict(X)
         return accuracy_score(y, preds)
+    
+    def get_results(self) -> dict:
+        ansatz_summary = None
+        if hasattr(self, "ansatz") and self.ansatz is not None:
+            ansatz_summary = self.ansatz.summary()
+
+        return to_json_safe({
+            "model_type": type(self).__name__,
+
+            "config": {
+                "n_qubits": self.n_qubits,
+                "n_classes": self.n_classes,
+                "feats": self.feats,
+                "n_features": safe_getattr(self, "n_features"),
+                "template": self.template,
+                "measurement_mode": self.measurement_mode,
+                "qml_device": str(self.qml_device),
+                "cuda_device": self.cuda_device,
+            },
+
+            "structure": {
+                "n_params": safe_getattr(self, "n_params"),
+                "weight_shapes": safe_getattr(self, "weight_shapes"),
+                "ansatz": ansatz_summary,
+            },
+
+            "training": {
+                "training_time": safe_getattr(self, "training_time"),
+                "final_train_loss": self.train_losses[-1] if hasattr(self, "train_losses") and len(self.train_losses) > 0 else None,
+                "best_train_loss": min(self.train_losses) if hasattr(self, "train_losses") and len(self.train_losses) > 0 else None,
+                "final_val_loss": self.val_losses[-1] if hasattr(self, "val_losses") and len(self.val_losses) > 0 else None,
+                "best_val_loss": min(self.val_losses) if hasattr(self, "val_losses") and len(self.val_losses) > 0 else None,
+                # "train_losses": safe_getattr(self, "train_losses", []),
+                # "val_losses": safe_getattr(self, "val_losses", []),
+                "n_train_epochs": len(safe_getattr(self, "train_losses", [])),
+                "n_val_epochs": len(safe_getattr(self, "val_losses", [])),
+                "optimizer": type(self.optimizer).__name__ if safe_getattr(self, "optimizer") is not None else None,
+            },
+
+            "validation": {
+                "weight": self.weight if hasattr(self, "weight") else None,
+                "val_report": safe_getattr(self, "val_report"),
+                "val_probs_shape": (
+                    list(self.val_probs.shape)
+                    if hasattr(self, "val_probs")
+                    else None
+                ),
+            },
+        })
 
 @typechecked
 class QuantumECOC:
@@ -497,7 +576,6 @@ class QuantumECOC:
             self.n_learners = 2 * len(self.labels)
 
         self.ecoc = build_ecoc_matrix(len(self.labels), self.n_learners, self.ecoc_depth)
-        self.feat_map = []
 
         if isinstance(self.templates, list):
             if len(self.templates) != self.n_learners:
@@ -508,7 +586,7 @@ class QuantumECOC:
         for i in range(self.n_learners):
             self.classifiers.append(
                 VQC.from_template(
-                    self.templates[i],
+                    template=self.templates[i],
                     n_classes=len(set(self.ecoc[i])),
                     n_total_features=len(self.features),
                     qml_device=self.qml_device,
@@ -643,6 +721,57 @@ class QuantumECOC:
     def score(self, X: DataFrame, y: Series) -> float:
         preds = self.predict(X)
         return accuracy_score(y.values, preds)
+    
+    def get_results(self) -> dict:
+        return to_json_safe({
+            "model_type": type(self).__name__,
+
+            "config": {
+                "n_learners": self.n_learners,
+                "templates": self.templates,
+                "ecoc_depth": self.ecoc_depth,
+                "qml_device": str(self.qml_device),
+                "cuda_device": self.cuda_device,
+                "scaler_range": self.scaler.feature_range,
+            },
+
+            "dataset": {
+                "n_features": len(self.features) if hasattr(self, "features") else None,
+                "features": safe_getattr(self, "features"),
+                "n_classes": safe_getattr(self, "n_classes"),
+                "labels": safe_getattr(self, "labels"),
+                "label_to_int": safe_getattr(self, "label_to_int"),
+            },
+
+            "structure": {
+                "ecoc": safe_getattr(self, "ecoc"),
+                "learner_weights": self.learner_weights if hasattr(self, "learner_weights") else None,
+                "total_base_qubits": (
+                    sum(clf.n_qubits for clf in self.classifiers)
+                    if hasattr(self, "classifiers")
+                    else None
+                ),
+                "total_base_params": (
+                    sum(getattr(clf, "n_params", 0) for clf in self.classifiers)
+                    if hasattr(self, "classifiers")
+                    else None
+                ),
+            },
+
+            "training": {
+                "training_time": safe_getattr(self, "training_time"),
+                "n_trained_learners": len(self.classifiers),
+                "mean_final_train_loss": np.mean([clf.train_losses[-1] for clf in self.classifiers if hasattr(clf, "train_losses") and len(clf.train_losses) > 0]) if hasattr(self, "classifiers") else None,
+                "mean_best_train_loss": np.mean([min(clf.train_losses) for clf in self.classifiers if hasattr(clf, "train_losses") and len(clf.train_losses) > 0]) if hasattr(self, "classifiers") else None,
+                "mean_final_val_loss": np.mean([clf.val_losses[-1] for clf in self.classifiers if hasattr(clf, "val_losses") and len(clf.val_losses) > 0]) if hasattr(self, "classifiers") else None,
+                "mean_best_val_loss": np.mean([min(clf.val_losses) for clf in self.classifiers if hasattr(clf, "val_losses") and len(clf.val_losses) > 0]) if hasattr(self, "classifiers") else None,
+            },
+
+            "base_learners": [
+                clf.results_dict()
+                for clf in self.classifiers
+            ],
+        })
 
 @typechecked
 class StackedECOC(QuantumECOC):
@@ -799,6 +928,35 @@ class StackedECOC(QuantumECOC):
     def score(self, X: DataFrame, y: Series) -> float:
         preds = self.predict(X)
         return accuracy_score(y.values, preds)
+    
+    def get_results(self) -> dict:
+        result = super().get_results()
+
+        result["model_type"] = type(self).__name__
+
+        result["meta_learner"] = {
+            "type": type(self.meta_learner).__name__,
+            "params": (
+                self.meta_learner.get_params()
+                if hasattr(self.meta_learner, "get_params")
+                else None
+            ),
+            "classes": (
+                self.meta_learner.classes_.tolist()
+                if hasattr(self.meta_learner, "classes_")
+                else None
+            ),
+        }
+
+        result["stacking"] = {
+            "meta_feature_dim": (
+                self.n_learners * max(clf.n_classes for clf in self.classifiers)
+                if len(self.classifiers) > 0
+                else None
+            ),
+        }
+
+        return to_json_safe(result)
 
 class CoherentECOC(QuantumECOC):
     """
@@ -849,7 +1007,10 @@ class CoherentECOC(QuantumECOC):
             self.main_wires.append(self.n_qubits)
             self.n_qubits += clf.n_qubits
             base_params += clf.n_params
+
         self.n_params = self.meta_spec.n_params + (0 if freeze_base else base_params)
+        self.meta_wires = list(range(self.n_qubits)) if self.meta_design == "full" else self.main_wires
+        self.measurement_wires = self.meta_wires if self.meta_measurement == "full" else self.meta_wires[:int(np.ceil(np.log2(self.n_classes)))]
 
         coherent_device = qml.device(self.qml_device, wires=self.n_qubits)
         @qml.qnode(coherent_device, interface="torch", diff_method="best")
@@ -869,14 +1030,13 @@ class CoherentECOC(QuantumECOC):
 
             qml.Barrier(wires=list(range(self.n_qubits)), only_visual=True)
 
-            meta_wires = list(range(self.n_qubits)) if self.meta_design == "full" else self.main_wires
             self.meta_spec.apply(
                 inputs=inputs,
                 weights=weights[n_params:],
-                wires=meta_wires
+                wires=self.meta_wires
             )
 
-            return qml.probs(wires=meta_wires if self.meta_measurement == "full" else meta_wires[:int(np.ceil(np.log2(self.n_classes)))])
+            return qml.probs(wires=self.measurement_wires)
 
         weight_shapes = {
             "weights": (self.n_params,),
@@ -1067,6 +1227,38 @@ class CoherentECOC(QuantumECOC):
     def score(self, X: np.ndarray, y: np.ndarray) -> float:
         preds = self.predict(X)
         return accuracy_score(y, preds)
+    
+    def get_results(self) -> dict:
+        result = super().get_results()
+
+        result["model_type"] = type(self).__name__
+
+        result["coherent"] = {
+            "meta_template": self.meta_template,
+            "meta_design": self.meta_design,
+            "meta_measurement": self.meta_measurement,
+
+            "n_qubits": safe_getattr(self, "n_qubits"),
+            "n_params": safe_getattr(self, "n_params"),
+
+            "main_wires": safe_getattr(self, "main_wires"),
+            "meta_wires": safe_getattr(self, "meta_wires"),
+            "measurement_wires": safe_getattr(self, "measurement_wires"),
+
+            "meta_spec": (
+                self.meta_spec.summary()
+                if hasattr(self, "meta_spec") and self.meta_spec is not None
+                else None
+            ),
+
+            "coherent_vqc": (
+                self.coherent_vqc.results_dict()
+                if hasattr(self, "coherent_vqc")
+                else None
+            ),
+        }
+
+        return to_json_safe(result)
 
 if __name__ == "__main__":
     import pandas as pd
