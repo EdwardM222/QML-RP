@@ -1087,23 +1087,21 @@ if __name__ == "__main__":
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=2, stratify=y)
 
-    # scaler = MinMaxScaler(feature_range=(0, np.pi))
-    # X_tr = scaler.fit_transform(X_train)
-    # X_te = scaler.transform(X_test)
+    scaler = MinMaxScaler(feature_range=(0, np.pi))
+    X_tr = scaler.fit_transform(X_train)
+    X_te = scaler.transform(X_test)
 
-    # y_tr = y_train.map({label: idx for idx, label in enumerate(sorted(y.unique()))}).values
-    # y_te = y_test.map({label: idx for idx, label in enumerate(sorted(y.unique()))}).values
+    y_tr = y_train.map({label: idx for idx, label in enumerate(sorted(y.unique()))}).values
+    y_te = y_test.map({label: idx for idx, label in enumerate(sorted(y.unique()))}).values
 
-    # vqc = VQC(
-    #     n_classes=len(np.unique(y_train)),
-    #     feats=list(range(X_train.shape[1])),
-    #     template='hea_cz_ring',
-    # ).to("cpu")
-    # vqc.ansatz.draw_mpl(decimals=2)
-    # vqc.fit(X_tr, y_tr, X_te, y_te, epochs=200, plot=False, verbosity=1)
-    # vqc.ansatz.draw_mpl(decimals=2, weights=vqc.qlayer.weights.detach().cpu().numpy())
-    # print(f"VQC Classification Report:\n{classification_report(y_te, vqc.predict(X_te), zero_division=0)}\n")
-    # vqc.ansatz.draw_mpl(decimals=2, weights=vqc.qlayer.weights.detach().cpu().numpy())
+    vqc = VQC(
+        n_classes=len(np.unique(y_train)),
+        feats=list(range(X_train.shape[1])),
+        template='hea_cz_ring',
+    ).to("cpu")
+    vqc.fit(X_tr, y_tr, X_te, y_te, epochs=200, plot=False, verbosity=1)
+    print(f"VQC Classification Report:\n{classification_report(y_te, vqc.predict(X_te), zero_division=0)}\n")
+    vqc.ansatz.draw_mpl(decimals=2, weights=vqc.qlayer.weights.detach().cpu().numpy())
 
     # ens = QuantumECOC(templates='hea_cz_ring').to("cpu")
     # ens.fit(X_train, y_train, X_test, y_test, epochs=100, plot=False, verbosity=1)
@@ -1133,6 +1131,6 @@ if __name__ == "__main__":
     # plt.grid(True)
     # plt.show()
 
-    model = CoherentECOC().to("cpu") 
-    model.fit(X_train, y_train, X_test, y_test, k_folds=5, epochs=200, plot=False, verbosity=2, tune_size=0.1)
-    print(f"CoherentECOC Classification Report:\n{classification_report(y_test, model.predict(X_test), zero_division=0)}\n")
+    # model = CoherentECOC().to("cpu") 
+    # model.fit(X_train, y_train, X_test, y_test, k_folds=5, epochs=200, plot=False, verbosity=2, tune_size=0.1)
+    # print(f"CoherentECOC Classification Report:\n{classification_report(y_test, model.predict(X_test), zero_division=0)}\n")
