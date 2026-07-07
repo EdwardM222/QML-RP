@@ -1,6 +1,4 @@
 from concurrent.futures import ProcessPoolExecutor, as_completed
-from qiskit_ibm_runtime import results
-from qiskit import result
 from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
@@ -183,6 +181,12 @@ if __name__ == "__main__":
         default="default",
         help="Identifier used in the output filename",
     )
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=1,
+        help="Number of parallel worker processes.",
+    )
     args = parser.parse_args()
     results_path = Path(f"results/search_results_{args.run_id}.jsonl")
 
@@ -204,7 +208,8 @@ if __name__ == "__main__":
             # }))
 
             jobs.extend(create_search_jobs("VQC", path, {
-                "n_qubits": [2, 4, 6, 8, 12, 16],
+                "n_qubits": [2, 4, 6],
+                # "n_qubits": [2, 4, 6, 8, 12, 16],
                 "measurement_mode": ["min"],
                 "ansatz": ["default", "hea_cz_ring", "1"],
                 "feature_density": [0.25, 0.5, 0.75, 1.0, 2, 4, 6, 8],
@@ -228,7 +233,7 @@ if __name__ == "__main__":
 
     start_time = time.time()
     results = []
-    with ProcessPoolExecutor(max_workers=os.cpu_count()) as executor:
+    with ProcessPoolExecutor(max_workers=args.workers) as executor:
         futures = {
             executor.submit(train_model, *job): job
             for job in jobs
