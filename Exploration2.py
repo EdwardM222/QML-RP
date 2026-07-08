@@ -167,41 +167,10 @@ def search(model_name, dataset_path, param_grid, fit_args=None):
 
     return results
 
-def make_job_id(model_name, dataset_path, model_args, fit_args=None):
-    return json.dumps(
-        json_safe({
-            "model_name": model_name,
-            "dataset": dataset_path,
-            "model_args": model_args,
-            "fit_args": fit_args or {},
-        }),
-        sort_keys=True,
-    )
-
-def create_search_jobs(model_name, dataset_path, param_grid, fit_args=None, results_path=None):
+def create_search_jobs(model_name, dataset_path, param_grid, fit_args=None):
     jobs = []
-    existing_ids = set()
-
-    if results_path is not None and Path(results_path).exists():
-        with Path(results_path).open("r", encoding="utf-8") as f:
-            for line in f:
-                try:
-                    record = json.loads(line)
-                    job_id = record.get("job", {}).get("id")
-
-                    if job_id is not None:
-                        existing_ids.add(job_id)
-                except json.JSONDecodeError:
-                    pass
-
     for params in ParameterGrid(param_grid):
-        job_id = make_job_id(model_name, dataset_path, params, fit_args)
-
-        if job_id in existing_ids:
-            print(f"Skipping existing job: {model_name} | {dataset_path} | {params}")
-            continue
-
-        jobs.append((f"{model_name}", dataset_path, params, fit_args, job_id))
+        jobs.append((f"{model_name}", dataset_path, params, fit_args))
 
     return jobs
 
@@ -230,17 +199,17 @@ if __name__ == "__main__":
             #     'kernel': ['rbf'],
             #     'class_weight': ['balanced'],
             #     'random_state': [2]
-            # }, results_path=results_path))
+            # }))
 
             # jobs.extend(create_search_jobs("Random Forest", path, {
             #     'n_estimators': [100],
             #     'class_weight': ['balanced'],
             #     'random_state': [2]
-            # }, results_path=results_path))
+            # }))
 
             jobs.extend(create_search_jobs("VQC", path, {
-                "n_qubits": [2, 4, 6, 8],
-                # "n_qubits": [12],
+                # "n_qubits": [2, 4, 6, 8],
+                "n_qubits": [12],
                 # "n_qubits": [16],
                 "measurement_mode": ["min"],
                 "ansatz": [
@@ -257,19 +226,19 @@ if __name__ == "__main__":
                 ],
                 "feature_density": [0.25, 0.5, 0.75, 1.0, 2, 4, 6, 8],
                 "feature_range": [(0, np.pi), (0, np.pi / 2), (-np.pi, np.pi)],
-            }, results_path=results_path))
+            }))
 
             # jobs.extend(create_search_jobs("QuantumECOC", path, {
             #     'templates': ["1"]
-            # }, results_path=results_path))
+            # }))
 
             # jobs.extend(create_search_jobs("StackedECOC", path, {
             #     'templates': ["1"]
-            # }, results_path=results_path))
+            # }))
 
             # jobs.extend(create_search_jobs("Quantum StackedECOC", path, {
             #     'templates': ["1"]
-            # }, results_path=results_path))
+            # }))
 
     # jobs = jobs[:20]
     print(f"Total jobs to run: {len(jobs)}\n")
@@ -285,14 +254,13 @@ if __name__ == "__main__":
 
         for future in as_completed(futures):
             job = futures[future]
-            job_name, dataset_path, model_args, fit_args, job_id = job
+            job_name, dataset_path, model_args, fit_args = job
 
             try:
                 result = future.result()
 
                 # Add job metadata explicitly, even if train_model already included it.
                 result["job"] = {
-                    "id": job_id,
                     "model_name": job_name,
                     "dataset": dataset_path,
                     "model_args": model_args,
@@ -324,7 +292,7 @@ if __name__ == "__main__":
                     "completed_at": datetime.now().isoformat(timespec="seconds"),
                 }
 
-                # append_jsonl(results_path, error_record)
+                append_jsonl(results_path, error_record)
                 print(f"Error occurred while processing {job_name}: {error_record['error']}")
 
     final_time = TimeInt(time.time() - start_time)
