@@ -59,17 +59,17 @@ def append_jsonl(path, record):
     with path.open("a", encoding="utf-8") as f:
         f.write(json.dumps(json_safe(record)) + "\n")
 
-def train_model(name, dataset, model_args, fit_args=None):
+def train_model(name, dataset, model_args, fit_args=None, job_id=None):
     if fit_args is None:
         fit_args = {}
 
     print(f"Training {name}...")
 
-    X_train = pd.read_csv(dataset / "train.csv")
+    X_train = pd.read_csv(f"{dataset}/train.csv")
     y_train = X_train['target']
     X_train = X_train.drop('target', axis=1)
 
-    X_test = pd.read_csv(dataset / "test.csv")
+    X_test = pd.read_csv(f"{dataset}/test.csv")
     y_test = X_test['target']
     X_test = X_test.drop('target', axis=1)
 
@@ -138,6 +138,7 @@ def train_model(name, dataset, model_args, fit_args=None):
 
     result = {
         "run": {
+            "id": job_id,
             "model_name": name,
             "dataset": dataset,
             "model_args": model_args,
@@ -228,7 +229,7 @@ if __name__ == "__main__":
         help="List of datasets to use.",
     )
     args = parser.parse_args()
-    results_path = Path(f"results/search_results_{args.run_id}.jsonl")
+    results_path = Path(f"results/{args.run_id}.jsonl")
 
     main_datasets = [
         "iris",
@@ -299,9 +300,9 @@ if __name__ == "__main__":
         #     'templates': ["1"]
         # }, results_path=results_path))
 
-    # jobs = jobs[:20]
+    jobs = jobs[:20]
     print(f"Total jobs to run: {len(jobs)}\n")
-    exit()
+    # exit()
 
     start_time = time.time()
     results = []

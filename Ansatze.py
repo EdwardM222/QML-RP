@@ -6,7 +6,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable
 
-from jupyter_core.version import pattern
 import numpy as np
 import matplotlib.pyplot as plt
 import pennylane as qml
