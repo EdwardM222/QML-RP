@@ -82,7 +82,8 @@ def train_model(name, dataset, model_args, fit_args=None, job_id=None):
         model.fit(X_train, y_train, **fit_args)
     elif name.startswith("VQC"):
         c = len(np.unique(y_train))
-        scaler = MinMaxScaler(feature_range=model_args.pop('feature_range'))
+        feature_range = model_args.pop('feature_range')
+        scaler = MinMaxScaler(feature_range=feature_range)
 
         model = VQC.from_template(
             template=model_args,
@@ -116,6 +117,8 @@ def train_model(name, dataset, model_args, fit_args=None, job_id=None):
 
     if name.startswith("VQC"):
         report = model.val_report
+        model_args["ansatz"] = next(iter(model_args["ansatz"].keys()))
+        model_args["feature_range"] = feature_range
     else:
         preds = model.predict(X_test)
         report = classification_report(
@@ -124,14 +127,6 @@ def train_model(name, dataset, model_args, fit_args=None, job_id=None):
             zero_division=0,
             output_dict=True,
         )
-
-    report_df = pd.DataFrame(report).transpose()
-    report_df.loc["accuracy"] = [
-        np.nan,
-        np.nan,
-        report_df.loc["accuracy", "f1-score"],
-        report_df.loc["macro avg", "support"],
-    ]
 
     model_results = None
     if hasattr(model, "get_results"):
@@ -147,16 +142,9 @@ def train_model(name, dataset, model_args, fit_args=None, job_id=None):
             "device": DEVICE,
             "completed_at": datetime.now().isoformat(timespec="seconds"),
         },
-        "timing": {
-            "training_time": getattr(model, "training_time", None),
-        },
         "metrics": {
             "classification_report": report,
-            "accuracy": report.get("accuracy"),
-            "macro_f1": report.get("macro avg", {}).get("f1-score"),
-            "weighted_f1": report.get("weighted avg", {}).get("f1-score"),
         },
-        "report_table": report_df,
         "model": model_results,
     }
 
@@ -194,7 +182,7 @@ def create_search_jobs(model_name, dataset_path, param_grid, fit_args=None, resu
             for line in f:
                 try:
                     record = json.loads(line)
-                    job_id = record.get("job", {}).get("id")
+                    job_id = record.get("run", {}).get("id")
 
                     if job_id is not None:
                         existing_ids.add(job_id)
@@ -307,12 +295,12 @@ if __name__ == "__main__":
         #     'templates': ["1"]
         # }, results_path=results_path))
 
-    # jobs = jobs[:20]
+    jobs = jobs[:10]
     print(f"Total jobs to run: {len(jobs)}\n")
     # exit()
 
     start_time = time.time()
-    results = []
+    results = 0
     with ProcessPoolExecutor(max_workers=args.workers) as executor:
         futures = {
             executor.submit(train_model, *job): job
@@ -325,32 +313,21 @@ if __name__ == "__main__":
 
             try:
                 result = future.result()
-
-                # Add job metadata explicitly, even if train_model already included it.
-                result["job"] = {
-                    "id": job_id,
-                    "model_name": job_name,
-                    "dataset": dataset_path,
-                    "model_args": model_args,
-                    "fit_args": fit_args,
-                }
-
-                results.append(result)
                 append_jsonl(results_path, result)
+                results += 1
 
-                metrics = result.get("metrics", {})
-                training_time = result.get("timing", {}).get("training_time")
+                # metrics = result.get("metrics", {})
+                # training_time = result.get("timing", {}).get("training_time")
 
-                print(
-                    f"Saved result: {job_name} | {dataset_path} | "
-                    f"macro_f1={metrics.get('macro_f1')} | "
-                    f"time={training_time}"
-                )
-
+                # print(
+                #     f"Saved result: {job_name} | {dataset_path} | "
+                #     f"macro_f1={metrics.get('macro_f1')} | "
+                #     f"time={training_time}"
+                # )
             except Exception:
                 error_record = {
                     "status": "error",
-                    "job": {
+                    "run": {
                         "model_name": job_name,
                         "dataset": dataset_path,
                         "model_args": model_args,
@@ -369,7 +346,7 @@ if __name__ == "__main__":
         "status": "complete",
         "run_id": args.run_id,
         "n_jobs": len(jobs),
-        "n_success": len(results),
+        "n_success": results,
         "total_execution_time": final_time,
         "completed_at": datetime.now().isoformat(timespec="seconds"),
     }
@@ -377,4 +354,4 @@ if __name__ == "__main__":
     append_jsonl(results_path, summary)
 
     print(f"\nTotal execution time: {final_time}")
-    print(f"Saved {len(results)}/{len(jobs)} successful results to {results_path}")
+    print(f"Saved {results}/{len(jobs)} successful results to {results_path}")

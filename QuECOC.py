@@ -493,22 +493,22 @@ class VQC(nn.Module):
             ansatz_summary = self.ansatz.summary()
 
         return to_json_safe({
-            "model_type": type(self).__name__,
+            # "model_type": type(self).__name__,
 
             "config": {
                 "n_qubits": self.n_qubits,
                 "n_classes": self.n_classes,
                 "feats": self.feats,
                 "n_features": safe_getattr(self, "n_features"),
-                "template": self.template,
+                # "template": self.template,
                 "measurement_mode": self.measurement_mode,
-                "qml_device": str(self.qml_device),
-                "cuda_device": self.cuda_device,
+                # "qml_device": str(self.qml_device),
+                # "cuda_device": self.cuda_device,
             },
 
             "structure": {
                 "n_params": safe_getattr(self, "n_params"),
-                "weight_shapes": safe_getattr(self, "weight_shapes"),
+                # "weight_shapes": safe_getattr(self, "weight_shapes"),
                 "ansatz": ansatz_summary,
             },
 
@@ -521,19 +521,19 @@ class VQC(nn.Module):
                 # "train_losses": safe_getattr(self, "train_losses", []),
                 # "val_losses": safe_getattr(self, "val_losses", []),
                 "n_train_epochs": len(safe_getattr(self, "train_losses", [])),
-                "n_val_epochs": len(safe_getattr(self, "val_losses", [])),
+                # "n_val_epochs": len(safe_getattr(self, "val_losses", [])),
                 "optimizer": type(self.optimizer).__name__ if safe_getattr(self, "optimizer") is not None else None,
             },
 
-            "validation": {
-                "weight": self.weight if hasattr(self, "weight") else None,
-                "val_report": safe_getattr(self, "val_report"),
-                "val_probs_shape": (
-                    list(self.val_probs.shape)
-                    if hasattr(self, "val_probs")
-                    else None
-                ),
-            },
+            # "validation": {
+            #     "weight": self.weight if hasattr(self, "weight") else None,
+            #     "val_report": safe_getattr(self, "val_report"),
+            #     "val_probs_shape": (
+            #         list(self.val_probs.shape)
+            #         if hasattr(self, "val_probs")
+            #         else None
+            #     ),
+            # },
         })
 
 @typechecked

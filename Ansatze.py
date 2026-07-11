@@ -605,7 +605,7 @@ def build_ansatz(
 
     return {
         "ansatz": {
-            "name": layers
+            name: layers
         },
         "id": id
     }
@@ -791,13 +791,13 @@ class AnsatzSpec:
         """Return useful experiment metadata."""
         return {
             "name": self.name,
-            "n_qubits": self.n_qubits,
+            # "n_qubits": self.n_qubits,
             "n_layers": len(self.layers),
             # "layer_sequence": [layer.name for layer in self.layers],
             "trainable_params": self.n_params,
-            "weight_shapes": self.weight_shapes,
-            "input_dim": self.input_dim,
-            "used_features": self.used_features,
+            # "weight_shapes": self.weight_shapes,
+            # "input_dim": self.input_dim,
+            # "used_features": self.used_features,
             "n_used_features": len(self.used_features),
             "feature_coverage": self.feature_coverage,
         }
