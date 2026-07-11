@@ -1,0 +1,171 @@
+{
+  "identity": {
+    "dataset": "contraceptive-method-choice",
+    "source": "UCI",
+    "source_path": "/home/edwar/QML-RP/original-datasets/contraceptive-method-choice.csv",
+    "domain": "",
+    "description": "",
+    "collection_notes": "",
+    "manual_tags": [],
+    "blank_manual_metadata_fields": [
+      "domain",
+      "description",
+      "collection_notes",
+      "manual_tags"
+    ]
+  },
+  "source_structure": {
+    "source_rows": 1473,
+    "source_columns": 10,
+    "usable_rows": 1473,
+    "raw_feature_count": 9,
+    "processed_feature_count": 11,
+    "categorical_expansion_factor": 1.2222222222222223
+  },
+  "split": {
+    "random_state": 42,
+    "test_size": 0.2,
+    "train_rows": 1178,
+    "test_rows": 295,
+    "stratified": true
+  },
+  "feature_characteristics": {
+    "numeric_feature_count": 5,
+    "categorical_feature_count": 4,
+    "ordinal_feature_count": 3,
+    "binary_feature_count": 3,
+    "continuous_feature_count": 2,
+    "discrete_numeric_feature_count": 2,
+    "numeric_columns": [
+      "wife_age",
+      "wife_edu",
+      "husband_edu",
+      "num_children",
+      "standard_of_living_index"
+    ],
+    "categorical_columns": [
+      "wife_religion",
+      "wife_working",
+      "husband_occupation",
+      "media_exposure"
+    ],
+    "ordinal_columns": [
+      "wife_edu",
+      "husband_edu",
+      "standard_of_living_index"
+    ],
+    "binary_columns": [
+      "wife_religion",
+      "wife_working",
+      "media_exposure"
+    ],
+    "continuous_columns": [
+      "wife_age",
+      "num_children"
+    ],
+    "discrete_numeric_columns": [
+      "wife_age",
+      "num_children"
+    ],
+    "raw_feature_columns": [
+      "wife_age",
+      "wife_edu",
+      "husband_edu",
+      "num_children",
+      "wife_religion",
+      "wife_working",
+      "husband_occupation",
+      "standard_of_living_index",
+      "media_exposure"
+    ],
+    "processed_feature_names": [
+      "wife_age",
+      "wife_edu",
+      "husband_edu",
+      "num_children",
+      "standard_of_living_index",
+      "wife_religion_1",
+      "wife_working_1",
+      "husband_occupation_2",
+      "husband_occupation_3",
+      "husband_occupation_4",
+      "media_exposure_1"
+    ],
+    "raw_feature_unique_counts": {
+      "wife_age": 34,
+      "wife_edu": 4,
+      "husband_edu": 4,
+      "num_children": 15,
+      "wife_religion": 2,
+      "wife_working": 2,
+      "husband_occupation": 4,
+      "standard_of_living_index": 4,
+      "media_exposure": 2
+    }
+  },
+  "target_characteristics": {
+    "class_count": 3,
+    "target_dtype": "int64",
+    "target_mapping": {
+      "1": 0,
+      "2": 1,
+      "3": 2
+    },
+    "target_class_counts": {
+      "1": 629,
+      "3": 511,
+      "2": 333
+    },
+    "smallest_class_size": 333,
+    "largest_class_size": 629,
+    "imbalance_ratio": 1.8888888888888888,
+    "majority_class_fraction": 0.4270196877121521,
+    "normalised_class_entropy": 0.971022710347714,
+    "merged_classes": {},
+    "original_class_count": 3,
+    "processed_class_count": 3,
+    "original_class_counts": {
+      "1": 629,
+      "3": 511,
+      "2": 333
+    },
+    "processed_class_counts": {
+      "1": 629,
+      "3": 511,
+      "2": 333
+    }
+  },
+  "missing_data": {
+    "missing_target_count": 0,
+    "total_missing_feature_values": 0,
+    "rows_with_missing_feature_values": 0,
+    "missing_row_fraction": 0.0,
+    "missing_cell_fraction": 0.0,
+    "columns_with_missing_values": 0,
+    "maximum_feature_missing_fraction": 0.0,
+    "missing_values_by_column": {},
+    "missing_fraction_by_column": {}
+  },
+  "preprocessing": {
+    "numeric_imputation": "median",
+    "categorical_imputation": "most_frequent",
+    "categorical_encoding": "one_hot",
+    "one_hot_drop": "first",
+    "unknown_category_handling": "ignore",
+    "feature_scaling": "not applied during dataset processing",
+    "explicitly_dropped_columns": [],
+    "configured_but_absent_drop_columns": [],
+    "constant_columns_removed": []
+  },
+  "analysis_groups": {
+    "sample_size_group": "medium",
+    "raw_feature_count_group": "medium",
+    "processed_feature_count_group": "medium",
+    "class_count_group": "low",
+    "datatype_group": "mixed",
+    "imbalance_group": "moderate"
+  },
+  "warnings": [
+    "contraceptive-method-choice: blank manual metadata fields: ['domain', 'description', 'collection_notes', 'manual_tags']"
+  ]
+}

@@ -1,0 +1,189 @@
+{
+  "identity": {
+    "dataset": "yeast",
+    "source": "UCI",
+    "source_path": "/home/edwar/QML-RP/original-datasets/yeast.csv",
+    "domain": "",
+    "description": "",
+    "collection_notes": "",
+    "manual_tags": [],
+    "blank_manual_metadata_fields": [
+      "domain",
+      "description",
+      "collection_notes",
+      "manual_tags"
+    ]
+  },
+  "source_structure": {
+    "source_rows": 1484,
+    "source_columns": 9,
+    "usable_rows": 1484,
+    "raw_feature_count": 8,
+    "processed_feature_count": 8,
+    "categorical_expansion_factor": 1.0
+  },
+  "split": {
+    "random_state": 42,
+    "test_size": 0.2,
+    "train_rows": 1187,
+    "test_rows": 297,
+    "stratified": true
+  },
+  "feature_characteristics": {
+    "numeric_feature_count": 8,
+    "categorical_feature_count": 0,
+    "ordinal_feature_count": 0,
+    "binary_feature_count": 1,
+    "continuous_feature_count": 7,
+    "discrete_numeric_feature_count": 0,
+    "numeric_columns": [
+      "mcg",
+      "gvh",
+      "alm",
+      "mit",
+      "erl",
+      "pox",
+      "vac",
+      "nuc"
+    ],
+    "categorical_columns": [],
+    "ordinal_columns": [],
+    "binary_columns": [
+      "erl"
+    ],
+    "continuous_columns": [
+      "mcg",
+      "gvh",
+      "alm",
+      "mit",
+      "pox",
+      "vac",
+      "nuc"
+    ],
+    "discrete_numeric_columns": [],
+    "raw_feature_columns": [
+      "mcg",
+      "gvh",
+      "alm",
+      "mit",
+      "erl",
+      "pox",
+      "vac",
+      "nuc"
+    ],
+    "processed_feature_names": [
+      "mcg",
+      "gvh",
+      "alm",
+      "mit",
+      "erl",
+      "pox",
+      "vac",
+      "nuc"
+    ],
+    "raw_feature_unique_counts": {
+      "mcg": 81,
+      "gvh": 79,
+      "alm": 53,
+      "mit": 78,
+      "erl": 2,
+      "pox": 3,
+      "vac": 48,
+      "nuc": 68
+    }
+  },
+  "target_characteristics": {
+    "class_count": 10,
+    "target_dtype": "str",
+    "target_mapping": {
+      "CYT": 0,
+      "ERL": 1,
+      "EXC": 2,
+      "ME1": 3,
+      "ME2": 4,
+      "ME3": 5,
+      "MIT": 6,
+      "NUC": 7,
+      "POX": 8,
+      "VAC": 9
+    },
+    "target_class_counts": {
+      "CYT": 463,
+      "NUC": 429,
+      "MIT": 244,
+      "ME3": 163,
+      "ME2": 51,
+      "ME1": 44,
+      "EXC": 35,
+      "VAC": 30,
+      "POX": 20,
+      "ERL": 5
+    },
+    "smallest_class_size": 5,
+    "largest_class_size": 463,
+    "imbalance_ratio": 92.6,
+    "majority_class_fraction": 0.3119946091644205,
+    "normalised_class_entropy": 0.7496904102366404,
+    "merged_classes": {},
+    "original_class_count": 10,
+    "processed_class_count": 10,
+    "original_class_counts": {
+      "CYT": 463,
+      "NUC": 429,
+      "MIT": 244,
+      "ME3": 163,
+      "ME2": 51,
+      "ME1": 44,
+      "EXC": 35,
+      "VAC": 30,
+      "POX": 20,
+      "ERL": 5
+    },
+    "processed_class_counts": {
+      "CYT": 463,
+      "NUC": 429,
+      "MIT": 244,
+      "ME3": 163,
+      "ME2": 51,
+      "ME1": 44,
+      "EXC": 35,
+      "VAC": 30,
+      "POX": 20,
+      "ERL": 5
+    }
+  },
+  "missing_data": {
+    "missing_target_count": 0,
+    "total_missing_feature_values": 0,
+    "rows_with_missing_feature_values": 0,
+    "missing_row_fraction": 0.0,
+    "missing_cell_fraction": 0.0,
+    "columns_with_missing_values": 0,
+    "maximum_feature_missing_fraction": 0.0,
+    "missing_values_by_column": {},
+    "missing_fraction_by_column": {}
+  },
+  "preprocessing": {
+    "numeric_imputation": "median",
+    "categorical_imputation": "most_frequent",
+    "categorical_encoding": "one_hot",
+    "one_hot_drop": "first",
+    "unknown_category_handling": "ignore",
+    "feature_scaling": "not applied during dataset processing",
+    "explicitly_dropped_columns": [],
+    "configured_but_absent_drop_columns": [],
+    "constant_columns_removed": []
+  },
+  "analysis_groups": {
+    "sample_size_group": "medium",
+    "raw_feature_count_group": "low",
+    "processed_feature_count_group": "low",
+    "class_count_group": "high",
+    "datatype_group": "numeric",
+    "imbalance_group": "extreme"
+  },
+  "warnings": [
+    "yeast: blank manual metadata fields: ['domain', 'description', 'collection_notes', 'manual_tags']",
+    "yeast: at least one target class has only 5 samples; cross-validation options are limited."
+  ]
+}

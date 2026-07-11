@@ -1,0 +1,139 @@
+{
+  "identity": {
+    "dataset": "balance-scale",
+    "source": "UCI",
+    "source_path": "/home/edwar/QML-RP/original-datasets/balance-scale.csv",
+    "domain": "",
+    "description": "",
+    "collection_notes": "",
+    "manual_tags": [],
+    "blank_manual_metadata_fields": [
+      "domain",
+      "description",
+      "collection_notes",
+      "manual_tags"
+    ]
+  },
+  "source_structure": {
+    "source_rows": 625,
+    "source_columns": 5,
+    "usable_rows": 625,
+    "raw_feature_count": 4,
+    "processed_feature_count": 4,
+    "categorical_expansion_factor": 1.0
+  },
+  "split": {
+    "random_state": 42,
+    "test_size": 0.2,
+    "train_rows": 500,
+    "test_rows": 125,
+    "stratified": true
+  },
+  "feature_characteristics": {
+    "numeric_feature_count": 4,
+    "categorical_feature_count": 0,
+    "ordinal_feature_count": 4,
+    "binary_feature_count": 0,
+    "continuous_feature_count": 0,
+    "discrete_numeric_feature_count": 0,
+    "numeric_columns": [
+      "right-distance",
+      "right-weight",
+      "left-distance",
+      "left-weight"
+    ],
+    "categorical_columns": [],
+    "ordinal_columns": [
+      "right-distance",
+      "right-weight",
+      "left-distance",
+      "left-weight"
+    ],
+    "binary_columns": [],
+    "continuous_columns": [],
+    "discrete_numeric_columns": [],
+    "raw_feature_columns": [
+      "right-distance",
+      "right-weight",
+      "left-distance",
+      "left-weight"
+    ],
+    "processed_feature_names": [
+      "right-distance",
+      "right-weight",
+      "left-distance",
+      "left-weight"
+    ],
+    "raw_feature_unique_counts": {
+      "right-distance": 5,
+      "right-weight": 5,
+      "left-distance": 5,
+      "left-weight": 5
+    }
+  },
+  "target_characteristics": {
+    "class_count": 3,
+    "target_dtype": "str",
+    "target_mapping": {
+      "B": 0,
+      "L": 1,
+      "R": 2
+    },
+    "target_class_counts": {
+      "R": 288,
+      "L": 288,
+      "B": 49
+    },
+    "smallest_class_size": 49,
+    "largest_class_size": 288,
+    "imbalance_ratio": 5.877551020408164,
+    "majority_class_fraction": 0.4608,
+    "normalised_class_entropy": 0.831638758545922,
+    "merged_classes": {},
+    "original_class_count": 3,
+    "processed_class_count": 3,
+    "original_class_counts": {
+      "R": 288,
+      "L": 288,
+      "B": 49
+    },
+    "processed_class_counts": {
+      "R": 288,
+      "L": 288,
+      "B": 49
+    }
+  },
+  "missing_data": {
+    "missing_target_count": 0,
+    "total_missing_feature_values": 0,
+    "rows_with_missing_feature_values": 0,
+    "missing_row_fraction": 0.0,
+    "missing_cell_fraction": 0.0,
+    "columns_with_missing_values": 0,
+    "maximum_feature_missing_fraction": 0.0,
+    "missing_values_by_column": {},
+    "missing_fraction_by_column": {}
+  },
+  "preprocessing": {
+    "numeric_imputation": "median",
+    "categorical_imputation": "most_frequent",
+    "categorical_encoding": "one_hot",
+    "one_hot_drop": "first",
+    "unknown_category_handling": "ignore",
+    "feature_scaling": "not applied during dataset processing",
+    "explicitly_dropped_columns": [],
+    "configured_but_absent_drop_columns": [],
+    "constant_columns_removed": []
+  },
+  "analysis_groups": {
+    "sample_size_group": "medium",
+    "raw_feature_count_group": "low",
+    "processed_feature_count_group": "low",
+    "class_count_group": "low",
+    "datatype_group": "numeric",
+    "imbalance_group": "high"
+  },
+  "warnings": [
+    "balance-scale: blank manual metadata fields: ['domain', 'description', 'collection_notes', 'manual_tags']"
+  ]
+}

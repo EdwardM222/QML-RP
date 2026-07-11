@@ -1,0 +1,221 @@
+{
+  "identity": {
+    "dataset": "obesity",
+    "source": "UCI",
+    "source_path": "/home/edwar/QML-RP/original-datasets/obesity.csv",
+    "domain": "",
+    "description": "",
+    "collection_notes": "",
+    "manual_tags": [],
+    "blank_manual_metadata_fields": [
+      "domain",
+      "description",
+      "collection_notes",
+      "manual_tags"
+    ]
+  },
+  "source_structure": {
+    "source_rows": 2111,
+    "source_columns": 17,
+    "usable_rows": 2111,
+    "raw_feature_count": 16,
+    "processed_feature_count": 23,
+    "categorical_expansion_factor": 1.4375
+  },
+  "split": {
+    "random_state": 42,
+    "test_size": 0.2,
+    "train_rows": 1688,
+    "test_rows": 423,
+    "stratified": true
+  },
+  "feature_characteristics": {
+    "numeric_feature_count": 8,
+    "categorical_feature_count": 8,
+    "ordinal_feature_count": 0,
+    "binary_feature_count": 5,
+    "continuous_feature_count": 8,
+    "discrete_numeric_feature_count": 0,
+    "numeric_columns": [
+      "Age",
+      "Height",
+      "Weight",
+      "FCVC",
+      "NCP",
+      "CH2O",
+      "FAF",
+      "TUE"
+    ],
+    "categorical_columns": [
+      "Gender",
+      "family_history_with_overweight",
+      "FAVC",
+      "CAEC",
+      "SMOKE",
+      "SCC",
+      "CALC",
+      "MTRANS"
+    ],
+    "ordinal_columns": [],
+    "binary_columns": [
+      "Gender",
+      "family_history_with_overweight",
+      "FAVC",
+      "SMOKE",
+      "SCC"
+    ],
+    "continuous_columns": [
+      "Age",
+      "Height",
+      "Weight",
+      "FCVC",
+      "NCP",
+      "CH2O",
+      "FAF",
+      "TUE"
+    ],
+    "discrete_numeric_columns": [],
+    "raw_feature_columns": [
+      "Gender",
+      "Age",
+      "Height",
+      "Weight",
+      "family_history_with_overweight",
+      "FAVC",
+      "FCVC",
+      "NCP",
+      "CAEC",
+      "SMOKE",
+      "CH2O",
+      "SCC",
+      "FAF",
+      "TUE",
+      "CALC",
+      "MTRANS"
+    ],
+    "processed_feature_names": [
+      "Age",
+      "Height",
+      "Weight",
+      "FCVC",
+      "NCP",
+      "CH2O",
+      "FAF",
+      "TUE",
+      "Gender_Male",
+      "family_history_with_overweight_yes",
+      "FAVC_yes",
+      "CAEC_Frequently",
+      "CAEC_Sometimes",
+      "CAEC_no",
+      "SMOKE_yes",
+      "SCC_yes",
+      "CALC_Frequently",
+      "CALC_Sometimes",
+      "CALC_no",
+      "MTRANS_Bike",
+      "MTRANS_Motorbike",
+      "MTRANS_Public_Transportation",
+      "MTRANS_Walking"
+    ],
+    "raw_feature_unique_counts": {
+      "Gender": 2,
+      "Age": 1402,
+      "Height": 1574,
+      "Weight": 1525,
+      "family_history_with_overweight": 2,
+      "FAVC": 2,
+      "FCVC": 810,
+      "NCP": 635,
+      "CAEC": 4,
+      "SMOKE": 2,
+      "CH2O": 1268,
+      "SCC": 2,
+      "FAF": 1190,
+      "TUE": 1129,
+      "CALC": 4,
+      "MTRANS": 5
+    }
+  },
+  "target_characteristics": {
+    "class_count": 7,
+    "target_dtype": "str",
+    "target_mapping": {
+      "Insufficient_Weight": 0,
+      "Normal_Weight": 1,
+      "Obesity_Type_I": 2,
+      "Obesity_Type_II": 3,
+      "Obesity_Type_III": 4,
+      "Overweight_Level_I": 5,
+      "Overweight_Level_II": 6
+    },
+    "target_class_counts": {
+      "Obesity_Type_I": 351,
+      "Obesity_Type_III": 324,
+      "Obesity_Type_II": 297,
+      "Overweight_Level_I": 290,
+      "Overweight_Level_II": 290,
+      "Normal_Weight": 287,
+      "Insufficient_Weight": 272
+    },
+    "smallest_class_size": 272,
+    "largest_class_size": 351,
+    "imbalance_ratio": 1.2904411764705883,
+    "majority_class_fraction": 0.1662719090478446,
+    "normalised_class_entropy": 0.9982953866102063,
+    "merged_classes": {},
+    "original_class_count": 7,
+    "processed_class_count": 7,
+    "original_class_counts": {
+      "Obesity_Type_I": 351,
+      "Obesity_Type_III": 324,
+      "Obesity_Type_II": 297,
+      "Overweight_Level_I": 290,
+      "Overweight_Level_II": 290,
+      "Normal_Weight": 287,
+      "Insufficient_Weight": 272
+    },
+    "processed_class_counts": {
+      "Obesity_Type_I": 351,
+      "Obesity_Type_III": 324,
+      "Obesity_Type_II": 297,
+      "Overweight_Level_I": 290,
+      "Overweight_Level_II": 290,
+      "Normal_Weight": 287,
+      "Insufficient_Weight": 272
+    }
+  },
+  "missing_data": {
+    "missing_target_count": 0,
+    "total_missing_feature_values": 0,
+    "rows_with_missing_feature_values": 0,
+    "missing_row_fraction": 0.0,
+    "missing_cell_fraction": 0.0,
+    "columns_with_missing_values": 0,
+    "maximum_feature_missing_fraction": 0.0,
+    "missing_values_by_column": {},
+    "missing_fraction_by_column": {}
+  },
+  "preprocessing": {
+    "numeric_imputation": "median",
+    "categorical_imputation": "most_frequent",
+    "categorical_encoding": "one_hot",
+    "one_hot_drop": "first",
+    "unknown_category_handling": "ignore",
+    "feature_scaling": "not applied during dataset processing",
+    "explicitly_dropped_columns": [],
+    "configured_but_absent_drop_columns": [],
+    "constant_columns_removed": []
+  },
+  "analysis_groups": {
+    "sample_size_group": "medium",
+    "raw_feature_count_group": "medium",
+    "processed_feature_count_group": "high",
+    "class_count_group": "medium",
+    "datatype_group": "mixed",
+    "imbalance_group": "balanced"
+  },
+  "warnings": [
+    "obesity: blank manual metadata fields: ['domain', 'description', 'collection_notes', 'manual_tags']"
+  ]
+}

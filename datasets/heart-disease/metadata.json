@@ -1,0 +1,207 @@
+{
+  "identity": {
+    "dataset": "heart-disease",
+    "source": "UCI",
+    "source_path": "/home/edwar/QML-RP/original-datasets/heart-disease.csv",
+    "domain": "",
+    "description": "",
+    "collection_notes": "",
+    "manual_tags": [],
+    "blank_manual_metadata_fields": [
+      "domain",
+      "description",
+      "collection_notes",
+      "manual_tags"
+    ]
+  },
+  "source_structure": {
+    "source_rows": 303,
+    "source_columns": 14,
+    "usable_rows": 303,
+    "raw_feature_count": 13,
+    "processed_feature_count": 20,
+    "categorical_expansion_factor": 1.5384615384615385
+  },
+  "split": {
+    "random_state": 42,
+    "test_size": 0.2,
+    "train_rows": 242,
+    "test_rows": 61,
+    "stratified": true
+  },
+  "feature_characteristics": {
+    "numeric_feature_count": 5,
+    "categorical_feature_count": 8,
+    "ordinal_feature_count": 0,
+    "binary_feature_count": 3,
+    "continuous_feature_count": 5,
+    "discrete_numeric_feature_count": 4,
+    "numeric_columns": [
+      "age",
+      "trestbps",
+      "chol",
+      "thalach",
+      "oldpeak"
+    ],
+    "categorical_columns": [
+      "sex",
+      "cp",
+      "fbs",
+      "restecg",
+      "exang",
+      "slope",
+      "ca",
+      "thal"
+    ],
+    "ordinal_columns": [],
+    "binary_columns": [
+      "sex",
+      "fbs",
+      "exang"
+    ],
+    "continuous_columns": [
+      "age",
+      "trestbps",
+      "chol",
+      "thalach",
+      "oldpeak"
+    ],
+    "discrete_numeric_columns": [
+      "age",
+      "trestbps",
+      "chol",
+      "thalach"
+    ],
+    "raw_feature_columns": [
+      "age",
+      "sex",
+      "cp",
+      "trestbps",
+      "chol",
+      "fbs",
+      "restecg",
+      "thalach",
+      "exang",
+      "oldpeak",
+      "slope",
+      "ca",
+      "thal"
+    ],
+    "processed_feature_names": [
+      "age",
+      "trestbps",
+      "chol",
+      "thalach",
+      "oldpeak",
+      "sex_1",
+      "cp_2",
+      "cp_3",
+      "cp_4",
+      "fbs_1",
+      "restecg_1",
+      "restecg_2",
+      "exang_1",
+      "slope_2",
+      "slope_3",
+      "ca_1.0",
+      "ca_2.0",
+      "ca_3.0",
+      "thal_6.0",
+      "thal_7.0"
+    ],
+    "raw_feature_unique_counts": {
+      "age": 41,
+      "sex": 2,
+      "cp": 4,
+      "trestbps": 50,
+      "chol": 152,
+      "fbs": 2,
+      "restecg": 3,
+      "thalach": 91,
+      "exang": 2,
+      "oldpeak": 40,
+      "slope": 3,
+      "ca": 4,
+      "thal": 3
+    }
+  },
+  "target_characteristics": {
+    "class_count": 5,
+    "target_dtype": "int64",
+    "target_mapping": {
+      "0": 0,
+      "1": 1,
+      "2": 2,
+      "3": 3,
+      "4": 4
+    },
+    "target_class_counts": {
+      "0": 164,
+      "1": 55,
+      "2": 36,
+      "3": 35,
+      "4": 13
+    },
+    "smallest_class_size": 13,
+    "largest_class_size": 164,
+    "imbalance_ratio": 12.615384615384615,
+    "majority_class_fraction": 0.5412541254125413,
+    "normalised_class_entropy": 0.7950040265746733,
+    "merged_classes": {},
+    "original_class_count": 5,
+    "processed_class_count": 5,
+    "original_class_counts": {
+      "0": 164,
+      "1": 55,
+      "2": 36,
+      "3": 35,
+      "4": 13
+    },
+    "processed_class_counts": {
+      "0": 164,
+      "1": 55,
+      "2": 36,
+      "3": 35,
+      "4": 13
+    }
+  },
+  "missing_data": {
+    "missing_target_count": 0,
+    "total_missing_feature_values": 6,
+    "rows_with_missing_feature_values": 6,
+    "missing_row_fraction": 0.019801980198019802,
+    "missing_cell_fraction": 0.0015232292460015233,
+    "columns_with_missing_values": 2,
+    "maximum_feature_missing_fraction": 0.013201320132013201,
+    "missing_values_by_column": {
+      "ca": 4,
+      "thal": 2
+    },
+    "missing_fraction_by_column": {
+      "ca": 0.013201320132013201,
+      "thal": 0.006600660066006601
+    }
+  },
+  "preprocessing": {
+    "numeric_imputation": "median",
+    "categorical_imputation": "most_frequent",
+    "categorical_encoding": "one_hot",
+    "one_hot_drop": "first",
+    "unknown_category_handling": "ignore",
+    "feature_scaling": "not applied during dataset processing",
+    "explicitly_dropped_columns": [],
+    "configured_but_absent_drop_columns": [],
+    "constant_columns_removed": []
+  },
+  "analysis_groups": {
+    "sample_size_group": "small",
+    "raw_feature_count_group": "medium",
+    "processed_feature_count_group": "medium",
+    "class_count_group": "medium",
+    "datatype_group": "mixed",
+    "imbalance_group": "extreme"
+  },
+  "warnings": [
+    "heart-disease: blank manual metadata fields: ['domain', 'description', 'collection_notes', 'manual_tags']"
+  ]
+}

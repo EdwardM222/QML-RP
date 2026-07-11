@@ -163,8 +163,9 @@ class VQC(nn.Module):
             n_classes: int = 2,
             feats: list[int] | None = None,
             template: str = "default",
-            qml_device: str | qml.devices.Device = "default.qubit",
             measurement_mode: str = "min",
+            qml_device: str | qml.devices.Device = "default.qubit",
+            diff_method: str = "best",
             **kwargs
         ):
         super().__init__()
@@ -173,6 +174,7 @@ class VQC(nn.Module):
         self.feats = feats
         self.template = template
         self.qml_device = qml_device
+        self.diff_method = diff_method
 
         if measurement_mode not in {"min", "full"}:
             raise ValueError(f"Unknown measurement_mode '{measurement_mode}'. Supported values are 'min' and 'full'.")
@@ -192,6 +194,7 @@ class VQC(nn.Module):
         n_classes: int,
         n_total_features: int,
         qml_device: str | qml.devices.Device = "default.qubit",
+        diff_method: str = "best",
         cuda_device: str = "cpu",
         template_path: str | Path = "vqcs.json",
         random_state: int | None = None,
@@ -221,8 +224,9 @@ class VQC(nn.Module):
             n_classes=n_classes,
             feats=feats,
             template=config["ansatz"],
-            qml_device=qml_device,
             measurement_mode=config["measurement_mode"],
+            qml_device=qml_device,
+            diff_method=diff_method,
         ).to(cuda_device)
 
     def to(self, device):
@@ -265,7 +269,8 @@ class VQC(nn.Module):
         self.qlayer, self.circuit = (
             self.ansatz.build_qlayer(
                 device_name=self.qml_device,
-                measurement_wires=self.n_qubits if self.measurement_mode == "full" else int(np.ceil(np.log2(self.n_classes)))
+                measurement_wires=self.n_qubits if self.measurement_mode == "full" else int(np.ceil(np.log2(self.n_classes))),
+                diff_method=self.diff_method
             )
         )
 
@@ -535,19 +540,22 @@ class QuantumECOC:
         n_learners: int | None = None,
         templates: str | list[str] = "default",
         ecoc_depth: int = 2,
+        scaler_range: tuple[float, float] = (0, np.pi),
         device: str = "default.qubit",
-        scaler_range: tuple[float, float] = (0, np.pi)
+        diff_method: str = "best",
     ):
         self.n_learners = len(templates) if isinstance(templates, list) else n_learners
         self.templates = templates
 
         self.ecoc_depth = ecoc_depth
 
-        self.cuda_device = "cpu"
-        self.qml_device = device
-        self.classifiers: list[VQC] = []
-
         self.scaler = MinMaxScaler(feature_range=scaler_range)
+
+        self.qml_device = device
+        self.diff_method = diff_method
+        self.cuda_device = "cpu"
+
+        self.classifiers: list[VQC] = []
 
     def to(self, device):
         self.cuda_device = device
@@ -590,6 +598,7 @@ class QuantumECOC:
                     n_classes=len(set(self.ecoc[i])),
                     n_total_features=len(self.features),
                     qml_device=self.qml_device,
+                    diff_method=self.diff_method,
                     random_state=2+i
                 ).to(self.cuda_device)
             )
@@ -785,9 +794,10 @@ class StackedECOC(QuantumECOC):
         templates: str | list[str] = "default",
         ecoc_depth: int = 2,
         device: str = "default.qubit",
+        diff_method: str = "best",
         **kwargs
     ):
-        super().__init__(n_learners=n_learners, templates=templates, ecoc_depth=ecoc_depth, device=device, **kwargs)
+        super().__init__(n_learners=n_learners, templates=templates, ecoc_depth=ecoc_depth, device=device, diff_method=diff_method, **kwargs)
         
         self.meta_learner = meta_learner if meta_learner is not None else SVC(kernel="rbf", random_state=2, probability=True)
 
@@ -970,10 +980,13 @@ class CoherentECOC(QuantumECOC):
         n_learners: int | None = None,
         templates: str | list[str] = "default",
         ecoc_depth: int = 2,
-        device: str = "default.qubit",
+        meta_device: str = "default.qubit",
+        meta_diff_method: str = "best",
+        base_device: str = "default.qubit",
+        base_diff_method: str = "best",
         **kwargs,
     ):
-        super().__init__(n_learners=n_learners, templates=templates, ecoc_depth=ecoc_depth, device=device, **kwargs)
+        super().__init__(n_learners=n_learners, templates=templates, ecoc_depth=ecoc_depth, device=base_device, diff_method=base_diff_method, **kwargs)
 
         self.meta_template = meta_template
 
@@ -984,6 +997,9 @@ class CoherentECOC(QuantumECOC):
         if meta_measurement not in {"min", "full"}:
             raise ValueError(f"Unknown meta_measurement '{meta_measurement}'. Supported values are 'min' and 'full'.")
         self.meta_measurement = meta_measurement
+
+        self.meta_device = meta_device
+        self.meta_diff_method = meta_diff_method
 
     def initialise_ensemble(self, X: DataFrame, y: Series, verbosity: int = 0):
         super().initialise_ensemble(X, y, verbosity)
@@ -1003,7 +1019,7 @@ class CoherentECOC(QuantumECOC):
         self.n_qubits = 0
         base_params = 0
         self.main_wires = []
-        for i, clf in enumerate(self.classifiers):
+        for clf in self.classifiers:
             self.main_wires.append(self.n_qubits)
             self.n_qubits += clf.n_qubits
             base_params += clf.n_params
@@ -1012,8 +1028,8 @@ class CoherentECOC(QuantumECOC):
         self.meta_wires = list(range(self.n_qubits)) if self.meta_design == "full" else self.main_wires
         self.measurement_wires = self.meta_wires if self.meta_measurement == "full" else self.meta_wires[:int(np.ceil(np.log2(self.n_classes)))]
 
-        coherent_device = qml.device(self.qml_device, wires=self.n_qubits)
-        @qml.qnode(coherent_device, interface="torch", diff_method="best")
+        coherent_device = qml.device(self.meta_device, wires=self.n_qubits)
+        @qml.qnode(coherent_device, interface="torch", diff_method=self.meta_diff_method)
         def coherent_circuit(inputs, weights):
             n_params = 0
             idx = 0
@@ -1297,26 +1313,34 @@ if __name__ == "__main__":
     # print(f"Training Accuracy: {train_score:.2f}")
     # print("Testing Classification Report:\n", classification_report(y_test, ens.predict(X_test), zero_division=0))
 
-    X = pd.read_csv(f"datasets/0/iris.csv")
-    # X = pd.read_csv(f"datasets/1/image-segmentation.csv")
-    y = X['target']
-    X = X.drop('target', axis=1)
+    X_train = pd.read_csv("datasets/iris/train.csv")
+    y_train = X_train['target']
+    X_train = X_train.drop('target', axis=1)
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=2, stratify=y)
+    X_test = pd.read_csv("datasets/iris/test.csv")
+    y_test = X_test['target']
+    X_test = X_test.drop('target', axis=1)
 
     scaler = MinMaxScaler(feature_range=(0, np.pi))
     X_tr = scaler.fit_transform(X_train)
     X_te = scaler.transform(X_test)
 
-    y_tr = y_train.map({label: idx for idx, label in enumerate(sorted(y.unique()))}).values
-    y_te = y_test.map({label: idx for idx, label in enumerate(sorted(y.unique()))}).values
+    y_tr = y_train.map({label: idx for idx, label in enumerate(sorted(y_train.unique()))}).values
+    y_te = y_test.map({label: idx for idx, label in enumerate(sorted(y_test.unique()))}).values
 
-    vqc = VQC.from_template(
+    # vqc = VQC.from_template(
+    #     template='meta',
+    #     n_classes=len(np.unique(y_train)),
+    #     n_total_features=X_train.shape[1],
+    # ).to("cpu")
+    vqc = VQC(
+        n_qubits=12,
         n_classes=len(np.unique(y_train)),
-        n_total_features=X_train.shape[1],
-        template='meta',
-    ).to("cpu")
-    vqc.fit(X_tr, y_tr, X_te, y_te, epochs=200, plot=False, verbosity=1)
+        feats=list(range(X_train.shape[1])),
+        qml_device="default.qubit",
+        diff_method="best",
+    )
+    vqc.fit(X_tr, y_tr, X_te, y_te, epochs=200, plot=False, verbosity=2)
     print(f"VQC Classification Report:\n{classification_report(y_te, vqc.predict(X_te), zero_division=0)}\n")
     # vqc.ansatz.draw_mpl(decimals=2, weights=vqc.qlayer.weights.detach().cpu().numpy())
 

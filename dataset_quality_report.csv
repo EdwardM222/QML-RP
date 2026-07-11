@@ -1,0 +1,2 @@
+dataset,tier,path,status,rows,columns,features,numeric_features,categorical_features,boolean_features,feature_type_counts,total_missing_values,rows_with_missing_values,missing_row_fraction,target_present,target_dtype,target_classes,target_missing_values,target_class_counts
+image-segmentation,original-datasets,/home/edwar/QML-RP/original-datasets/image-segmentation.csv,ok,210,20,19,19,0,0,"{'continuous numeric': 17, 'binary integer': 1, 'binary numeric': 1}",0,0,0.0,True,str,7,0,"{'BRICKFACE': 30, 'SKY': 30, 'FOLIAGE': 30, 'CEMENT': 30, 'WINDOW': 30, 'PATH': 30, 'GRASS': 30}"

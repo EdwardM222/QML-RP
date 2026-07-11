@@ -1,0 +1,228 @@
+{
+  "identity": {
+    "dataset": "credit-approval",
+    "source": "UCI",
+    "source_path": "/home/edwar/QML-RP/original-datasets/credit-approval.csv",
+    "domain": "",
+    "description": "",
+    "collection_notes": "",
+    "manual_tags": [],
+    "blank_manual_metadata_fields": [
+      "domain",
+      "description",
+      "collection_notes",
+      "manual_tags"
+    ]
+  },
+  "source_structure": {
+    "source_rows": 690,
+    "source_columns": 16,
+    "usable_rows": 690,
+    "raw_feature_count": 15,
+    "processed_feature_count": 37,
+    "categorical_expansion_factor": 2.466666666666667
+  },
+  "split": {
+    "random_state": 42,
+    "test_size": 0.2,
+    "train_rows": 552,
+    "test_rows": 138,
+    "stratified": true
+  },
+  "feature_characteristics": {
+    "numeric_feature_count": 6,
+    "categorical_feature_count": 9,
+    "ordinal_feature_count": 0,
+    "binary_feature_count": 4,
+    "continuous_feature_count": 6,
+    "discrete_numeric_feature_count": 2,
+    "numeric_columns": [
+      "A15",
+      "A14",
+      "A11",
+      "A8",
+      "A3",
+      "A2"
+    ],
+    "categorical_columns": [
+      "A1",
+      "A4",
+      "A5",
+      "A6",
+      "A7",
+      "A9",
+      "A10",
+      "A12",
+      "A13"
+    ],
+    "ordinal_columns": [],
+    "binary_columns": [
+      "A12",
+      "A10",
+      "A9",
+      "A1"
+    ],
+    "continuous_columns": [
+      "A15",
+      "A14",
+      "A11",
+      "A8",
+      "A3",
+      "A2"
+    ],
+    "discrete_numeric_columns": [
+      "A15",
+      "A11"
+    ],
+    "raw_feature_columns": [
+      "A15",
+      "A14",
+      "A13",
+      "A12",
+      "A11",
+      "A10",
+      "A9",
+      "A8",
+      "A7",
+      "A6",
+      "A5",
+      "A4",
+      "A3",
+      "A2",
+      "A1"
+    ],
+    "processed_feature_names": [
+      "A15",
+      "A14",
+      "A11",
+      "A8",
+      "A3",
+      "A2",
+      "A1_b",
+      "A4_u",
+      "A4_y",
+      "A5_gg",
+      "A5_p",
+      "A6_c",
+      "A6_cc",
+      "A6_d",
+      "A6_e",
+      "A6_ff",
+      "A6_i",
+      "A6_j",
+      "A6_k",
+      "A6_m",
+      "A6_q",
+      "A6_r",
+      "A6_w",
+      "A6_x",
+      "A7_dd",
+      "A7_ff",
+      "A7_h",
+      "A7_j",
+      "A7_n",
+      "A7_o",
+      "A7_v",
+      "A7_z",
+      "A9_t",
+      "A10_t",
+      "A12_t",
+      "A13_p",
+      "A13_s"
+    ],
+    "raw_feature_unique_counts": {
+      "A15": 240,
+      "A14": 170,
+      "A13": 3,
+      "A12": 2,
+      "A11": 23,
+      "A10": 2,
+      "A9": 2,
+      "A8": 132,
+      "A7": 9,
+      "A6": 14,
+      "A5": 3,
+      "A4": 3,
+      "A3": 215,
+      "A2": 349,
+      "A1": 2
+    }
+  },
+  "target_characteristics": {
+    "class_count": 2,
+    "target_dtype": "str",
+    "target_mapping": {
+      "+": 0,
+      "-": 1
+    },
+    "target_class_counts": {
+      "-": 383,
+      "+": 307
+    },
+    "smallest_class_size": 307,
+    "largest_class_size": 383,
+    "imbalance_ratio": 1.247557003257329,
+    "majority_class_fraction": 0.5550724637681159,
+    "normalised_class_entropy": 0.9912308989033521,
+    "merged_classes": {},
+    "original_class_count": 2,
+    "processed_class_count": 2,
+    "original_class_counts": {
+      "-": 383,
+      "+": 307
+    },
+    "processed_class_counts": {
+      "-": 383,
+      "+": 307
+    }
+  },
+  "missing_data": {
+    "missing_target_count": 0,
+    "total_missing_feature_values": 67,
+    "rows_with_missing_feature_values": 37,
+    "missing_row_fraction": 0.0536231884057971,
+    "missing_cell_fraction": 0.006473429951690821,
+    "columns_with_missing_values": 7,
+    "maximum_feature_missing_fraction": 0.01884057971014493,
+    "missing_values_by_column": {
+      "A14": 13,
+      "A7": 9,
+      "A6": 9,
+      "A5": 6,
+      "A4": 6,
+      "A2": 12,
+      "A1": 12
+    },
+    "missing_fraction_by_column": {
+      "A14": 0.01884057971014493,
+      "A7": 0.013043478260869565,
+      "A6": 0.013043478260869565,
+      "A5": 0.008695652173913044,
+      "A4": 0.008695652173913044,
+      "A2": 0.017391304347826087,
+      "A1": 0.017391304347826087
+    }
+  },
+  "preprocessing": {
+    "numeric_imputation": "median",
+    "categorical_imputation": "most_frequent",
+    "categorical_encoding": "one_hot",
+    "one_hot_drop": "first",
+    "unknown_category_handling": "ignore",
+    "feature_scaling": "not applied during dataset processing",
+    "explicitly_dropped_columns": [],
+    "configured_but_absent_drop_columns": [],
+    "constant_columns_removed": []
+  },
+  "analysis_groups": {
+    "sample_size_group": "medium",
+    "raw_feature_count_group": "medium",
+    "processed_feature_count_group": "high",
+    "class_count_group": "low",
+    "datatype_group": "mixed",
+    "imbalance_group": "balanced"
+  },
+  "warnings": [
+    "credit-approval: blank manual metadata fields: ['domain', 'description', 'collection_notes', 'manual_tags']"
+  ]
+}

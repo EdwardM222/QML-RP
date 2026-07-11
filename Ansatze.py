@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable
 
+from jupyter_core.version import pattern
 import numpy as np
 import matplotlib.pyplot as plt
 import pennylane as qml
@@ -224,7 +225,7 @@ def linear_pairwise_encoding(
     gate: str | Any = "rzz",
     features: list[int],
     distance: int = 1,
-    include_single: bool = True,
+    include_single: bool = False,
     single_gate: str = "rz",
 ) -> int:
     """Apply a linear pairwise feature encoding layer to the active circuit."""
@@ -254,7 +255,7 @@ def linear_pairwise_encoding(
         fb = int(features[b])
 
         angle = inputs[..., fa] * inputs[..., fb]
-        pair_gate(angle, wires=[wires[a], wires[b]])
+        pair_gate(angle, wires=[wires[a], wires[b]], id=f"f{fa}-f{fb}")
 
     return idx
 
@@ -267,7 +268,7 @@ def parallel_pairwise_encoding(
     gate: str | Any = "rzz",
     features: list[int],
     distance: int = 1,
-    include_single: bool = True,
+    include_single: bool = False,
     single_gate: str = "rz",
 ) -> int:
     """Apply a parallel pairwise feature encoding layer to the active circuit."""
@@ -297,7 +298,7 @@ def parallel_pairwise_encoding(
         fb = int(features[b])
 
         angle = inputs[..., fa] * inputs[..., fb]
-        pair_gate(angle, wires=[wires[a], wires[b]])
+        pair_gate(angle, wires=[wires[a], wires[b]], id=f"f{fa}-f{fb}")
 
     return idx
 
@@ -455,6 +456,217 @@ def count_total_params(layers: list[LayerSpec], n_qubits: int) -> int:
     """Count all trainable parameters for a layered ansatz."""
     return sum(count_layer_params(layer, n_qubits) for layer in layers)
 
+# --- Ansatz Builder ---
+
+def build_ansatz(
+    *,
+    feats_per_qubit: int,
+    reuploads: int,
+    encoding_style: str = "angle",
+    feature_strategy: str = "block",
+    trainable_layers: list[int],
+    entangling_uploads: str,
+    entangling_layers: str,
+    entangling_pattern: str = "linear",
+    entangler: str = "cz",
+    entangler_range: int = 1,
+    encoding_gates: tuple[str, ...] = ("rx", "rz"),
+    trainable_gates: tuple[str, ...] = ("rx", "rz"),
+    barriers: bool = False,
+    name: str | None = None,
+) -> dict:
+
+    if feats_per_qubit < 1:
+        raise ValueError("feats_per_qubit must be at least 1.")
+
+    if reuploads < 1:
+        raise ValueError("reuploads must be at least 1.")
+
+    if len(trainable_layers) != reuploads:
+        raise ValueError(
+            f"trainable_layers must have length equal to reuploads. "
+            f"Got len(trainable_layers)={len(trainable_layers)} and reuploads={reuploads}."
+        )
+
+    if any(n < 0 for n in trainable_layers):
+        raise ValueError("trainable_layers cannot contain negative values.")
+
+    if len(encoding_gates) == 0:
+        raise ValueError("encoding_gates must contain at least one gate.")
+
+    if len(trainable_gates) == 0:
+        raise ValueError("trainable_gates must contain at least one gate.")
+
+    ring_layer = "parallel_ring" if entangling_pattern == "parallel" else "linear_ring"
+    
+    layers = []
+
+    def add_entangler() -> None:
+        layers.append([
+            ring_layer,
+            {
+                "gate": entangler,
+                "range": entangler_range,
+            },
+        ])
+
+    def should_entangle(upload_pattern: str, layer_pattern: str, upload_idx: int, local_train_idx: int, n_trainable: int) -> bool:
+
+        if n_trainable <= 0:
+            return False
+
+        entangle = False
+        if "none" in upload_pattern:
+            return False
+        if "all" in upload_pattern:
+            entangle = True
+        if "first" in upload_pattern or "ends" in upload_pattern:
+            entangle = upload_idx == 0
+        if "mid" in upload_pattern:
+            entangle = upload_idx == n_trainable // 2
+        if "last" in upload_pattern or "ends" in upload_pattern:
+            entangle = upload_idx == n_trainable - 1
+
+        if entangle:
+            if "none" in layer_pattern:
+                return False
+            if "all" in layer_pattern:
+                return True
+            if "first" in layer_pattern or "ends" in layer_pattern:
+                return local_train_idx == 0
+            if "mid" in layer_pattern:
+                return local_train_idx == n_trainable // 2
+            if "last" in layer_pattern or "ends" in layer_pattern:
+                return local_train_idx == n_trainable - 1
+
+        return False
+
+    for upload_idx in range(reuploads):
+        # Encoding block
+        for feat_idx in range(feats_per_qubit):
+            if encoding_style == "angle":
+                gate = encoding_gates[feat_idx % len(encoding_gates)]
+
+                layers.append([
+                    "angle_encoding",
+                    {
+                        "gate": gate,
+                        "feature_strategy": feature_strategy,
+                    },
+                ])
+            elif encoding_style == "linear_pairwise":
+                layers.append(["linear_pairwise_encoding"])
+            elif encoding_style == "parallel_pairwise":
+                layers.append(["parallel_pairwise_encoding"])
+
+        # Trainable layers after this upload
+        n_trainable = trainable_layers[upload_idx]
+
+        for local_train_idx in range(n_trainable):
+            for gate in trainable_gates:
+                layers.append([
+                    "rotation_layer",
+                    {
+                        "gate": gate,
+                    },
+                ])
+
+            if should_entangle(
+                entangling_uploads,
+                entangling_layers,
+                upload_idx,
+                local_train_idx,
+                n_trainable,
+            ):
+                add_entangler()
+
+        if barriers:
+            layers.append(["barrier"])
+
+    if name is None:
+        trainable_label = "-".join(str(i) for i in trainable_layers)
+        entangling_label = entangling_uploads + "-" + entangling_layers
+        encoding_label = "".join(encoding_gates)
+        trainable_gate_label = "".join(trainable_gates)
+
+        name = (
+            f"f{feats_per_qubit}"
+            f"_r{reuploads}"
+            f"_t{trainable_label}"
+            f"_e{entangling_label}"
+            f"_{entangling_pattern[0]}{entangler}{entangler_range}"
+            # f"_enc{encoding_label}"
+            # f"_tr{trainable_gate_label}"
+            f"_{feature_strategy}"
+        )
+
+    string_layers = json.dumps(layers, separators=(',', ':'))
+    id = hash(string_layers)
+
+    return {
+        "name": name,
+        "layers": layers,
+        "id": id
+    }
+
+def get_ansatze_configs() -> list:
+    tr = 4
+    def get_layers(n):
+        if n == 0:
+            layers = '0'
+        nums = []
+        while n:
+            n, r = divmod(n, tr)
+            nums.append(str(r))
+        layers = ''.join(reversed(nums))
+        return [int(c) for c in layers]
+    
+    trainable_layers = {
+        1: [[0], [1], [2], [3]],
+        2: [[0, 0], [0, 1], [0, 2], [0, 3],
+            [1, 0], [1, 1], [1, 2], [1, 3],
+            [2, 0], [2, 1], [2, 2], [2, 3],
+            [3, 0], [3, 1], [3, 2], [3, 3]],
+        3: [[0, 0, 0],
+            [0, 0, 1], [0, 0, 2], [0, 0, 3],
+            [0, 1, 0], [0, 2, 0], [0, 3, 0],
+            [1, 0, 0], [2, 0, 0], [3, 0, 0],
+            [1, 0, 1], [2, 0, 2], [3, 0, 3],
+            [1, 1, 1], [2, 2, 2], [3, 3, 3],
+            [1, 2, 3], [3, 2, 1]]
+    }
+
+    ansatze = []
+    for feats_per_qubit in [1, 2, 3]:
+        for reuploads in [1, 2, 3]:
+            for encoding_style in ["angle", "linear_pairwise", "parallel_pairwise"]:
+                if feats_per_qubit > 2 and encoding_style != "angle":
+                    continue
+                for feat_strategy in ["cyclic", "block"]:
+                    for i in trainable_layers[reuploads]:
+                        for entangling_uploads in ["all"]:
+                            for entangling_layers in ["all"]:
+                                for entangling_pattern in ["linear", "parallel"]:
+                                    for entangler in ["cz", "rzz"]:
+                                        for entangler_range in [1]:
+                                            ansatz_spec = build_ansatz(
+                                                feats_per_qubit=feats_per_qubit,
+                                                reuploads=reuploads,
+                                                encoding_style=encoding_style,
+                                                feature_strategy=feat_strategy,
+                                                trainable_layers=i,
+                                                entangling_uploads=entangling_uploads,
+                                                entangling_layers=entangling_layers,
+                                                entangling_pattern=entangling_pattern,
+                                                entangler=entangler,
+                                                entangler_range=entangler_range,
+                                                barriers=False,
+                                                name="vqc"
+                                            )
+                                            ansatze.append(ansatz_spec)
+
+    return ansatze
+
 # --- AnsatzSpec ---
 
 @dataclass
@@ -468,7 +680,7 @@ class AnsatzSpec:
         self.layers = copy.deepcopy(self.layers)
 
         feat_idx = 0
-        for layer in self.layers:
+        for i, layer in enumerate(self.layers):
             if layer.name not in LAYER_FUNCTIONS:
                 raise ValueError(f"Unknown layer '{layer.name}'. Available layers: {list(LAYER_FUNCTIONS.keys())}")
 
@@ -481,7 +693,7 @@ class AnsatzSpec:
                         input_dim=self.input_dim,
                         n_qubits=self.n_qubits,
                         feat_idx=feat_idx,
-                        strategy=strategy,
+                        strategy="same" if i == 0 else strategy,
                         wrap=wrap,
                     )
                 else:
@@ -719,7 +931,7 @@ class AnsatzSpec:
             weights = np.zeros(self.n_params)
 
         drawer = qml.draw_mpl(circuit, decimals=decimals)(x, weights)
-        plt.show()
+        # plt.show()
         return drawer
 
 # --- Template Loading ---
@@ -799,3 +1011,29 @@ def resolve_layer_template(
         "template must be either a template name, a list of layer dictionaries, "
         "or a dictionary containing a 'layers' field."
     )
+
+if __name__ == "__main__":
+    # Example usage
+    ansatz_spec = build_ansatz(
+        feats_per_qubit=3,
+        reuploads=3,
+        feature_strategy="cyclic",
+        trainable_layers=[2, 1, 1],
+        entangling_uploads="all",
+        entangling_layers="last",
+        entangling_pattern="parallel",
+        entangler="rzz",
+        entangler_range=1,
+        barriers=True,
+    )
+
+    print("Ansatz Name:", ansatz_spec["name"])
+
+    ansatz = AnsatzSpec.from_template(
+        template="zz_feature_map",
+        n_qubits=4,
+        input_dim=8
+    )
+    fig, ax = ansatz.draw_mpl()
+    fig.set_size_inches(18, 5)
+    plt.show()

@@ -1,0 +1,187 @@
+{
+  "identity": {
+    "dataset": "wine",
+    "source": "UCI",
+    "source_path": "/home/edwar/QML-RP/original-datasets/wine.csv",
+    "domain": "",
+    "description": "",
+    "collection_notes": "",
+    "manual_tags": [],
+    "blank_manual_metadata_fields": [
+      "domain",
+      "description",
+      "collection_notes",
+      "manual_tags"
+    ]
+  },
+  "source_structure": {
+    "source_rows": 178,
+    "source_columns": 14,
+    "usable_rows": 178,
+    "raw_feature_count": 13,
+    "processed_feature_count": 13,
+    "categorical_expansion_factor": 1.0
+  },
+  "split": {
+    "random_state": 42,
+    "test_size": 0.2,
+    "train_rows": 142,
+    "test_rows": 36,
+    "stratified": true
+  },
+  "feature_characteristics": {
+    "numeric_feature_count": 13,
+    "categorical_feature_count": 0,
+    "ordinal_feature_count": 0,
+    "binary_feature_count": 0,
+    "continuous_feature_count": 13,
+    "discrete_numeric_feature_count": 2,
+    "numeric_columns": [
+      "Alcohol",
+      "Malicacid",
+      "Ash",
+      "Alcalinity_of_ash",
+      "Magnesium",
+      "Total_phenols",
+      "Flavanoids",
+      "Nonflavanoid_phenols",
+      "Proanthocyanins",
+      "Color_intensity",
+      "Hue",
+      "0D280_0D315_of_diluted_wines",
+      "Proline"
+    ],
+    "categorical_columns": [],
+    "ordinal_columns": [],
+    "binary_columns": [],
+    "continuous_columns": [
+      "Alcohol",
+      "Malicacid",
+      "Ash",
+      "Alcalinity_of_ash",
+      "Magnesium",
+      "Total_phenols",
+      "Flavanoids",
+      "Nonflavanoid_phenols",
+      "Proanthocyanins",
+      "Color_intensity",
+      "Hue",
+      "0D280_0D315_of_diluted_wines",
+      "Proline"
+    ],
+    "discrete_numeric_columns": [
+      "Magnesium",
+      "Proline"
+    ],
+    "raw_feature_columns": [
+      "Alcohol",
+      "Malicacid",
+      "Ash",
+      "Alcalinity_of_ash",
+      "Magnesium",
+      "Total_phenols",
+      "Flavanoids",
+      "Nonflavanoid_phenols",
+      "Proanthocyanins",
+      "Color_intensity",
+      "Hue",
+      "0D280_0D315_of_diluted_wines",
+      "Proline"
+    ],
+    "processed_feature_names": [
+      "Alcohol",
+      "Malicacid",
+      "Ash",
+      "Alcalinity_of_ash",
+      "Magnesium",
+      "Total_phenols",
+      "Flavanoids",
+      "Nonflavanoid_phenols",
+      "Proanthocyanins",
+      "Color_intensity",
+      "Hue",
+      "0D280_0D315_of_diluted_wines",
+      "Proline"
+    ],
+    "raw_feature_unique_counts": {
+      "Alcohol": 126,
+      "Malicacid": 133,
+      "Ash": 79,
+      "Alcalinity_of_ash": 63,
+      "Magnesium": 53,
+      "Total_phenols": 97,
+      "Flavanoids": 132,
+      "Nonflavanoid_phenols": 39,
+      "Proanthocyanins": 101,
+      "Color_intensity": 132,
+      "Hue": 78,
+      "0D280_0D315_of_diluted_wines": 122,
+      "Proline": 121
+    }
+  },
+  "target_characteristics": {
+    "class_count": 3,
+    "target_dtype": "int64",
+    "target_mapping": {
+      "1": 0,
+      "2": 1,
+      "3": 2
+    },
+    "target_class_counts": {
+      "2": 71,
+      "1": 59,
+      "3": 48
+    },
+    "smallest_class_size": 48,
+    "largest_class_size": 71,
+    "imbalance_ratio": 1.4791666666666667,
+    "majority_class_fraction": 0.398876404494382,
+    "normalised_class_entropy": 0.9885547930265094,
+    "merged_classes": {},
+    "original_class_count": 3,
+    "processed_class_count": 3,
+    "original_class_counts": {
+      "2": 71,
+      "1": 59,
+      "3": 48
+    },
+    "processed_class_counts": {
+      "2": 71,
+      "1": 59,
+      "3": 48
+    }
+  },
+  "missing_data": {
+    "missing_target_count": 0,
+    "total_missing_feature_values": 0,
+    "rows_with_missing_feature_values": 0,
+    "missing_row_fraction": 0.0,
+    "missing_cell_fraction": 0.0,
+    "columns_with_missing_values": 0,
+    "maximum_feature_missing_fraction": 0.0,
+    "missing_values_by_column": {},
+    "missing_fraction_by_column": {}
+  },
+  "preprocessing": {
+    "numeric_imputation": "median",
+    "categorical_imputation": "most_frequent",
+    "categorical_encoding": "one_hot",
+    "one_hot_drop": "first",
+    "unknown_category_handling": "ignore",
+    "feature_scaling": "not applied during dataset processing",
+    "explicitly_dropped_columns": [],
+    "configured_but_absent_drop_columns": [],
+    "constant_columns_removed": []
+  },
+  "analysis_groups": {
+    "sample_size_group": "small",
+    "raw_feature_count_group": "medium",
+    "processed_feature_count_group": "medium",
+    "class_count_group": "low",
+    "datatype_group": "numeric",
+    "imbalance_group": "balanced"
+  },
+  "warnings": [
+    "wine: blank manual metadata fields: ['domain', 'description', 'collection_notes', 'manual_tags']"
+  ]
+}

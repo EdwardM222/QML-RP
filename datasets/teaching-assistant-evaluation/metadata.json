@@ -1,0 +1,190 @@
+{
+  "identity": {
+    "dataset": "teaching-assistant-evaluation",
+    "source": "UCI",
+    "source_path": "/home/edwar/QML-RP/original-datasets/teaching-assistant-evaluation.csv",
+    "domain": "",
+    "description": "",
+    "collection_notes": "",
+    "manual_tags": [],
+    "blank_manual_metadata_fields": [
+      "domain",
+      "description",
+      "collection_notes",
+      "manual_tags"
+    ]
+  },
+  "source_structure": {
+    "source_rows": 151,
+    "source_columns": 6,
+    "usable_rows": 151,
+    "raw_feature_count": 5,
+    "processed_feature_count": 49,
+    "categorical_expansion_factor": 9.8
+  },
+  "split": {
+    "random_state": 42,
+    "test_size": 0.2,
+    "train_rows": 120,
+    "test_rows": 31,
+    "stratified": true
+  },
+  "feature_characteristics": {
+    "numeric_feature_count": 1,
+    "categorical_feature_count": 4,
+    "ordinal_feature_count": 0,
+    "binary_feature_count": 2,
+    "continuous_feature_count": 1,
+    "discrete_numeric_feature_count": 1,
+    "numeric_columns": [
+      "class size"
+    ],
+    "categorical_columns": [
+      "native english speaking",
+      "instructor",
+      "course",
+      "semester"
+    ],
+    "ordinal_columns": [],
+    "binary_columns": [
+      "native english speaking",
+      "semester"
+    ],
+    "continuous_columns": [
+      "class size"
+    ],
+    "discrete_numeric_columns": [
+      "class size"
+    ],
+    "raw_feature_columns": [
+      "native english speaking",
+      "instructor",
+      "course",
+      "semester",
+      "class size"
+    ],
+    "processed_feature_names": [
+      "class size",
+      "native english speaking_2",
+      "instructor_2",
+      "instructor_3",
+      "instructor_4",
+      "instructor_5",
+      "instructor_6",
+      "instructor_7",
+      "instructor_8",
+      "instructor_9",
+      "instructor_10",
+      "instructor_11",
+      "instructor_12",
+      "instructor_13",
+      "instructor_14",
+      "instructor_15",
+      "instructor_16",
+      "instructor_17",
+      "instructor_18",
+      "instructor_20",
+      "instructor_21",
+      "instructor_22",
+      "instructor_23",
+      "instructor_24",
+      "instructor_25",
+      "course_2",
+      "course_3",
+      "course_5",
+      "course_6",
+      "course_7",
+      "course_8",
+      "course_9",
+      "course_11",
+      "course_12",
+      "course_13",
+      "course_14",
+      "course_15",
+      "course_16",
+      "course_17",
+      "course_18",
+      "course_19",
+      "course_20",
+      "course_21",
+      "course_22",
+      "course_23",
+      "course_24",
+      "course_25",
+      "course_26",
+      "semester_2"
+    ],
+    "raw_feature_unique_counts": {
+      "native english speaking": 2,
+      "instructor": 25,
+      "course": 26,
+      "semester": 2,
+      "class size": 46
+    }
+  },
+  "target_characteristics": {
+    "class_count": 3,
+    "target_dtype": "int64",
+    "target_mapping": {
+      "1": 0,
+      "2": 1,
+      "3": 2
+    },
+    "target_class_counts": {
+      "3": 52,
+      "2": 50,
+      "1": 49
+    },
+    "smallest_class_size": 49,
+    "largest_class_size": 52,
+    "imbalance_ratio": 1.0612244897959184,
+    "majority_class_fraction": 0.3443708609271523,
+    "normalised_class_entropy": 0.9997213915970684,
+    "merged_classes": {},
+    "original_class_count": 3,
+    "processed_class_count": 3,
+    "original_class_counts": {
+      "3": 52,
+      "2": 50,
+      "1": 49
+    },
+    "processed_class_counts": {
+      "3": 52,
+      "2": 50,
+      "1": 49
+    }
+  },
+  "missing_data": {
+    "missing_target_count": 0,
+    "total_missing_feature_values": 0,
+    "rows_with_missing_feature_values": 0,
+    "missing_row_fraction": 0.0,
+    "missing_cell_fraction": 0.0,
+    "columns_with_missing_values": 0,
+    "maximum_feature_missing_fraction": 0.0,
+    "missing_values_by_column": {},
+    "missing_fraction_by_column": {}
+  },
+  "preprocessing": {
+    "numeric_imputation": "median",
+    "categorical_imputation": "most_frequent",
+    "categorical_encoding": "one_hot",
+    "one_hot_drop": "first",
+    "unknown_category_handling": "ignore",
+    "feature_scaling": "not applied during dataset processing",
+    "explicitly_dropped_columns": [],
+    "configured_but_absent_drop_columns": [],
+    "constant_columns_removed": []
+  },
+  "analysis_groups": {
+    "sample_size_group": "small",
+    "raw_feature_count_group": "low",
+    "processed_feature_count_group": "very_high",
+    "class_count_group": "low",
+    "datatype_group": "mixed",
+    "imbalance_group": "balanced"
+  },
+  "warnings": [
+    "teaching-assistant-evaluation: blank manual metadata fields: ['domain', 'description', 'collection_notes', 'manual_tags']"
+  ]
+}

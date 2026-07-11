@@ -1,0 +1,191 @@
+{
+  "identity": {
+    "dataset": "wine-quality",
+    "source": "UCI",
+    "source_path": "/home/edwar/QML-RP/original-datasets/wine-quality.csv",
+    "domain": "",
+    "description": "",
+    "collection_notes": "",
+    "manual_tags": [],
+    "blank_manual_metadata_fields": [
+      "domain",
+      "description",
+      "collection_notes",
+      "manual_tags"
+    ]
+  },
+  "source_structure": {
+    "source_rows": 6497,
+    "source_columns": 12,
+    "usable_rows": 6497,
+    "raw_feature_count": 11,
+    "processed_feature_count": 11,
+    "categorical_expansion_factor": 1.0
+  },
+  "split": {
+    "random_state": 42,
+    "test_size": 0.2,
+    "train_rows": 5197,
+    "test_rows": 1300,
+    "stratified": true
+  },
+  "feature_characteristics": {
+    "numeric_feature_count": 11,
+    "categorical_feature_count": 0,
+    "ordinal_feature_count": 0,
+    "binary_feature_count": 0,
+    "continuous_feature_count": 11,
+    "discrete_numeric_feature_count": 0,
+    "numeric_columns": [
+      "fixed_acidity",
+      "volatile_acidity",
+      "citric_acid",
+      "residual_sugar",
+      "chlorides",
+      "free_sulfur_dioxide",
+      "total_sulfur_dioxide",
+      "density",
+      "pH",
+      "sulphates",
+      "alcohol"
+    ],
+    "categorical_columns": [],
+    "ordinal_columns": [],
+    "binary_columns": [],
+    "continuous_columns": [
+      "fixed_acidity",
+      "volatile_acidity",
+      "citric_acid",
+      "residual_sugar",
+      "chlorides",
+      "free_sulfur_dioxide",
+      "total_sulfur_dioxide",
+      "density",
+      "pH",
+      "sulphates",
+      "alcohol"
+    ],
+    "discrete_numeric_columns": [],
+    "raw_feature_columns": [
+      "fixed_acidity",
+      "volatile_acidity",
+      "citric_acid",
+      "residual_sugar",
+      "chlorides",
+      "free_sulfur_dioxide",
+      "total_sulfur_dioxide",
+      "density",
+      "pH",
+      "sulphates",
+      "alcohol"
+    ],
+    "processed_feature_names": [
+      "fixed_acidity",
+      "volatile_acidity",
+      "citric_acid",
+      "residual_sugar",
+      "chlorides",
+      "free_sulfur_dioxide",
+      "total_sulfur_dioxide",
+      "density",
+      "pH",
+      "sulphates",
+      "alcohol"
+    ],
+    "raw_feature_unique_counts": {
+      "fixed_acidity": 106,
+      "volatile_acidity": 187,
+      "citric_acid": 89,
+      "residual_sugar": 316,
+      "chlorides": 214,
+      "free_sulfur_dioxide": 135,
+      "total_sulfur_dioxide": 276,
+      "density": 998,
+      "pH": 108,
+      "sulphates": 111,
+      "alcohol": 111
+    }
+  },
+  "target_characteristics": {
+    "class_count": 7,
+    "target_dtype": "int64",
+    "target_mapping": {
+      "3": 0,
+      "4": 1,
+      "5": 2,
+      "6": 3,
+      "7": 4,
+      "8": 5,
+      "9": 6
+    },
+    "target_class_counts": {
+      "6": 2836,
+      "5": 2138,
+      "7": 1079,
+      "4": 216,
+      "8": 193,
+      "3": 30,
+      "9": 5
+    },
+    "smallest_class_size": 5,
+    "largest_class_size": 2836,
+    "imbalance_ratio": 567.2,
+    "majority_class_fraction": 0.43650915807295676,
+    "normalised_class_entropy": 0.6545677500269281,
+    "merged_classes": {},
+    "original_class_count": 7,
+    "processed_class_count": 7,
+    "original_class_counts": {
+      "6": 2836,
+      "5": 2138,
+      "7": 1079,
+      "4": 216,
+      "8": 193,
+      "3": 30,
+      "9": 5
+    },
+    "processed_class_counts": {
+      "6": 2836,
+      "5": 2138,
+      "7": 1079,
+      "4": 216,
+      "8": 193,
+      "3": 30,
+      "9": 5
+    }
+  },
+  "missing_data": {
+    "missing_target_count": 0,
+    "total_missing_feature_values": 0,
+    "rows_with_missing_feature_values": 0,
+    "missing_row_fraction": 0.0,
+    "missing_cell_fraction": 0.0,
+    "columns_with_missing_values": 0,
+    "maximum_feature_missing_fraction": 0.0,
+    "missing_values_by_column": {},
+    "missing_fraction_by_column": {}
+  },
+  "preprocessing": {
+    "numeric_imputation": "median",
+    "categorical_imputation": "most_frequent",
+    "categorical_encoding": "one_hot",
+    "one_hot_drop": "first",
+    "unknown_category_handling": "ignore",
+    "feature_scaling": "not applied during dataset processing",
+    "explicitly_dropped_columns": [],
+    "configured_but_absent_drop_columns": [],
+    "constant_columns_removed": []
+  },
+  "analysis_groups": {
+    "sample_size_group": "large",
+    "raw_feature_count_group": "medium",
+    "processed_feature_count_group": "medium",
+    "class_count_group": "medium",
+    "datatype_group": "numeric",
+    "imbalance_group": "extreme"
+  },
+  "warnings": [
+    "wine-quality: blank manual metadata fields: ['domain', 'description', 'collection_notes', 'manual_tags']",
+    "wine-quality: at least one target class has only 5 samples; cross-validation options are limited."
+  ]
+}

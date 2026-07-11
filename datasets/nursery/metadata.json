@@ -1,0 +1,170 @@
+{
+  "identity": {
+    "dataset": "nursery",
+    "source": "UCI",
+    "source_path": "/home/edwar/QML-RP/original-datasets/nursery.csv",
+    "domain": "",
+    "description": "",
+    "collection_notes": "",
+    "manual_tags": [],
+    "blank_manual_metadata_fields": [
+      "domain",
+      "description",
+      "collection_notes",
+      "manual_tags"
+    ]
+  },
+  "source_structure": {
+    "source_rows": 12960,
+    "source_columns": 9,
+    "usable_rows": 12960,
+    "raw_feature_count": 8,
+    "processed_feature_count": 19,
+    "categorical_expansion_factor": 2.375
+  },
+  "split": {
+    "random_state": 42,
+    "test_size": 0.2,
+    "train_rows": 10368,
+    "test_rows": 2592,
+    "stratified": true
+  },
+  "feature_characteristics": {
+    "numeric_feature_count": 0,
+    "categorical_feature_count": 8,
+    "ordinal_feature_count": 0,
+    "binary_feature_count": 1,
+    "continuous_feature_count": 0,
+    "discrete_numeric_feature_count": 0,
+    "numeric_columns": [],
+    "categorical_columns": [
+      "parents",
+      "has_nurs",
+      "form",
+      "children",
+      "housing",
+      "finance",
+      "social",
+      "health"
+    ],
+    "ordinal_columns": [],
+    "binary_columns": [
+      "finance"
+    ],
+    "continuous_columns": [],
+    "discrete_numeric_columns": [],
+    "raw_feature_columns": [
+      "parents",
+      "has_nurs",
+      "form",
+      "children",
+      "housing",
+      "finance",
+      "social",
+      "health"
+    ],
+    "processed_feature_names": [
+      "parents_pretentious",
+      "parents_usual",
+      "has_nurs_improper",
+      "has_nurs_less_proper",
+      "has_nurs_proper",
+      "has_nurs_very_crit",
+      "form_completed",
+      "form_foster",
+      "form_incomplete",
+      "children_2",
+      "children_3",
+      "children_more",
+      "housing_critical",
+      "housing_less_conv",
+      "finance_inconv",
+      "social_problematic",
+      "social_slightly_prob",
+      "health_priority",
+      "health_recommended"
+    ],
+    "raw_feature_unique_counts": {
+      "parents": 3,
+      "has_nurs": 5,
+      "form": 4,
+      "children": 4,
+      "housing": 3,
+      "finance": 2,
+      "social": 3,
+      "health": 3
+    }
+  },
+  "target_characteristics": {
+    "class_count": 4,
+    "target_dtype": "str",
+    "target_mapping": {
+      "not_recom": 0,
+      "priority": 1,
+      "recommend": 2,
+      "spec_prior": 3
+    },
+    "target_class_counts": {
+      "not_recom": 4320,
+      "priority": 4266,
+      "spec_prior": 4044,
+      "recommend": 330
+    },
+    "smallest_class_size": 330,
+    "largest_class_size": 4320,
+    "imbalance_ratio": 13.090909090909092,
+    "majority_class_fraction": 0.3333333333333333,
+    "normalised_class_entropy": 0.8575685799843972,
+    "merged_classes": {
+      "very_recom": "recommend"
+    },
+    "original_class_count": 5,
+    "processed_class_count": 4,
+    "original_class_counts": {
+      "not_recom": 4320,
+      "priority": 4266,
+      "spec_prior": 4044,
+      "very_recom": 328,
+      "recommend": 2
+    },
+    "processed_class_counts": {
+      "not_recom": 4320,
+      "priority": 4266,
+      "spec_prior": 4044,
+      "recommend": 330
+    }
+  },
+  "missing_data": {
+    "missing_target_count": 0,
+    "total_missing_feature_values": 0,
+    "rows_with_missing_feature_values": 0,
+    "missing_row_fraction": 0.0,
+    "missing_cell_fraction": 0.0,
+    "columns_with_missing_values": 0,
+    "maximum_feature_missing_fraction": 0.0,
+    "missing_values_by_column": {},
+    "missing_fraction_by_column": {}
+  },
+  "preprocessing": {
+    "numeric_imputation": "median",
+    "categorical_imputation": "most_frequent",
+    "categorical_encoding": "one_hot",
+    "one_hot_drop": "first",
+    "unknown_category_handling": "ignore",
+    "feature_scaling": "not applied during dataset processing",
+    "explicitly_dropped_columns": [],
+    "configured_but_absent_drop_columns": [],
+    "constant_columns_removed": []
+  },
+  "analysis_groups": {
+    "sample_size_group": "large",
+    "raw_feature_count_group": "low",
+    "processed_feature_count_group": "medium",
+    "class_count_group": "medium",
+    "datatype_group": "categorical",
+    "imbalance_group": "extreme"
+  },
+  "warnings": [
+    "nursery: blank manual metadata fields: ['domain', 'description', 'collection_notes', 'manual_tags']"
+  ]
+}
