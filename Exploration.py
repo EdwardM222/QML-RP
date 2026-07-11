@@ -309,7 +309,7 @@ if __name__ == "__main__":
 
     # jobs = jobs[:20]
     print(f"Total jobs to run: {len(jobs)}\n")
-    exit()
+    # exit()
 
     start_time = time.time()
     results = []
