@@ -162,7 +162,7 @@ class VQC(nn.Module):
             n_qubits: int = 2,
             n_classes: int = 2,
             feats: list[int] | None = None,
-            template: str = "default",
+            template: str | dict = "default",
             measurement_mode: str = "min",
             qml_device: str | qml.devices.Device = "default.qubit",
             diff_method: str = "best",
@@ -328,6 +328,12 @@ class VQC(nn.Module):
         restore_best: bool = True,
         verbosity: int = 0,
     ):
+        if self.n_params == 0:
+            if X_test is not None and y_test is not None:
+                self.val_probs = self.predict_proba(X_test)
+                self.val_report = ValReport(classification_report(y_test, self.val_probs.argmax(axis=1), zero_division=0, output_dict=True))
+            return np.array([])
+
         X_tr = torch.tensor(X, dtype=torch.float32).to(self.cuda_device)
         y_tr = torch.tensor(y, dtype=torch.long).to(self.cuda_device)
         train_loader = DataLoader(TensorDataset(X_tr, y_tr), batch_size=64, shuffle=True)

@@ -16,6 +16,7 @@ import json
 from pathlib import Path
 from datetime import datetime
 from sklearn.preprocessing import MinMaxScaler
+import hashlib
 
 DEVICE = "cpu"
 
@@ -173,15 +174,16 @@ def search(model_name, dataset_path, param_grid, fit_args=None):
     return results
 
 def make_job_id(model_name, dataset_path, model_args, fit_args=None):
-    return json.dumps(
-        json_safe({
-            "model_name": model_name,
-            "dataset": dataset_path,
-            "model_args": model_args,
-            "fit_args": fit_args or {},
+    return hashlib.md5(
+        json.dumps(
+            json_safe({
+                "model_name": model_name,
+                "dataset": dataset_path,
+                "model_args": model_args,
+                "fit_args": fit_args or {},
         }),
         sort_keys=True,
-    )
+    ).encode()).hexdigest()
 
 def create_search_jobs(model_name, dataset_path, param_grid, fit_args=None, results_path=None):
     jobs = []
@@ -199,14 +201,19 @@ def create_search_jobs(model_name, dataset_path, param_grid, fit_args=None, resu
                 except json.JSONDecodeError:
                     pass
 
+    skipped = []
     for params in ParameterGrid(param_grid):
         job_id = make_job_id(model_name, dataset_path, params, fit_args)
 
         if job_id in existing_ids:
-            print(f"Skipping existing job: {model_name} | {dataset_path} | {params}")
+            skipped.append(job_id)
             continue
 
         jobs.append((f"{model_name}", dataset_path, params, fit_args, job_id))
+
+    if len(skipped) > 0:
+        print(f"Skipped {len(skipped)} jobs for {model_name} on {dataset_path} due to existing results.")
+        print(f"Skipped job IDs: {skipped}")
 
     return jobs
 
@@ -254,7 +261,7 @@ if __name__ == "__main__":
     ids = []
     for ansatz in get_ansatze_configs():
         if ansatz["id"] not in ids:
-            ansatze.append(ansatz["layers"])
+            ansatze.append(ansatz["ansatz"])
             ids.append(ansatz["id"])
 
     jobs = []
@@ -284,7 +291,7 @@ if __name__ == "__main__":
             # "n_qubits": [16],
             "measurement_mode": ["min"],
             "ansatz": ansatze,
-            "feature_density": [0.25, 0.5, 0.75, 1.0],
+            "feature_density": [0.25, 0.5, 0.75, 1.0, 2, 4, 6, 8],
             "feature_range": [(0, np.pi), (-np.pi, np.pi)],
         }, results_path=results_path))
 
@@ -300,9 +307,9 @@ if __name__ == "__main__":
         #     'templates': ["1"]
         # }, results_path=results_path))
 
-    jobs = jobs[:20]
+    # jobs = jobs[:20]
     print(f"Total jobs to run: {len(jobs)}\n")
-    # exit()
+    exit()
 
     start_time = time.time()
     results = []

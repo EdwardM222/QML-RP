@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 from dataclasses import dataclass
 from pathlib import Path
@@ -600,11 +601,12 @@ def build_ansatz(
         )
 
     string_layers = json.dumps(layers, separators=(',', ':'))
-    id = hash(string_layers)
+    id = hashlib.md5(string_layers.encode()).hexdigest()
 
     return {
-        "name": name,
-        "layers": layers,
+        "ansatz": {
+            "name": layers
+        },
         "id": id
     }
 
