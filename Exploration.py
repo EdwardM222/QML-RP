@@ -64,7 +64,7 @@ def train_model(name, dataset, model_args, fit_args=None, job_id=None):
     if fit_args is None:
         fit_args = {}
 
-    print(f"Training {name}...")
+    # print(f"Training {name}...")
 
     X_train = pd.read_csv(f"{dataset}/train.csv")
     y_train = X_train['target']
@@ -118,7 +118,10 @@ def train_model(name, dataset, model_args, fit_args=None, job_id=None):
     if name.startswith("VQC"):
         report = model.val_report
         model_args["ansatz"] = next(iter(model_args["ansatz"].keys()))
+        # for key, val in model_args["config"].items():
+        #     model_args[key] = val
         model_args["feature_range"] = feature_range
+        # print(model_args) # New updaed fixed model args
     else:
         preds = model.predict(X_test)
         report = classification_report(
@@ -148,7 +151,7 @@ def train_model(name, dataset, model_args, fit_args=None, job_id=None):
         "model": model_results,
     }
 
-    print(f"Finished {name}.")
+    # print(f"Finished {name}.")
 
     return result
 
@@ -201,7 +204,7 @@ def create_search_jobs(model_name, dataset_path, param_grid, fit_args=None, resu
 
     if len(skipped) > 0:
         print(f"Skipped {len(skipped)} jobs for {model_name} on {dataset_path} due to existing results.")
-        print(f"Skipped job IDs: {skipped}")
+        # print(f"Skipped job IDs: {skipped}")
 
     return jobs
 
@@ -295,7 +298,7 @@ if __name__ == "__main__":
         #     'templates': ["1"]
         # }, results_path=results_path))
 
-    jobs = jobs[:10]
+    # jobs = jobs[:5]
     print(f"Total jobs to run: {len(jobs)}\n")
     # exit()
 

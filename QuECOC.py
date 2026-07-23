@@ -783,8 +783,7 @@ class QuantumECOC:
             },
 
             "base_learners": [
-                clf.results_dict()
-                for clf in self.classifiers
+                clf.results_dict() for clf in self.classifiers
             ],
         })
 

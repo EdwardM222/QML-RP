@@ -607,6 +607,18 @@ def build_ansatz(
         "ansatz": {
             name: layers
         },
+        "config": {
+            "feats_per_qubit": feats_per_qubit,
+            "reuploads": reuploads,
+            "encoding_style": encoding_style,
+            "feature_strategy": feature_strategy,
+            "trainable_layers": trainable_layers,
+            # "entangling_uploads": entangling_uploads,
+            # "entangling_layers": entangling_layers,
+            "entangling_pattern": entangling_pattern,
+            "entangler": entangler,
+            # "entangler_range": entangler_range,
+        },
         "id": id
     }
 
@@ -661,8 +673,7 @@ def get_ansatze_configs() -> list:
                                                 entangling_pattern=entangling_pattern,
                                                 entangler=entangler,
                                                 entangler_range=entangler_range,
-                                                barriers=False,
-                                                name="vqc"
+                                                barriers=False
                                             )
                                             ansatze.append(ansatz_spec)
 
