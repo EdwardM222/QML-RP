@@ -5,6 +5,7 @@ from pathlib import Path
 import pandas as pd
 
 from VQCResults import (
+    aggregate_ansatze,
     aggregate_results,
     extract_runs,
     rank_results,
@@ -17,6 +18,8 @@ OUTPUT_DIR = Path("results/analysis")
 RUNS_PATH = OUTPUT_DIR / "vqc_runs.parquet"
 RESULTS_PATH = OUTPUT_DIR / "vqc_results.parquet"
 RANKINGS_PATH = OUTPUT_DIR / "vqc_rankings.parquet"
+ANSATZ_RESULTS_PATH = OUTPUT_DIR / "vqc_ansatz_results.parquet"
+ANSATZ_DATASET_RESULTS_PATH = OUTPUT_DIR / "vqc_ansatz_dataset_results.parquet"
 
 DASHBOARD_PATH = Path("VQCDashboard.py")
 
@@ -34,6 +37,8 @@ def run_vqc_analysis(
     runs_path,
     results_path,
     rankings_path,
+    ansatz_results_path,
+    ansatz_dataset_results_path,
     dashboard_path=None,
     file_prefix="VQCS",
     reload_jsonl=False,
@@ -82,6 +87,12 @@ def run_vqc_analysis(
         output_path=rankings_path,
     )
 
+    ansatz_results, ansatz_dataset_results = aggregate_ansatze(
+        results,
+        overall_output_path=ansatz_results_path,
+        dataset_output_path=ansatz_dataset_results_path,
+    )
+
     print("\nTop 20 configurations:")
     print(
         rankings[
@@ -124,9 +135,13 @@ def run_vqc_analysis(
             str(rankings_path),
             "--runs-path",
             str(runs_path),
+            "--ansatz-results-path",
+            str(ansatz_results_path),
+            "--ansatz-dataset-results-path",
+            str(ansatz_dataset_results_path),
         ])
 
-    return runs, results, rankings
+    return runs, results, rankings, ansatz_results, ansatz_dataset_results
 
 
 if __name__ == "__main__":
@@ -135,6 +150,8 @@ if __name__ == "__main__":
         runs_path=RUNS_PATH,
         results_path=RESULTS_PATH,
         rankings_path=RANKINGS_PATH,
+        ansatz_results_path=ANSATZ_RESULTS_PATH,
+        ansatz_dataset_results_path=ANSATZ_DATASET_RESULTS_PATH,
         dashboard_path=DASHBOARD_PATH,
         file_prefix=FILE_PREFIX,
         reload_jsonl=RELOAD_JSONL,

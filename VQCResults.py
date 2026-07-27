@@ -425,3 +425,138 @@ def rank_results(results, output_path=None):
         )
 
     return rankings
+
+def aggregate_ansatze(results, overall_output_path=None, dataset_output_path=None):
+    ansatz_columns = [
+        "ansatz",
+        "feats_per_qubit",
+        "reuploads",
+        "encoding_style",
+        "feature_strategy",
+        "trainable_layers",
+        "n_trainable_layers",
+        "entangling_pattern",
+        "entangler",
+    ]
+
+    ansatz_dataset_results = results.groupby(
+        ["dataset"] + ansatz_columns,
+        observed=True,
+        dropna=False,
+    ).agg(
+        configurations=("run_id", "size"),
+        qubit_counts=("n_qubits", "nunique"),
+        feature_densities=("feature_density", "nunique"),
+        feature_ranges=("feature_range", "nunique"),
+
+        average_percentile=("rank_percentile", "mean"),
+        median_percentile=("rank_percentile", "median"),
+        percentile_std=("rank_percentile", "std"),
+        minimum_percentile=("rank_percentile", "min"),
+        maximum_percentile=("rank_percentile", "max"),
+
+        macro_f1_mean=("macro_f1_mean", "mean"),
+        macro_f1_std=("macro_f1_mean", "std"),
+        repeat_std_mean=("macro_f1_std", "mean"),
+        accuracy_mean=("accuracy_mean", "mean"),
+        weighted_f1_mean=("weighted_f1_mean", "mean"),
+        training_time_mean=("training_time_mean", "mean"),
+
+        n_qubits_mean=("n_qubits", "mean"),
+        n_params_mean=("n_params", "mean"),
+        n_params_min=("n_params", "min"),
+        n_params_max=("n_params", "max"),
+    ).reset_index()
+
+    ansatz_dataset_results["ansatz_rank"] = (
+        ansatz_dataset_results
+        .groupby("dataset", observed=True)["average_percentile"]
+        .rank(method="min", ascending=False)
+        .astype("Int32")
+    )
+
+    ansatz_dataset_results["dataset_ansatze"] = (
+        ansatz_dataset_results
+        .groupby("dataset", observed=True)["ansatz"]
+        .transform("size")
+        .astype("Int32")
+    )
+
+    ansatz_dataset_results["ansatz_rank_percentile"] = (
+        1
+        - (
+            (ansatz_dataset_results["ansatz_rank"] - 1)
+            / (ansatz_dataset_results["dataset_ansatze"] - 1)
+        )
+    ).astype("float32")
+
+    ansatz_results = ansatz_dataset_results.groupby(
+        ansatz_columns,
+        observed=True,
+        dropna=False,
+    ).agg(
+        datasets=("dataset", "nunique"),
+        configurations=("configurations", "sum"),
+
+        average_rank=("ansatz_rank", "mean"),
+        median_rank=("ansatz_rank", "median"),
+        best_rank=("ansatz_rank", "min"),
+        worst_rank=("ansatz_rank", "max"),
+
+        average_percentile=("ansatz_rank_percentile", "mean"),
+        minimum_percentile=("ansatz_rank_percentile", "min"),
+        maximum_percentile=("ansatz_rank_percentile", "max"),
+
+        configuration_percentile_mean=("average_percentile", "mean"),
+        configuration_percentile_std=("average_percentile", "std"),
+        macro_f1_mean=("macro_f1_mean", "mean"),
+        macro_f1_dataset_std=("macro_f1_mean", "std"),
+        macro_f1_repeat_std=("repeat_std_mean", "mean"),
+        accuracy_mean=("accuracy_mean", "mean"),
+        weighted_f1_mean=("weighted_f1_mean", "mean"),
+        training_time_mean=("training_time_mean", "mean"),
+
+        n_qubits_mean=("n_qubits_mean", "mean"),
+        n_params_mean=("n_params_mean", "mean"),
+        n_params_min=("n_params_min", "min"),
+        n_params_max=("n_params_max", "max"),
+    ).reset_index()
+
+    ansatz_results = ansatz_results.sort_values(
+        ["average_rank", "average_percentile", "macro_f1_repeat_std"],
+        ascending=[True, False, True],
+    ).reset_index(drop=True)
+
+    ansatz_results.insert(
+        0,
+        "overall_rank",
+        np.arange(1, len(ansatz_results) + 1, dtype=np.int32),
+    )
+
+    if dataset_output_path is not None:
+        dataset_output_path = Path(dataset_output_path)
+        dataset_output_path.parent.mkdir(parents=True, exist_ok=True)
+        ansatz_dataset_results.to_parquet(
+            dataset_output_path,
+            compression="zstd",
+            index=False,
+        )
+        print(
+            f"Saved {len(ansatz_dataset_results):,} dataset ansatz results "
+            f"to {dataset_output_path}"
+        )
+
+    if overall_output_path is not None:
+        overall_output_path = Path(overall_output_path)
+        overall_output_path.parent.mkdir(parents=True, exist_ok=True)
+        ansatz_results.to_parquet(
+            overall_output_path,
+            compression="zstd",
+            index=False,
+        )
+        print(
+            f"Saved {len(ansatz_results):,} overall ansatz results "
+            f"to {overall_output_path}"
+        )
+
+    return ansatz_results, ansatz_dataset_results

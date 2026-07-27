@@ -248,6 +248,21 @@ if __name__ == "__main__":
         "letter",
     ]
 
+    train_layers = [
+        [1, 3],
+        [2, 2],
+        [3, 1],
+        [2, 3],
+        [3, 2],
+        [3, 3],
+        [2, 0, 2],
+        [3, 0, 3],
+        [1, 2, 3],
+        [2, 2, 2],
+        [3, 2, 1],
+        [3, 3, 3],
+    ]
+
     ansatze = []
     ids = []
     for ansatz in get_ansatze_configs():
@@ -300,7 +315,7 @@ if __name__ == "__main__":
 
     # jobs = jobs[:5]
     print(f"Total jobs to run: {len(jobs)}\n")
-    # exit()
+    exit()
 
     start_time = time.time()
     results = 0

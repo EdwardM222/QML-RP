@@ -590,14 +590,13 @@ def build_ansatz(
         trainable_gate_label = "".join(trainable_gates)
 
         name = (
-            f"f{feats_per_qubit}"
+            f"{feature_strategy[0]}-{encoding_style[0]}-{encoding_label}"
+            f"_f{feats_per_qubit}"
             f"_r{reuploads}"
             f"_t{trainable_label}"
             f"_e{entangling_label}"
-            f"_{entangling_pattern[0]}{entangler}{entangler_range}"
-            # f"_enc{encoding_label}"
+            f"_{entangling_pattern[0]}-{entangler}-{entangler_range}"
             # f"_tr{trainable_gate_label}"
-            f"_{feature_strategy}"
         )
 
     string_layers = json.dumps(layers, separators=(',', ':'))
@@ -653,8 +652,8 @@ def get_ansatze_configs() -> list:
     for feats_per_qubit in [1, 2, 3]:
         for reuploads in [1, 2, 3]:
             for encoding_style in ["angle", "linear_pairwise", "parallel_pairwise"]:
-                if feats_per_qubit > 2 and encoding_style != "angle":
-                    continue
+                # if feats_per_qubit > 2 and encoding_style != "angle":
+                #     continue
                 for feat_strategy in ["cyclic", "block"]:
                     for i in trainable_layers[reuploads]:
                         for entangling_uploads in ["all"]:
