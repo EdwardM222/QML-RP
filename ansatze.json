@@ -319,7 +319,7 @@
         ["rotation_layer", { "gate": "rz" }],
         ["linear_ring", { "gate": "cz", "distance": 1 }]
     ],
-        "hea_rxrz_cz": [
+    "hea_rxrz_cz": [
         ["angle_encoding", { "gate": "rx", "feature_strategy": "same" }],
         ["rotation_layer", { "gate": "rx" }],
         ["rotation_layer", { "gate": "rz" }],
@@ -329,7 +329,7 @@
         ["rotation_layer", { "gate": "rz" }],
         ["linear_ring", { "gate": "cz", "range": 1 }]
     ],
-        "hea_rxrz_rzz": [
+    "hea_rxrz_rzz": [
         ["angle_encoding", { "gate": "rx", "feature_strategy": "same" }],
         ["rotation_layer", { "gate": "rx" }],
         ["rotation_layer", { "gate": "rz" }],
@@ -339,7 +339,7 @@
         ["rotation_layer", { "gate": "rz" }],
         ["linear_ring", { "gate": "rzz", "range": 1 }]
     ],
-        "shallow_rxrz_cz": [
+    "shallow_rxrz_cz": [
         ["angle_encoding", { "gate": "rx", "feature_strategy": "same" }],
         ["angle_encoding", { "gate": "rz", "feature_strategy": "same" }],
         ["rotation_layer", { "gate": "rx" }],
