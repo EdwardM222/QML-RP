@@ -129,7 +129,7 @@ def get_parallel_ring_edges(n_qubits: int, distance: int = 1) -> list[tuple[int,
         sublayer = [(i, (i + distance) % n_qubits) for i in range(i, n_qubits, distance + 1)]
         edges.extend(unique_edges(sublayer))
 
-    return edges
+    return unique_edges(edges)
 
 # --- Feature-Index Helpers ---
 
@@ -546,9 +546,8 @@ def build_ansatz(
         # Encoding block
         if encoding_style != "none":
             for feat_idx in range(feats_per_qubit):
+                gate = encoding_gates[feat_idx % len(encoding_gates)]
                 if encoding_style == "angle":
-                    gate = encoding_gates[feat_idx % len(encoding_gates)]
-
                     layers.append([
                         "angle_encoding",
                         {
@@ -557,9 +556,21 @@ def build_ansatz(
                         },
                     ])
                 elif encoding_style == "linear_pairwise":
-                    layers.append(["linear_pairwise_encoding"])
+                    layers.append([
+                        "linear_pairwise_encoding",
+                        {
+                            "gate": gate,
+                            "feature_strategy": feature_strategy,
+                        },
+                        ])
                 elif encoding_style == "parallel_pairwise":
-                    layers.append(["parallel_pairwise_encoding"])
+                    layers.append([
+                        "parallel_pairwise_encoding",
+                        {
+                            "gate": gate,
+                            "feature_strategy": feature_strategy,
+                        },
+                    ])
 
         # Trainable layers after this upload
         n_trainable = trainable_layers[upload_idx]
@@ -1031,26 +1042,28 @@ def resolve_layer_template(
 
 if __name__ == "__main__":
     # Example usage
-    ansatz_spec = build_ansatz(
-        feats_per_qubit=3,
-        reuploads=3,
-        feature_strategy="cyclic",
-        trainable_layers=[2, 1, 1],
-        entangling_uploads="all",
-        entangling_layers="last",
-        entangling_pattern="parallel",
-        entangler="rzz",
-        entangler_range=1,
-        barriers=True,
-    )
+    print(get_parallel_ring_edges(2))
 
-    print("Ansatz Name:", ansatz_spec["name"])
+    # ansatz_spec = build_ansatz(
+    #     feats_per_qubit=3,
+    #     reuploads=3,
+    #     feature_strategy="cyclic",
+    #     trainable_layers=[2, 1, 1],
+    #     entangling_uploads="all",
+    #     entangling_layers="last",
+    #     entangling_pattern="parallel",
+    #     entangler="rzz",
+    #     entangler_range=1,
+    #     barriers=True,
+    # )
 
-    ansatz = AnsatzSpec.from_template(
-        template="zz_feature_map",
-        n_qubits=4,
-        input_dim=8
-    )
-    fig, ax = ansatz.draw_mpl()
-    fig.set_size_inches(18, 5)
-    plt.show()
+    # print("Ansatz Name:", ansatz_spec["name"])
+
+    # ansatz = AnsatzSpec.from_template(
+    #     template="zz_feature_map",
+    #     n_qubits=4,
+    #     input_dim=8
+    # )
+    # fig, ax = ansatz.draw_mpl()
+    # fig.set_size_inches(18, 5)
+    # plt.show()

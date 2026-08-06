@@ -306,6 +306,9 @@ class VQC(nn.Module):
         for i in range(self.n_classes):
             p = meas[:, i*states_per_class:(i+1)*states_per_class].sum(dim=1)
             probs[:, i] = p
+
+        probs = probs / probs.sum(dim=1, keepdim=True)
+
         return probs
 
     def fit(
