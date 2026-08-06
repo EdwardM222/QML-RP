@@ -151,7 +151,7 @@ def feature_indices(
     if strategy == "same":
         start = feat_idx
     elif strategy == "cyclic":
-        start = feat_idx + 1
+        start = feat_idx + (n_qubits // 2)
     elif strategy == "block":
         start = feat_idx + n_qubits
     else:
@@ -476,8 +476,12 @@ def build_ansatz(
     name: str | None = None,
 ) -> dict:
 
-    if feats_per_qubit < 1:
-        raise ValueError("feats_per_qubit must be at least 1.")
+    if encoding_style != "none":
+        if feats_per_qubit < 1:
+            raise ValueError("feats_per_qubit must be at least 1.")
+
+        if len(encoding_gates) == 0:
+            raise ValueError("encoding_gates must contain at least one gate.")
 
     if reuploads < 1:
         raise ValueError("reuploads must be at least 1.")
@@ -490,9 +494,6 @@ def build_ansatz(
 
     if any(n < 0 for n in trainable_layers):
         raise ValueError("trainable_layers cannot contain negative values.")
-
-    if len(encoding_gates) == 0:
-        raise ValueError("encoding_gates must contain at least one gate.")
 
     if len(trainable_gates) == 0:
         raise ValueError("trainable_gates must contain at least one gate.")
@@ -523,9 +524,9 @@ def build_ansatz(
         if "first" in upload_pattern or "ends" in upload_pattern:
             entangle = upload_idx == 0
         if "mid" in upload_pattern:
-            entangle = upload_idx == n_trainable // 2
+            entangle = upload_idx == reuploads // 2
         if "last" in upload_pattern or "ends" in upload_pattern:
-            entangle = upload_idx == n_trainable - 1
+            entangle = upload_idx == reuploads - 1
 
         if entangle:
             if "none" in layer_pattern:
@@ -543,21 +544,22 @@ def build_ansatz(
 
     for upload_idx in range(reuploads):
         # Encoding block
-        for feat_idx in range(feats_per_qubit):
-            if encoding_style == "angle":
-                gate = encoding_gates[feat_idx % len(encoding_gates)]
+        if encoding_style != "none":
+            for feat_idx in range(feats_per_qubit):
+                if encoding_style == "angle":
+                    gate = encoding_gates[feat_idx % len(encoding_gates)]
 
-                layers.append([
-                    "angle_encoding",
-                    {
-                        "gate": gate,
-                        "feature_strategy": feature_strategy,
-                    },
-                ])
-            elif encoding_style == "linear_pairwise":
-                layers.append(["linear_pairwise_encoding"])
-            elif encoding_style == "parallel_pairwise":
-                layers.append(["parallel_pairwise_encoding"])
+                    layers.append([
+                        "angle_encoding",
+                        {
+                            "gate": gate,
+                            "feature_strategy": feature_strategy,
+                        },
+                    ])
+                elif encoding_style == "linear_pairwise":
+                    layers.append(["linear_pairwise_encoding"])
+                elif encoding_style == "parallel_pairwise":
+                    layers.append(["parallel_pairwise_encoding"])
 
         # Trainable layers after this upload
         n_trainable = trainable_layers[upload_idx]
@@ -586,12 +588,16 @@ def build_ansatz(
     if name is None:
         trainable_label = "-".join(str(i) for i in trainable_layers)
         entangling_label = entangling_uploads + "-" + entangling_layers
-        encoding_label = "".join(encoding_gates)
+        if encoding_style == "none":
+            encoding_label = "none"
+        else:
+            encoding_label = (
+                f"{feature_strategy[0]}-{encoding_style[0]}-{''.join(encoding_gates)}_f{feats_per_qubit}"
+            )
         trainable_gate_label = "".join(trainable_gates)
 
         name = (
-            f"{feature_strategy[0]}-{encoding_style[0]}-{encoding_label}"
-            f"_f{feats_per_qubit}"
+            f"{encoding_label}"
             f"_r{reuploads}"
             f"_t{trainable_label}"
             f"_e{entangling_label}"

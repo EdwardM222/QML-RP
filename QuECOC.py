@@ -115,9 +115,6 @@ def resolve_vqc_template(template: str | dict, template_path: str | Path = "vqcs
     else:
         raise TypeError("VQC template must be either a template name or a config dictionary.")
 
-    if config["measurement_mode"] not in {"min", "full"}:
-        raise ValueError(f"Unknown measurement_mode '{config['measurement_mode']}'. Supported values are 'min' and 'full'.")
-
     return {
         "n_qubits": config.get("n_qubits", 2),
         "ansatz": config.get("ansatz", "default"),
@@ -246,6 +243,7 @@ class VQC(nn.Module):
             self.circuit = self.kwargs.get("circuit", None)
             self.weight_shapes = self.kwargs.get("weight_shapes", None)
             self.n_features = self.kwargs.get("n_features", None)
+            self.n_params = self.kwargs.get("n_params", None)
             return
         elif self.template == "custom":
             self.ansatz = self.kwargs.get("ansatz", None)
@@ -544,7 +542,7 @@ class QuantumECOC:
     def __init__(
         self,
         n_learners: int | None = None,
-        templates: str | list[str] = "default",
+        templates: str | list = "default",
         ecoc_depth: int = 2,
         scaler_range: tuple[float, float] = (0, np.pi),
         device: str = "default.qubit",
@@ -608,6 +606,8 @@ class QuantumECOC:
                     random_state=2+i
                 ).to(self.cuda_device)
             )
+
+        self.templates = [next(iter(template["ansatz"].keys())) for template in self.templates] if isinstance(self.templates[0], dict) else self.templates
 
     def reset_ensemble(self):
         for clf in self.classifiers:
@@ -782,9 +782,10 @@ class QuantumECOC:
                 "mean_best_val_loss": np.mean([min(clf.val_losses) for clf in self.classifiers if hasattr(clf, "val_losses") and len(clf.val_losses) > 0]) if hasattr(self, "classifiers") else None,
             },
 
-            "base_learners": [
-                clf.results_dict() for clf in self.classifiers
-            ],
+            "base_learners": {
+                "macro-f1s": [clf.weight for clf in self.classifiers],
+                # "full_config": [clf.get_results() for clf in self.classifiers]
+            } if hasattr(self, "classifiers") else None,
         })
 
 @typechecked
@@ -796,7 +797,7 @@ class StackedECOC(QuantumECOC):
         self,
         meta_learner = None,
         n_learners: int | None = None,
-        templates: str | list[str] = "default",
+        templates: str | list = "default",
         ecoc_depth: int = 2,
         device: str = "default.qubit",
         diff_method: str = "best",
@@ -983,7 +984,7 @@ class CoherentECOC(QuantumECOC):
         meta_design: str = "main",
         meta_measurement: str = "min",
         n_learners: int | None = None,
-        templates: str | list[str] = "default",
+        templates: str | list = "default",
         ecoc_depth: int = 2,
         meta_device: str = "default.qubit",
         meta_diff_method: str = "best",
@@ -1103,7 +1104,8 @@ class CoherentECOC(QuantumECOC):
                 qlayer=coherent_layer,
                 circuit=coherent_circuit,
                 weight_shapes=weight_shapes,
-                n_features=len(self.features)
+                n_features=len(self.features),
+                n_params=self.n_params
             ).to(self.cuda_device)
 
     def fit(

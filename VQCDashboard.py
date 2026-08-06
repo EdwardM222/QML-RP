@@ -1098,7 +1098,11 @@ elif page == "Comparison":
         ascending=lower_is_better,
     )
 
-    colour_options = ["None"] + categorical_columns
+    colour_options = ["None"] + categorical_columns + [
+        column
+        for column in numeric_columns
+        if column not in categorical_columns
+    ]
     facet_options = ["None"] + categorical_columns
 
     colour_column = st.sidebar.selectbox(
