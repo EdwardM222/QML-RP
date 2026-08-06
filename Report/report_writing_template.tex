@@ -1,0 +1,1550 @@
+\documentclass[]{UCD_CS_MSc_AAI_Report}
+
+% -----------------------------------------------------------------------------
+% Packages
+% -----------------------------------------------------------------------------
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{braket}
+\usepackage{subcaption}
+\usepackage{rotating}
+
+\usepackage[backend=biber]{biblatex}
+\addbibresource{references.bib}
+
+% -----------------------------------------------------------------------------
+% Draft research-note commands
+% Remove the coloured notes and planning lists before final submission.
+% -----------------------------------------------------------------------------
+\newcommand{\motive}[1]{{\color{blue!70!cyan}#1}}
+\newcommand{\challenge}[1]{{\color{red}#1}}
+\newcommand{\limitation}[1]{{\color{orange}#1}}
+\newcommand{\method}[1]{{\color{cyan!80!black}#1}}
+\newcommand{\result}[1]{{\color{green!60!black}#1}}
+\newcommand{\benchmark}[1]{{\color{violet}#1}}
+\newcommand{\comparison}[1]{{\color{pink!70!violet}#1}}
+\newcommand{\theory}[1]{{\color{gray}#1}}
+\newcommand{\tooling}[1]{{\color{brown}#1}}
+\newcommand{\gap}[1]{{\color{black}#1}}
+\newcommand{\validation}[1]{{\color{yellow!60!olive}#1}}
+
+\newcommand{\sectionbrief}{\paragraph{Key points to cover.}}
+\newcommand{\researchnotes}{\paragraph{Research notes and evidence.}}
+\newcommand{\resultplaceholder}{\paragraph{Results to insert.}}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+}
+
+\lstset{
+    mathescape=true,
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    numbers=left,
+    numberstyle=\tiny,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    language=Python
+}
+
+% -----------------------------------------------------------------------------
+% Project details
+% -----------------------------------------------------------------------------
+\def\studentname{Edward Mallia}
+\def\studentid{25233259}
+\def\projecttitle{Quantum Ensemble Stacking with State Preservation}
+\def\supervisorname{Dr Simon Caton}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+\newpage
+
+% =============================================================================
+% ABSTRACT
+% =============================================================================
+\abstract
+
+% Write the abstract last. Cover each point in one or two sentences.
+\begin{itemize}
+    \item Context: practical limitations of large variational quantum classifiers and the motivation for ensembles of small circuits.
+    \item Problem: conventional stacking measures each quantum base learner before aggregation, potentially creating an information bottleneck.
+    \item Aim: design and evaluate a progression from measured ensemble aggregation to classical stacking, quantum re-encoding and measurement-free coherent stacking.
+    \item Method: configurable VQC base learners, ECOC decomposition, systematic VQC architecture selection, controlled aggregation comparisons and multiclass tabular datasets.
+    \item Evaluation: accuracy, macro-F1, class-level behaviour, convergence, training time and circuit-resource requirements.
+    \item Principal findings: insert only after the final experiments and analysis are complete.
+    \item Final conclusion: state whether coherent stacking was feasible, beneficial and practically justified relative to measured baselines.
+\end{itemize}
+
+% Optional front matter to add when needed:
+% \chapter*{List of Abbreviations}
+% QML, VQC, QNN, NISQ, ECOC, OOF, SVC, CZ, RZZ, etc.
+
+% =============================================================================
+% CHAPTER 1: INTRODUCTION
+% =============================================================================
+\chapter{Introduction}
+\label{chap:introduction}
+
+\section{Background and Motivation}
+\label{sec:intro-background}
+
+\sectionbrief
+\begin{itemize}
+    \item Introduce QML and variational quantum models as a near-term approach to supervised learning.
+    \item Explain the practical restrictions of current quantum models: qubit limits, circuit depth, noise, expensive simulation and difficult optimisation.
+    \item Motivate ensembles of several small VQCs as an alternative to one large monolithic circuit.
+    \item Introduce stacking as a learned aggregation mechanism rather than fixed voting or averaging.
+    \item Establish the specifically quantum issue: intermediate measurement converts a quantum state into classical outputs before the meta-learner can act on it.
+    \item Motivate the central investigation without assuming that unmeasured states necessarily improve classification.
+    \item End by narrowing the discussion from general QML to measurement-free quantum stacking.
+\end{itemize}
+
+\researchnotes
+\begin{itemize}
+    \motive{\item Ensemble methods combine complementary information from multiple learners and can improve accuracy, stability and generalisation on complex, noisy, imbalanced or high-dimensional data~\cite{dong_survey_2020}.}
+    \motive{\item Stacking learns a second-level combiner from base-model predictions, making it a suitable framework for comparing classical and quantum aggregation mechanisms~\cite{demir_modified_2018}.}
+    \motive{\item Quantum ensembles can retain the contributions of multiple classifiers rather than selecting one final model, motivating ensembles of simple quantum learners~\cite{schuld_quantum_2018}.}
+    \motive{\item Small or shallow quantum learners have been proposed as a modular response to NISQ-era limits in circuit depth, trainability and noise~\cite{friedrich_quantum_2025,park_addressing_2025,incudini_resource_2023}.}
+    \motive{\item Classical ensembles of small quantum classifiers have improved measured performance in several simulated and hardware-oriented studies, supporting ensemble construction as a relevant QML direction~\cite{song_quantum_2024,mcfarthing_classical_2024,tolotti_ensembles_2024}.}
+    \challenge{\item QML remains limited by data loading, output extraction, benchmarking, noise and trainability, so the dissertation should avoid broad or unsupported quantum-advantage claims~\cite{biamonte_quantum_2017,du_quantum_2025}.}
+\end{itemize}
+
+\section{Problem Statement}
+\label{sec:intro-problem}
+
+\sectionbrief
+\begin{itemize}
+    \item Define conventional measured quantum stacking: independently measure each VQC, concatenate its classical outputs and train a meta-learner.
+    \item Explain that a quantum meta-learner operating on re-encoded probabilities remains downstream of the same measurement boundary.
+    \item Define the proposed alternative: preserve each trained base circuit as an unmeasured subcircuit and append a trainable meta-circuit before final measurement.
+    \item State the uncertainty being tested: whether the preserved state contains exploitable information that is useful for classification.
+    \item Identify the competing practical cost: wider and deeper circuits, more two-qubit gates, harder optimisation and increased simulation or hardware demands.
+    \item Frame the dissertation as a controlled empirical comparison rather than a proof that measurement necessarily harms ensemble performance.
+\end{itemize}
+
+\researchnotes
+\begin{itemize}
+    \theory{\item An $n$-qubit state is described by $2^n$ amplitudes, while measurement yields classical outcomes and does not directly reveal the full state description~\cite{resch_quantum_2019}.}
+    \theory{\item Entanglement stores information in relationships between qubits, motivating investigation of whether cross-register operations can exploit relationships unavailable after independent base measurements~\cite{resch_quantum_2019}.}
+    \challenge{\item Quantum states are fragile and cannot be freely copied or persistently stored, making quantum intermediate representations fundamentally different from saved classical stacking features~\cite{resch_quantum_2019}.}
+    \challenge{\item Increased circuit size and global entanglement can worsen optimisation, noise exposure and barren-plateau behaviour~\cite{du_quantum_2025,cerezo_challenges_2022}.}
+    \gap{\item Existing work does not provide a direct controlled comparison of classical measured stacking, quantum re-encoding and a coherent meta-circuit applied to trained VQC base states.}
+\end{itemize}
+
+\section{Aim}
+\label{sec:intro-aim}
+
+\sectionbrief
+\begin{itemize}
+    \item State one overall aim: to design, implement and evaluate a quantum ensemble architecture whose aggregation stage progresses from measured methods to a fully quantum, measurement-free stacking condition.
+    \item Emphasise that the base VQCs and ECOC decomposition provide a controlled foundation; the primary research focus is the stacking boundary and meta-level aggregation.
+\end{itemize}
+
+\section{Research Objectives}
+\label{sec:intro-objectives}
+
+\begin{enumerate}
+    \item Develop configurable and trainable VQC base learners for small multiclass tabular datasets.
+    \item Investigate VQC architecture choices and select a compact set of feasible base-learner designs.
+    \item Construct a controlled ECOC ensemble of simple quantum learners.
+    \item Establish direct measured ECOC aggregation as the basic quantum ensemble baseline.
+    \item Implement classical measured stacking using stratified out-of-fold meta-training.
+    \item Implement a quantum meta-learner operating on re-encoded measured base outputs.
+    \item Develop a coherent architecture that removes intermediate measurements and appends a trainable quantum meta-circuit to frozen base circuits.
+    \item Compare predictive performance, optimisation behaviour, computational cost and circuit-resource requirements across aggregation conditions.
+    \item Analyse which dataset and ensemble characteristics are associated with any observed stacking benefit.
+\end{enumerate}
+
+\section{Research Questions}
+\label{sec:intro-rqs}
+
+\begin{enumerate}
+    \item Can an ensemble of small VQC base learners provide a viable foundation for multiclass quantum classification?
+    \item How does classical stacking of measured VQC outputs compare with direct measured ECOC aggregation?
+    \item Does a quantum meta-learner trained on re-encoded measured outputs provide an advantage over a classical meta-learner?
+    \item Can trained VQC base learners be composed into a trainable measurement-free quantum stacking circuit?
+    \item Does preserving the base learners' quantum states improve classification performance, macro-F1, robustness or convergence relative to measured stacking?
+    \item What additional computational and quantum-resource costs are introduced by measurement-free stacking?
+    \item For which dataset or ensemble characteristics, if any, is coherent quantum stacking most beneficial?
+\end{enumerate}
+
+\section{Expected and Actual Contributions}
+\label{sec:intro-contributions}
+
+\sectionbrief
+\begin{itemize}
+    \item A configurable framework for VQC architecture construction and evaluation.
+    \item A systematic VQC architecture-search pipeline and cross-dataset ranking process.
+    \item A controlled ECOC framework for generating simple multiclass quantum base learners.
+    \item A strong out-of-fold classical stacking baseline for measured VQC ensembles.
+    \item A quantum re-encoding comparison that isolates the effect of the meta-learner type.
+    \item A measurement-free architecture formed by composing frozen VQC base circuits with a trainable coherent meta-circuit.
+    \item An empirical analysis of measurement as a possible base-to-meta information bottleneck.
+    \item A performance--cost analysis covering prediction quality, training cost and circuit resources.
+    \item Rewrite this list near submission so that it states only contributions that were actually completed and evaluated.
+\end{itemize}
+
+\section{Scope and Delimitations}
+\label{sec:intro-scope}
+
+\sectionbrief
+\begin{itemize}
+    \item The central contribution concerns aggregation, not a novel ECOC coding theory or a general-purpose new VQC.
+    \item The study focuses on supervised multiclass classification using small and moderate tabular datasets.
+    \item ECOC is used as practical scaffolding for repeatable low-complexity base tasks.
+    \item Base learners are deliberately small so that the stacking mechanism remains the main experimental variable.
+    \item Most experiments are expected to rely on simulation because coherent statevector cost scales exponentially with total qubit count.
+    \item Include noisy simulation or IBM hardware only if those experiments are actually completed.
+    \item Do not claim quantum speed-up or quantum advantage unless directly supported by the final evidence.
+\end{itemize}
+
+\section{Dissertation Structure}
+\label{sec:intro-structure}
+
+\sectionbrief
+\begin{itemize}
+    \item Summarise Chapters~\ref{chap:related-work}--\ref{chap:conclusion} in one short paragraph after the chapters have stabilised.
+\end{itemize}
+
+% =============================================================================
+% CHAPTER 2: RELATED WORK
+% =============================================================================
+\chapter{Related Work}
+\label{chap:related-work}
+
+\section{Ensemble Learning}
+\label{sec:rw-ensembles}
+
+\subsection{Motivation for Ensemble Learning}
+
+\sectionbrief
+\begin{itemize}
+    \item Explain why multiple imperfect learners can outperform or stabilise a single learner.
+    \item Introduce the accuracy--diversity trade-off.
+    \item Identify sources of diversity: data samples, feature subsets, model architectures, class decompositions, initialisation and prediction behaviour.
+    \item Relate ensemble diversity to the dissertation's feature subspacing, bagging, ECOC tasks and VQC-template variation.
+\end{itemize}
+
+\researchnotes
+\begin{itemize}
+    \method{\item Ensemble diversity can be introduced through sample subsets, feature subspaces, classifier selection, weighting and ensemble-level optimisation~\cite{dong_survey_2020}.}
+    \comparison{\item Ensemble quality depends on the joint behaviour of accuracy, diversity, generalisation, stability, sparsity and complexity rather than constituent accuracy alone~\cite{dong_survey_2020}.}
+    \method{\item Random-subspace methods provide direct precedent for assigning different feature subsets to VQC base learners~\cite{dong_survey_2020,radojicic_reducing_2026}.}
+    \result{\item Prior VQC composition work identifies prediction disagreement as a stronger indicator of ensemble contribution than individual F1 or architectural difference, supporting analysis of actual base-prediction diversity~\cite{pinto_composing_2026}.}
+    \method{\item Diversity-aware QBoost work explicitly optimises disagreement alongside prediction loss and regularisation, providing precedent for treating diversity as a design objective rather than only a post-hoc statistic~\cite{liu_construction_2025}.}
+\end{itemize}
+
+\subsection{Bagging, Boosting and Stacking}
+
+\sectionbrief
+\begin{itemize}
+    \item Distinguish parallel bagging, sequential boosting and two-level stacking.
+    \item Explain why stacking is the principal aggregation method in this dissertation.
+    \item Describe fixed aggregation, weighted aggregation and learned aggregation.
+    \item Clarify that bagging is also used within the project as a source of base-learner diversity rather than as the main research contribution.
+\end{itemize}
+
+\researchnotes
+\begin{itemize}
+    \method{\item Classical supervised ensembles commonly include bagging, boosting, random forests, random subspaces and stacking~\cite{dong_survey_2020}.}
+    \method{\item Stacking uses base predictions as second-level input features and trains a combiner to learn how those predictions should be integrated~\cite{demir_modified_2018}.}
+    \comparison{\item Different stackers can favour different class-level behaviours, showing that the meta-learner is a substantive design choice rather than neutral plumbing~\cite{demir_modified_2018}.}
+    \result{\item Prior VQC ensemble work reports stronger gains from stacking than from bagging, supporting the dissertation's emphasis on learned aggregation~\cite{pinto_composing_2026}.}
+\end{itemize}
+
+\subsection{Out-of-Fold Stacking}
+
+\sectionbrief
+\begin{itemize}
+    \item Explain why training the meta-learner on in-sample base predictions creates leakage and overly optimistic performance.
+    \item Define stratified $K$-fold out-of-fold prediction generation.
+    \item Explain the distinction between temporary fold ensembles and the final base ensemble trained on the full training partition.
+    \item Connect this directly to the implemented \texttt{StackedECOC} training procedure.
+\end{itemize}
+
+\researchnotes
+\begin{itemize}
+    \method{\item Five-fold stacking predictions are used in prior hybrid ensemble work to create valid learned features before downstream quantum classification~\cite{xiong_hybrid_2024}.}
+    \method{\item Modified stacking uses feature-subspace base models and validation-driven model selection before training the combiner, providing precedent for separating base-model generation from meta-training~\cite{demir_modified_2018}.}
+\end{itemize}
+
+\subsection{Error-Correcting Output Codes}
+
+\sectionbrief
+\begin{itemize}
+    \item Introduce ECOC as a method for decomposing multiclass classification into several simpler learner tasks.
+    \item Define the coding matrix, class codewords, learner columns or rows according to the implementation convention, and decoding.
+    \item Explain binary ECOC and the optional generalisation to greater decomposition depth.
+    \item Explain why ECOC is appropriate here: controllable learner count, simple VQC tasks and consistent use across datasets.
+    \item State explicitly that ECOC is not the central novelty.
+\end{itemize}
+
+\researchnotes
+\begin{itemize}
+    \motive{\item ECOC decomposes a $c$-class problem into several simpler learner problems and decodes the resulting prediction codeword against class codewords~\cite{nguyen_optimal_2021}.}
+    \theory{\item Strong ECOC matrices aim to maintain separation between class codewords while avoiding redundant or constant learners~\cite{nguyen_optimal_2021}.}
+    \method{\item $N$-ary ECOC generalises binary class partitions but increases the complexity of each base task, supporting binary decomposition as the principal dissertation setting~\cite{nguyen_optimal_2021}.}
+    \gap{\item Classical ECOC optimisation literature does not address VQC trainability, qubit budgets or coherent quantum stacking~\cite{nguyen_optimal_2021}.}
+\end{itemize}
+
+\section{Quantum Machine Learning}
+\label{sec:rw-qml}
+
+\subsection{Near-Term Quantum Machine Learning}
+
+\sectionbrief
+\begin{itemize}
+    \item Distinguish fault-tolerant quantum algorithms from NISQ-compatible hybrid variational approaches.
+    \item Introduce the hybrid quantum--classical optimisation loop.
+    \item Explain why VQCs are appropriate to the dissertation's implementation and resource constraints.
+    \item Treat quantum computing as a specialised accelerator or experimental computational model rather than a wholesale replacement for classical ML.
+\end{itemize}
+
+\researchnotes
+\begin{itemize}
+    \comparison{\item Fault-tolerant QML may support stronger theoretical speed-ups but requires error-corrected devices, whereas QNNs and kernels are more experimentally accessible in the NISQ setting~\cite{du_quantum_2025}.}
+    \method{\item Near-term variational algorithms repeatedly execute a parameterised quantum circuit, measure its outputs and update parameters through a classical optimiser~\cite{resch_quantum_2019,du_quantum_2025}.}
+    \limitation{\item Input preparation, output reconstruction and practical resource estimates can undermine theoretical QML speed-up claims~\cite{biamonte_quantum_2017}.}
+    \comparison{\item Early QML literature distinguishes quantum acceleration of classical subroutines from genuinely quantum learning models, supporting the dissertation's focus on the learning and aggregation mechanism itself~\cite{schuld_introduction_2015}.}
+\end{itemize}
+
+\subsection{Variational Quantum Classifiers}
+
+\sectionbrief
+\begin{itemize}
+    \item Define a VQC as feature encoding, parameterised quantum transformations, entangling operations, measurement and classical optimisation.
+    \item Describe how measurements are converted into class probabilities in this project.
+    \item Introduce local versus fuller measurement choices.
+    \item Explain why architecture selection matters for expressivity, trainability and generalisation.
+\end{itemize}
+
+\researchnotes
+\begin{itemize}
+    \method{\item A standard QNN workflow consists of encoding, trainable quantum processing, measurement, loss evaluation and classical parameter updates~\cite{du_quantum_2025}.}
+    \theory{\item Circuit design is governed by the interaction between expressivity, trainability and generalisation~\cite{du_quantum_2025}.}
+    \challenge{\item VQCs can be sensitive to initialisation, dataset size, circuit depth and cost-function concentration~\cite{vasan_exploring_2025,friedrich_quantum_2025}.}
+\end{itemize}
+
+\subsection{Quantum Feature Encoding and Re-uploading}
+
+\sectionbrief
+\begin{itemize}
+    \item Introduce angle encoding and the mapping of classical features to rotation gates.
+    \item Explain feature density, feature assignment across qubits and repeated data re-uploading.
+    \item Discuss the trade-off between richer feature representation and increased depth or gate count.
+    \item Introduce pairwise feature interactions through RZZ-based encoding where relevant.
+\end{itemize}
+
+\researchnotes
+\begin{itemize}
+    \method{\item Data re-uploading is a recognised strategy for increasing the expressivity of classical-data quantum feature maps~\cite{du_quantum_2025}.}
+    \method{\item Repeated feature-encoding rotations can increase accessible Fourier frequencies and classifier expressivity~\cite{mcfarthing_classical_2024}.}
+    \comparison{\item Feature-map ordering and the placement of trainable layers can materially change trainability and eliminate redundant gates~\cite{salmenpera_impact_2024}.}
+    \challenge{\item Higher feature dimensionality increases circuit width or depth and can make full-feature VQC training prohibitive, motivating feature subspacing~\cite{radojicic_reducing_2026}.}
+\end{itemize}
+
+\subsection{Ansatz Design and Entanglement}
+
+\sectionbrief
+\begin{itemize}
+    \item Describe parameterised rotation layers and entangling layers.
+    \item Discuss CZ and RZZ entanglers, linear/ring/odd--even connectivity and hardware-aware design.
+    \item Explain why the dissertation searches several qualitatively different shallow ansatz structures rather than committing to one arbitrary template.
+    \item Relate the selected gate family to IBM Heron-compatible gates where appropriate.
+\end{itemize}
+
+\researchnotes
+\begin{itemize}
+    \challenge{\item Similar-depth ansatz families can differ substantially in performance, creating an empirical ``ansatz lottery'' if only one architecture is tested~\cite{pinto_composing_2026}.}
+    \method{\item Shallow circuit families, restricted entanglement and hardware-efficient templates can improve practical trainability and reduce noise exposure~\cite{friedrich_quantum_2025,park_addressing_2025}.}
+    \challenge{\item Limited hardware connectivity may introduce SWAP operations, increasing depth, latency and error exposure~\cite{resch_quantum_2019}.}
+    \result{\item Several studies observe diminishing performance returns after a small number of trainable layers, supporting shallow initial designs~\cite{salmenpera_impact_2024,incudini_resource_2023}.}
+\end{itemize}
+
+\subsection{Trainability and Scaling}
+
+\sectionbrief
+\begin{itemize}
+    \item Introduce barren plateaus, vanishing gradients, local minima and initialisation sensitivity.
+    \item Explain how circuit width, depth, global measurements and entanglement can affect optimisation.
+    \item Motivate shallow base learners, early stopping and staged training.
+    \item Explain the exponential classical statevector cost of increasing the total coherent qubit count.
+\end{itemize}
+
+\researchnotes
+\begin{itemize}
+    \challenge{\item Barren plateaus can cause gradient magnitudes to decrease exponentially with system size~\cite{du_quantum_2025,cerezo_challenges_2022}.}
+    \method{\item Initialisation, local cost functions, structured circuits and regularisation are common mitigation strategies~\cite{du_quantum_2025}.}
+    \method{\item Partitioning one deep quantum layer into multiple shallow components can increase gradient variance and improve convergence in some settings~\cite{friedrich_quantum_2025}.}
+    \challenge{\item More global entanglement may worsen trainability and generalisation, while local or modular entanglement can reduce optimisation difficulty~\cite{park_addressing_2025}.}
+\end{itemize}
+
+\subsection{Measurement and Quantum Information}
+
+\sectionbrief
+\begin{itemize}
+    \item Explain measurement as the final conversion from quantum state to classical outcome probabilities.
+    \item Distinguish the mathematical state from the limited statistics obtained through measurement.
+    \item Explain why independently measuring base registers prevents later coherent cross-register operations.
+    \item Avoid claiming that all discarded state information is useful for the target task.
+    \item Establish measurement as the empirical variable examined at the base-to-meta boundary.
+\end{itemize}
+
+\researchnotes
+\begin{itemize}
+    \theory{\item Amplitudes are not directly observable and expectation values require repeated measurement or exact simulation~\cite{resch_quantum_2019,tolotti_ensembles_2024}.}
+    \challenge{\item Measured ensemble pipelines are sensitive to shot noise and readout precision~\cite{tolotti_ensembles_2024,tolotti_weighted_2025}.}
+    \theory{\item The no-cloning theorem and the absence of practical persistent quantum memory prevent treating quantum intermediate states like ordinary stored classical features~\cite{resch_quantum_2019}.}
+\end{itemize}
+
+\section{Quantum Ensemble Learning}
+\label{sec:rw-quantum-ensembles}
+
+\subsection{Coherent Superposition Ensembles}
+
+\sectionbrief
+\begin{itemize}
+    \item Review early definitions of quantum ensembles based on superpositions over classifier parameters or indexed internal classifiers.
+    \item Explain the theoretical appeal of parallel evaluation and amplitude-weighted aggregation.
+    \item Distinguish these methods from the dissertation's finite set of independently trained VQC subcircuits.
+\end{itemize}
+
+\researchnotes
+\begin{itemize}
+    \method{\item Schuld and Petruccione prepare a weighted superposition over classifier parameter states and extract a collective decision through final measurement~\cite{schuld_quantum_2018}.}
+    \method{\item Araujo and da Silva compare untrained and trained classifier ensembles and find that optimisation is important on benchmark datasets~\cite{araujo_quantum_2020}.}
+    \method{\item Weighted indexed ensembles can generate different internal data compositions in superposition and re-encode classically learned aggregation weights for coherent test-time execution~\cite{tolotti_weighted_2025}.}
+    \limitation{\item These approaches rely on idealised state preparation, indexed data access, post-selection or simulated amplitudes, limiting direct equivalence to near-term trained VQC stacks~\cite{schuld_quantum_2018,araujo_quantum_2020,tolotti_weighted_2025}.}
+\end{itemize}
+
+\subsection{Measured Quantum Bagging and Boosting}
+
+\sectionbrief
+\begin{itemize}
+    \item Review measured quantum base learners combined through voting, averaging, bagging or boosting.
+    \item Explain what these approaches demonstrate about ensemble robustness and small-circuit modularity.
+    \item Identify that they still measure base learners before aggregation.
+\end{itemize}
+
+\researchnotes
+\begin{itemize}
+    \method{\item AdaBoost.Q uses measured class probabilities as confidence information for reweighting samples and combining quantum classifiers~\cite{song_quantum_2024}.}
+    \method{\item Bagging and boosting of compact QNN or single-qubit classifiers can improve predictive performance while reducing matched training or circuit costs~\cite{mcfarthing_classical_2024,incudini_resource_2023}.}
+    \method{\item Bagging--QSVC and related measured quantum ensembles aggregate independently measured predictions classically~\cite{abdulsalam_explainable_2023}.}
+    \method{\item Quantum bootstrapped bagging combines quantum-inspired subsampling or clustering with measured or classical aggregation, providing robustness evidence but not coherent VQC meta-learning~\cite{rathi_quantum_2025}.}
+    \comparison{\item These methods provide evidence that ensemble construction can help quantum classifiers, but they do not preserve base states for a coherent meta-circuit.}
+\end{itemize}
+
+\subsection{Measured and Hybrid Quantum Stacking}
+
+\sectionbrief
+\begin{itemize}
+    \item Review stacking systems that use quantum learners as measured base models and a classical stacker.
+    \item Review systems that combine classical and quantum learners in a classical stacking architecture.
+    \item Identify their relevance as measured baselines rather than coherent architectures.
+\end{itemize}
+
+\researchnotes
+\begin{itemize}
+    \method{\item Vasan et al. combine measured QSVC, QVC and QNN posterior probabilities with a Random Forest meta-learner~\cite{vasan_exploring_2025}.}
+    \method{\item Kang and Shin combine measured ML, DNN and QNN predictions through a classical meta-model~\cite{kang_amino_2025}.}
+    \method{\item Xiong et al. first use classical stacking for feature reduction and then apply a heterogeneous measured quantum voting ensemble~\cite{xiong_hybrid_2024}.}
+    \result{\item These studies report improved aggregate performance or minority-class behaviour, supporting measured stacking as a substantive baseline~\cite{vasan_exploring_2025,kang_amino_2025,xiong_hybrid_2024}.}
+    \gap{\item None trains a coherent quantum meta-circuit directly on the unmeasured states of trained VQC base learners.}
+\end{itemize}
+
+\subsection{Quantum Meta-Learning after Measurement}
+
+\sectionbrief
+\begin{itemize}
+    \item Review systems that re-encode classical base predictions into a quantum kernel or variational meta-model.
+    \item Explain that they test the value of a quantum meta-model but not preservation of the original base states.
+    \item Use this distinction to motivate the dissertation's re-encoding comparison condition.
+\end{itemize}
+
+\researchnotes
+\begin{itemize}
+    \method{\item SEQSVM concatenates classical ensemble predictions into a compact meta-feature vector and feeds it to a quantum-kernel SVM~\cite{akrom_bloodbrain_2025}.}
+    \method{\item Quantum stacking studies can provide the quantum meta-learner with predicted classes, confidence values or reduced high-level features~\cite{tolotti_ensembles_2024,akrom_bloodbrain_2025}.}
+    \comparison{\item Re-encoding can introduce quantum processing at the meta-level, but cannot reconstruct information removed by the preceding base measurement.}
+\end{itemize}
+
+\subsection{Modular and Coherent Quantum Aggregation}
+
+\sectionbrief
+\begin{itemize}
+    \item Review shallow ensemble layers, multi-chip VQCs, controlled-trajectory ensembles and amplitude-amplification aggregation.
+    \item Separate approaches that preserve coherence from those that use modular circuits but aggregate classically.
+    \item Explain where the proposed frozen-base coherent stack is similar and where it differs.
+\end{itemize}
+
+\researchnotes
+\begin{itemize}
+    \method{\item Friedrich and Maziero replace a deeper quantum layer with several independently measured shallow circuits whose outputs are summed~\cite{friedrich_quantum_2025}.}
+    \method{\item Multi-chip ensemble VQCs partition inputs across small circuits but intentionally avoid cross-chip entanglement and combine measured outputs through a classical function~\cite{park_addressing_2025}.}
+    \method{\item Rathi and Kumar create multiple transformed trajectories in superposition before a shared classifier and final ensemble measurement~\cite{rathi_enhanced_2025}.}
+    \method{\item Safina uses amplitude amplification to estimate aggregate class probability from classically prepared classifier probabilities~\cite{safina_quantum_2023}.}
+    \gap{\item These methods do not implement the same staged process of independently training VQC base learners, freezing their parameters and appending a trainable cross-register meta-VQC.}
+\end{itemize}
+
+\section{Gap Analysis}
+\label{sec:rw-gap}
+
+\subsection{Limitations of Existing Work}
+
+\sectionbrief
+\begin{itemize}
+    \item Most practical quantum ensembles measure each component before aggregation.
+    \item Hybrid and re-encoded quantum stackers operate only on classical outputs produced after collapse.
+    \item Coherent ensemble proposals often rely on fault-tolerant assumptions, indexed data access, idealised state preparation or non-VQC classifier models.
+    \item Modular VQC studies often avoid cross-register coupling for scalability and trainability.
+    \item Existing studies rarely hold the base ensemble fixed while comparing direct measured aggregation, classical stacking, quantum re-encoding and coherent stacking.
+    \item Many evaluations use small binary datasets or limited simulator settings and do not report both predictive and circuit-resource costs.
+\end{itemize}
+
+\researchnotes
+\begin{itemize}
+    \gap{\item Early quantum ensemble work explicitly leaves open alternative coherent definitions of quantum ensembles~\cite{schuld_quantum_2018}.}
+    \gap{\item Measured quantum stacking studies do not investigate direct aggregation of unmeasured trained VQC states~\cite{vasan_exploring_2025,kang_amino_2025}.}
+    \gap{\item Quantum meta-learning after re-encoding leaves the measurement boundary intact~\cite{akrom_bloodbrain_2025,tolotti_ensembles_2024}.}
+    \gap{\item Shallow or multi-chip quantum ensembles improve modularity but still sum or classically combine measured outputs~\cite{friedrich_quantum_2025,park_addressing_2025}.}
+    \gap{\item Quantum bagging frameworks may assume QRAM-style access or retain classical clustering and aggregation steps, leaving the trained coherent VQC stacking problem unresolved~\cite{rathi_quantum_2025}.}
+    \gap{\item Supervisor-provided VQC ensemble studies identify VQC meta-learning as a natural extension but do not test coherent measurement-free stacking~\cite{radojicic_reducing_2026,pinto_composing_2026}.}
+\end{itemize}
+
+\subsection{Research Gap Addressed by This Dissertation}
+
+\sectionbrief
+\begin{itemize}
+    \item State the gap in one precise paragraph: limited empirical evidence exists for stacking trained VQC base learners by preserving their unmeasured states and applying a trainable quantum meta-circuit across their registers.
+    \item Explain that the study responds through a controlled sequence of aggregation conditions sharing the same basic ensemble foundation.
+    \item Emphasise that the comparison evaluates both prediction quality and the additional cost of state preservation.
+\end{itemize}
+
+% =============================================================================
+% CHAPTER 3: APPROACH AND METHODOLOGY
+% =============================================================================
+\chapter{Approach and Methodology}
+\label{chap:methodology}
+
+\section{Research Design}
+\label{sec:method-research-design}
+
+\sectionbrief
+\begin{itemize}
+    \item Describe the dissertation as a controlled empirical comparison of increasingly quantum aggregation mechanisms.
+    \item Define the principal independent variable as aggregation strategy.
+    \item Define dependent measures: predictive metrics, optimisation behaviour, runtime and quantum resources.
+    \item Explain which factors are held consistent across conditions: datasets, preprocessing, outer splits, base-learner pool and evaluation procedure.
+    \item Explain where exact equivalence is impossible, such as classical versus quantum meta-model capacity.
+\end{itemize}
+
+\subsection{Experimental Conditions}
+
+\begin{enumerate}
+    \item Classical reference models: SVC and Random Forest.
+    \item Selected individual VQCs.
+    \item Direct measured QuantumECOC aggregation.
+    \item Classical measured StackedECOC using out-of-fold base outputs.
+    \item Quantum meta-learning through re-encoded measured outputs.
+    \item Measurement-free coherent stacking using frozen base circuits and a trainable quantum meta-circuit.
+\end{enumerate}
+
+\researchnotes
+\begin{itemize}
+    \comparison{\item The comparison should isolate the effect of aggregation rather than allowing every condition to use unrelated base learners or preprocessing.}
+    \method{\item Prior ensemble design studies support varying feature subsets, learner selection and ensemble size in a bounded structured search rather than an unrestricted sweep~\cite{dong_survey_2020,demir_modified_2018,pinto_composing_2026}.}
+\end{itemize}
+
+\section{System Overview}
+\label{sec:method-system}
+
+\sectionbrief
+\begin{itemize}
+    \item Add an architecture figure showing: dataset $\rightarrow$ preprocessing $\rightarrow$ ECOC decomposition $\rightarrow$ VQC base learners $\rightarrow$ selected aggregation condition $\rightarrow$ final prediction.
+    \item Separate the system into a base-ensemble level and a stacking/meta-learning level.
+    \item Add a second figure contrasting the information flow in measured, re-encoded and coherent stacking.
+    \item Explain the incremental implementation path from direct ensemble aggregation to the final coherent model.
+\end{itemize}
+
+\section{Implementation and Computational Environment}
+\label{sec:method-environment}
+
+\sectionbrief
+\begin{itemize}
+    \item Python version and core libraries: PyTorch, PennyLane, NumPy, pandas and scikit-learn.
+    \item Custom VQC layer construction, forward pass, training/validation loop, prediction functions and result collection.
+    \item Configurable ansatz definitions and template serialisation.
+    \item Simulation devices and differentiation methods actually used.
+    \item UCD SONIC HPC environment, Slurm execution and multiprocessing where relevant.
+    \item Structured JSONL result logging, deterministic job identifiers and completed-job skipping.
+    \item GitHub repository and reproducibility information.
+    \item Include Qiskit or IBM Runtime only for work that is actually used in the final experiments.
+\end{itemize}
+
+\researchnotes
+\begin{itemize}
+    \tooling{\item PennyLane, PyTorch and Qiskit are established tools for hybrid quantum-classical experimentation~\cite{du_quantum_2025,resch_quantum_2019}.}
+    \limitation{\item Simulator results represent best-case or modelled behaviour unless an explicit device-noise model or hardware execution is included~\cite{tolotti_ensembles_2024}.}
+\end{itemize}
+
+\section{Datasets}
+\label{sec:method-datasets}
+
+\subsection{Dataset Roles}
+
+\sectionbrief
+\begin{itemize}
+    \item Define sanity-check datasets used to validate implementation and basic trainability.
+    \item Define main evaluation datasets used for systematic comparisons.
+    \item Define final stress-test datasets used on a reduced set of selected configurations.
+    \item State the final list only after the full experiment plan is frozen.
+\end{itemize}
+
+\subsection{Dataset Characteristics}
+
+% Replace placeholders with the final dataset table.
+\begin{table}[ht]
+    \centering
+    \caption{Dataset characteristics and experimental roles.}
+    \label{tab:datasets}
+    \begin{tabular}{lrrrrll}
+        \toprule
+        Dataset & Samples & Features & Classes & Imbalance & Feature types & Role \\
+        \midrule
+        % Iris & ... & ... & ... & ... & ... & Sanity check \\
+        % ...
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\sectionbrief
+\begin{itemize}
+    \item Discuss sample size, feature dimensionality, number of classes, imbalance, missing values and mixed data types.
+    \item Explain why the set supports analysis across different levels of classification difficulty.
+    \item Record any original unconventional train/test splits and justify whether they were retained or replaced.
+\end{itemize}
+
+\section{Data Preprocessing}
+\label{sec:method-preprocessing}
+
+\subsection{Cleaning and Missing Values}
+\begin{itemize}
+    \item Dataset-specific invalid-value handling.
+    \item Numerical imputation strategy and fitted values.
+    \item Categorical missing-value handling.
+\end{itemize}
+
+\subsection{Categorical Encoding}
+\begin{itemize}
+    \item Encoding strategy for nominal and ordinal variables.
+    \item Avoidance of train--test leakage.
+    \item Preservation of final feature mappings for reproducibility.
+\end{itemize}
+
+\subsection{Scaling}
+\begin{itemize}
+    \item Scaling range required by angle encoding, including the implemented $[0,\pi]$ range where applicable.
+    \item Fit the scaler on training data and apply it to validation/test data.
+    \item Explain any condition-specific scaling required by classical or quantum models.
+\end{itemize}
+
+\subsection{Data Splits}
+\begin{itemize}
+    \item Outer train/test split and stratification.
+    \item Validation data used for early stopping or base-learner weighting.
+    \item Inner out-of-fold splits used only for meta-feature construction.
+    \item Repeated seeds or runs, where computationally feasible.
+\end{itemize}
+
+\section{Variational Quantum Classifier}
+\label{sec:method-vqc}
+
+\subsection{VQC Interface and Output Mapping}
+\sectionbrief
+\begin{itemize}
+    \item Inputs: qubit count, class count, feature subset, ansatz template, measurement mode, device and differentiation method.
+    \item Materialisation of the PennyLane quantum layer and integration with PyTorch.
+    \item Conversion of measured basis-state probabilities into class probabilities.
+    \item Minimum versus full measurement mode.
+    \item Training, prediction, scoring and result-extraction functions.
+\end{itemize}
+
+\subsection{Feature Subspacing}
+\begin{itemize}
+    \item Selection of a subset of original features for each learner.
+    \item Feature density as either a fraction or fixed number of features.
+    \item Deterministic learner-specific seeds.
+    \item Role in reducing circuit cost and increasing ensemble diversity.
+\end{itemize}
+
+\researchnotes
+\begin{itemize}
+    \result{\item Random-subspace VQC studies report that smaller feature ratios can preserve performance while reducing training cost, although the optimum is dataset-dependent~\cite{radojicic_reducing_2026}.}
+    \benchmark{\item Resource-saving QNN ensembles can reduce qubit requirements substantially, but lower feature coverage may also reduce predictive information~\cite{incudini_resource_2023}.}
+\end{itemize}
+
+\subsection{Encoding Layers}
+\begin{itemize}
+    \item Angle-encoding layer and mapping of features to qubits.
+    \item Feature strategies: same, shifted or explicit assignments.
+    \item Feature re-uploading and feature count per qubit.
+    \item Pairwise RZZ feature encoding where included.
+    \item Barriers used only for circuit visualisation or transpilation clarity, if relevant.
+\end{itemize}
+
+\subsection{Trainable and Entangling Layers}
+\begin{itemize}
+    \item Parameterised RX and RZ rotations.
+    \item CZ and trainable RZZ entanglers.
+    \item Linear, ring, cyclic, odd--even or other implemented connectivity patterns.
+    \item Placement of entanglement relative to encoding and trainable layers.
+    \item Parameter count and gate-count derivation.
+\end{itemize}
+
+\section{VQC Architecture Exploration}
+\label{sec:method-vqc-search}
+
+\subsection{Purpose}
+\begin{itemize}
+    \item Explain why the final ensemble cannot be evaluated fairly using one arbitrarily selected circuit.
+    \item Identify the target: compact, trainable and sufficiently expressive base architectures rather than maximum standalone accuracy at any resource cost.
+\end{itemize}
+
+\subsection{Search Space}
+\begin{itemize}
+    \item Qubit counts evaluated.
+    \item Feature density and features per qubit.
+    \item Minimum versus full measurement.
+    \item Encoding style, feature strategy and re-upload count.
+    \item Number and arrangement of trainable layers.
+    \item Entangling-layer positions, connectivity and entangler type.
+    \item Final exact values should be inserted from the executed job generator rather than memory.
+\end{itemize}
+
+\subsection{Search Execution}
+\begin{itemize}
+    \item Job-list generation and stable job identifiers.
+    \item Parallel execution on local or HPC resources.
+    \item Early stopping, epoch budget and validation protocol.
+    \item JSONL logging and later reduction of redundant output fields.
+    \item Failed-run handling and result repair where needed.
+\end{itemize}
+
+\subsection{Ranking and Selection}
+\begin{itemize}
+    \item Per-dataset ranking.
+    \item Average rank or percentile across datasets.
+    \item Overall configuration-level and ansatz-level aggregation.
+    \item Performance consistency and resource cost.
+    \item Shortlisting of qualitatively different high-performing base designs.
+    \item Avoid selection using the final held-out test results.
+\end{itemize}
+
+\researchnotes
+\begin{itemize}
+    \challenge{\item Ansatz performance can vary strongly even for circuits with similar depth and parameter count, justifying systematic architecture selection~\cite{pinto_composing_2026}.}
+    \method{\item Model-pool reuse separates expensive VQC training from later ensemble construction and analysis~\cite{pinto_composing_2026}.}
+    \result{\item Shallow architectures can provide strong F1-per-second behaviour and reduce noise exposure~\cite{pinto_composing_2026}.}
+\end{itemize}
+
+\section{ECOC Base Ensemble}
+\label{sec:method-ecoc}
+
+\subsection{Coding Matrix Construction}
+\begin{itemize}
+    \item Define the implemented construction based on class count, learner count and ECOC depth.
+    \item Explain how modular arithmetic generates learner-specific class groupings.
+    \item Explain row/column orientation exactly as used in the implementation.
+    \item Explain repetition or rolling when the requested learner count exceeds the initial matrix size.
+\end{itemize}
+
+\subsection{Learner Initialisation}
+\begin{itemize}
+    \item One VQC per ECOC subtask.
+    \item Learner-specific class count based on its code partition.
+    \item Template assignment and feature-subset selection.
+    \item Controlled use of same, few-different and all-different base architectures.
+\end{itemize}
+
+\subsection{Training and Diversity}
+\begin{itemize}
+    \item Mapping original labels to each learner's ECOC targets.
+    \item Stratified bagging or full-data training.
+    \item Class weighting where used.
+    \item Diversity from ECOC tasks, feature subsets, data samples, ansatz templates, entangler type and feature assignment.
+\end{itemize}
+
+\subsection{Direct Measured Aggregation}
+\begin{itemize}
+    \item Independently measure each VQC.
+    \item Convert learner probabilities to scores over original classes using the ECOC matrix.
+    \item Describe weighted or unweighted aggregation.
+    \item Decode the highest final class score.
+    \item Establish this as the direct measured quantum ensemble baseline.
+\end{itemize}
+
+\section{Classical Measured Stacking}
+\label{sec:method-classical-stacking}
+
+\subsection{Meta-Feature Construction}
+\begin{itemize}
+    \item Concatenate the measured probability outputs of all base VQCs.
+    \item State the dimensionality of the resulting meta-feature vector.
+    \item Explain whether original input features are included; use only the implemented final design.
+\end{itemize}
+
+\subsection{Out-of-Fold Training Procedure}
+\begin{enumerate}
+    \item Split the training data into stratified folds.
+    \item Train a temporary ensemble on $K-1$ folds.
+    \item Predict probabilities for the held-out fold.
+    \item Repeat until every training sample has an out-of-fold meta-feature vector.
+    \item Train the classical meta-learner on the complete out-of-fold matrix.
+    \item Train the final base ensemble on the full training data.
+    \item Generate final test meta-features with the final base ensemble.
+\end{enumerate}
+
+\subsection{Classical Meta-Learner}
+\begin{itemize}
+    \item State the final selected model, such as SVC or the implemented neural meta-learner.
+    \item Include relevant hyperparameters and class weighting.
+    \item Explain why this constitutes a strong measured baseline.
+\end{itemize}
+
+\section{Quantum Re-Encoding Stacking}
+\label{sec:method-reencoding}
+
+\subsection{Measured Inputs}
+\begin{itemize}
+    \item Use the same base-output information available to classical stacking.
+    \item Explain scaling, padding or feature selection applied before quantum encoding.
+\end{itemize}
+
+\subsection{Meta-VQC}
+\begin{itemize}
+    \item Number of qubits and measured wires.
+    \item Feature encoding of the base probability vector.
+    \item Trainable and entangling layers.
+    \item Loss, optimiser and training protocol.
+\end{itemize}
+
+\subsection{Purpose of the Condition}
+\begin{itemize}
+    \item Isolate whether a quantum meta-model adds value when the information supplied to it is already classical.
+    \item Separate the effect of quantum meta-model capacity from the effect of preserving base states.
+\end{itemize}
+
+\section{Measurement-Free Quantum Stacking}
+\label{sec:method-coherent}
+
+\subsection{Architectural Principle}
+\begin{itemize}
+    \item Each trained VQC becomes an unmeasured subcircuit within one larger quantum circuit.
+    \item Base learners occupy disjoint registers and process their assigned feature subsets.
+    \item No base-level probability measurement is performed.
+    \item A quantum meta-circuit acts across selected wires or registers.
+    \item Measurement occurs only at the final classifier output.
+\end{itemize}
+
+\subsection{Base-Circuit Composition}
+\begin{itemize}
+    \item Reconstruct each selected ansatz inside the combined QNode.
+    \item Load trained base parameters without copying the measured QLayer itself.
+    \item Define the global wire mapping from local learner wires to the combined register.
+    \item Preserve learner-specific feature subsets and circuit templates.
+\end{itemize}
+
+\subsection{Frozen Base Parameters}
+\begin{itemize}
+    \item Train each base learner before constructing the coherent circuit.
+    \item Freeze the base parameters during initial meta-training.
+    \item Train only meta-level parameters to reduce optimisation difficulty.
+    \item State whether end-to-end fine-tuning was attempted; omit it if not executed.
+\end{itemize}
+
+\subsection{Meta-Wire Selection}
+\begin{itemize}
+    \item Main design: first or designated main wire from each base learner.
+    \item Alternative design: all base wires, if evaluated.
+    \item Explain the information--resource trade-off.
+\end{itemize}
+
+\subsection{Cross-Learner Meta-Circuit}
+\begin{itemize}
+    \item Meta-level RX/RZ rotations.
+    \item CZ or RZZ connections between learner registers.
+    \item Number of meta-layers and connection topology.
+    \item How cross-register entanglement differs from independent measured aggregation.
+\end{itemize}
+
+\subsection{Final Measurement and Class Mapping}
+\begin{itemize}
+    \item Final measured wires.
+    \item Basis-state to class-probability mapping.
+    \item Treatment of unused basis states.
+    \item Loss function used for final multiclass training.
+\end{itemize}
+
+\subsection{Scaling Analysis}
+\begin{itemize}
+    \item Total width approximately equals the sum of base-register widths.
+    \item Base-circuit depth remains parallel conceptually, but simulator and transpiled depth depend on scheduling and topology.
+    \item Meta-depth grows with meta-layer count and connectivity.
+    \item Two-qubit gate count grows with base entanglement plus cross-learner meta-entanglement.
+    \item Statevector memory scales exponentially with total coherent qubit count.
+\end{itemize}
+
+\researchnotes
+\begin{itemize}
+    \method{\item Staged optimisation of pretrained and frozen components is consistent with the broader hybrid variational approach and reduces the initial coherent optimisation burden~\cite{resch_quantum_2019,du_quantum_2025}.}
+    \challenge{\item Cross-register two-qubit gates introduce the mechanism of interest but also increase depth, topology overhead and hardware noise exposure~\cite{resch_quantum_2019}.}
+    \comparison{\item Multi-chip VQCs deliberately avoid inter-register entanglement for trainability, whereas this dissertation introduces a limited meta-circuit specifically to test coherent aggregation~\cite{park_addressing_2025}.}
+\end{itemize}
+
+\section{Classical Reference Models}
+\label{sec:method-classical-baselines}
+
+\sectionbrief
+\begin{itemize}
+    \item SVC configuration.
+    \item Random Forest configuration.
+    \item Preprocessing and data splits shared with quantum models.
+    \item Explain that these provide practical context rather than perfectly capacity-matched quantum-advantage tests.
+\end{itemize}
+
+\section{Training Protocol}
+\label{sec:method-training}
+
+\subsection{Optimisation}
+\begin{itemize}
+    \item Adam or final selected optimiser.
+    \item Learning rate.
+    \item Negative log-likelihood or final selected loss.
+    \item Batch size.
+    \item Maximum epochs.
+\end{itemize}
+
+\subsection{Early Stopping}
+\begin{itemize}
+    \item Warm-up period.
+    \item Patience.
+    \item Minimum loss improvement.
+    \item Restoration of the best model state.
+\end{itemize}
+
+\subsection{Repeated Training and Randomness}
+\begin{itemize}
+    \item Data-split seeds.
+    \item Feature-subset and bagging seeds.
+    \item Parameter initialisation.
+    \item Number of repeated runs used in final comparisons.
+    \item Explicitly acknowledge configurations with fewer repeats due to computational cost.
+\end{itemize}
+
+\subsection{Execution and Failure Handling}
+\begin{itemize}
+    \item Multiprocessing and HPC worker allocation.
+    \item Memory and qubit-count limits.
+    \item Failed-run logging.
+    \item Rules for retrying, excluding or reporting failed configurations.
+\end{itemize}
+
+\section{Evaluation Framework}
+\label{sec:method-evaluation}
+
+\subsection{Predictive Metrics}
+\begin{itemize}
+    \item Accuracy.
+    \item Macro-F1 as the primary class-balanced metric.
+    \item Weighted-F1.
+    \item Per-class precision and recall.
+    \item Confusion matrices for selected comparisons.
+\end{itemize}
+
+\subsection{Optimisation Metrics}
+\begin{itemize}
+    \item Best and final training loss.
+    \item Best and final validation loss.
+    \item Epochs completed and early-stopping epoch.
+    \item Convergence curves for representative configurations.
+    \item Run failures or unstable training.
+\end{itemize}
+
+\subsection{Computational Metrics}
+\begin{itemize}
+    \item Base-training time.
+    \item Out-of-fold stacking overhead.
+    \item Meta-training time.
+    \item End-to-end training time.
+    \item Peak memory where available.
+\end{itemize}
+
+\subsection{Quantum Resource Metrics}
+\begin{itemize}
+    \item Qubit count.
+    \item Circuit depth.
+    \item Trainable parameter count.
+    \item Total gate count.
+    \item Two-qubit gate count.
+    \item Transpiled depth and SWAP overhead, if transpilation is performed.
+\end{itemize}
+
+\researchnotes
+\begin{itemize}
+    \benchmark{\item Accuracy alone can obscure minority-class failure, supporting macro-F1 and per-class recall~\cite{demir_modified_2018,vasan_exploring_2025}.}
+    \benchmark{\item Hardware feasibility depends on width, depth, two-qubit gate count, topology, gate fidelity and coherence rather than qubit count alone~\cite{resch_quantum_2019}.}
+    \benchmark{\item Previous VQC ensemble studies evaluate performance and training cost jointly and use statistical tests where repeated observations permit them~\cite{radojicic_reducing_2026}.}
+\end{itemize}
+
+\section{Noise and Hardware Evaluation}
+\label{sec:method-noise-hardware}
+
+\sectionbrief
+\begin{itemize}
+    \item Keep this section only if noisy simulation or hardware experiments are completed.
+    \item Specify the noise model or exact backend and calibration date.
+    \item Specify shot count, transpilation level and error-mitigation method.
+    \item Use a reduced set of configurations selected before hardware testing.
+    \item Compare degradation relative to noiseless simulation.
+    \item Do not retain generic IBM hardware claims if the final work remains simulator-only.
+\end{itemize}
+
+\researchnotes
+\begin{itemize}
+    \validation{\item Ensemble QNNs and AdaBoost.Q have been tested on superconducting hardware, showing that some quantum ensemble methods can move beyond ideal simulation~\cite{incudini_resource_2023,song_quantum_2024}.}
+    \challenge{\item Hardware deployment requires topology-aware transpilation, qubit placement and error mitigation, and added two-qubit gates may remove a noiseless coherent advantage~\cite{rathi_enhanced_2025}.}
+\end{itemize}
+
+\section{Reproducibility and Result Management}
+\label{sec:method-reproducibility}
+
+\sectionbrief
+\begin{itemize}
+    \item Repository commit used for final experiments.
+    \item Environment and dependency versions.
+    \item Dataset download and preprocessing scripts.
+    \item Configuration templates and job generator.
+    \item Stable job IDs and skipped completed jobs.
+    \item JSONL schema and reduced logging design.
+    \item Aggregated parquet files and analysis dashboard.
+    \item Random seeds and commands needed to reproduce the final tables.
+\end{itemize}
+
+% =============================================================================
+% CHAPTER 4: EVALUATION AND RESULTS
+% =============================================================================
+\chapter{Evaluation and Results}
+\label{chap:results}
+
+\section{Experimental Overview}
+\label{sec:results-overview}
+
+\resultplaceholder
+\begin{itemize}
+    \item Final datasets and their roles.
+    \item Final model configurations and aggregation conditions.
+    \item Number of runs, seeds and completed/failed jobs.
+    \item Hardware and simulator resources used.
+    \item Compact table of the final experimental matrix.
+\end{itemize}
+
+\section{VQC Architecture Exploration}
+\label{sec:results-vqc-search}
+
+\subsection{Search Coverage}
+\begin{itemize}
+    \item Number of generated and completed VQC jobs.
+    \item Distribution across datasets, qubit counts and architecture groups.
+    \item Exclusions caused by failure, memory limits or invalid configurations.
+\end{itemize}
+
+\subsection{Overall Architecture Trends}
+\begin{itemize}
+    \item Effects of qubit count.
+    \item Effects of feature density and features per qubit.
+    \item Effects of re-uploading and trainable-layer count.
+    \item Effects of entangler and entanglement placement.
+    \item Effects of measurement mode.
+    \item Report interactions only when supported by the analysis.
+\end{itemize}
+
+\subsection{Dataset-Dependent Behaviour}
+\begin{itemize}
+    \item Which architectural choices generalise across datasets.
+    \item Which choices are strongly dataset-specific.
+    \item Relationship with class count, feature count and dataset difficulty.
+\end{itemize}
+
+\subsection{Selected Base Configurations}
+\begin{itemize}
+    \item Final shortlist.
+    \item Average percentile or ranking.
+    \item Resource cost.
+    \item Architectural diversity.
+    \item Reason each design was retained for ensemble experiments.
+\end{itemize}
+
+\section{Baseline Classification Performance}
+\label{sec:results-baselines}
+
+\subsection{Classical Models}
+\begin{itemize}
+    \item SVC and Random Forest accuracy, macro-F1 and weighted-F1.
+    \item Identify datasets where classical reference performance is already near ceiling.
+\end{itemize}
+
+\subsection{Individual VQCs}
+\begin{itemize}
+    \item Performance distribution of selected VQCs.
+    \item Variance across architecture and seed.
+    \item Resource cost and training time.
+\end{itemize}
+
+\subsection{Direct QuantumECOC}
+\begin{itemize}
+    \item Compare with individual VQCs.
+    \item Evaluate the effect of ensemble size and base diversity.
+    \item Report class-level gains or failures.
+    \item Answer Research Question 1.
+\end{itemize}
+
+\section{Classical Measured Stacking Results}
+\label{sec:results-classical-stacking}
+
+\subsection{Predictive Performance}
+\begin{itemize}
+    \item Direct QuantumECOC versus classical StackedECOC.
+    \item Accuracy and macro-F1 differences by dataset.
+    \item Mean/median difference across datasets and seeds.
+\end{itemize}
+
+\subsection{Per-Class Behaviour}
+\begin{itemize}
+    \item Minority or difficult classes assisted by stacking.
+    \item Confusion matrices for representative improvements and regressions.
+\end{itemize}
+
+\subsection{Computational Cost}
+\begin{itemize}
+    \item Cost of $K$ temporary fold ensembles.
+    \item Final full-data retraining cost.
+    \item Total stacking overhead relative to direct aggregation.
+\end{itemize}
+
+\subsection{Research Question 2}
+\begin{itemize}
+    \item Give a direct evidence-based answer after the results are presented.
+\end{itemize}
+
+\section{Quantum Re-Encoding Results}
+\label{sec:results-reencoding}
+
+\subsection{Predictive Performance}
+\begin{itemize}
+    \item Quantum re-encoding versus the classical meta-learner using the same measured base outputs.
+    \item Dataset-level and aggregate comparisons.
+\end{itemize}
+
+\subsection{Convergence and Stability}
+\begin{itemize}
+    \item Loss curves.
+    \item Sensitivity to initialisation.
+    \item Early-stopping behaviour.
+    \item Failed or collapsed runs.
+\end{itemize}
+
+\subsection{Research Question 3}
+\begin{itemize}
+    \item State whether making only the meta-model quantum provided a consistent benefit.
+\end{itemize}
+
+\section{Measurement-Free Stacking Results}
+\label{sec:results-coherent}
+
+\subsection{Implementation Feasibility}
+\begin{itemize}
+    \item Largest successfully simulated coherent circuit.
+    \item Maximum learner and qubit counts.
+    \item Memory, runtime and differentiation constraints.
+    \item Configurations that could not be trained and the observed failure mode.
+    \item Answer the feasibility component of Research Question 4.
+\end{itemize}
+
+\subsection{Predictive Performance}
+\begin{itemize}
+    \item Coherent stacking versus direct QuantumECOC.
+    \item Coherent stacking versus classical stacking.
+    \item Coherent stacking versus quantum re-encoding.
+    \item Accuracy, macro-F1 and per-class behaviour.
+\end{itemize}
+
+\subsection{Convergence and Stability}
+\begin{itemize}
+    \item Training and validation curves.
+    \item Effect of frozen base parameters.
+    \item Meta-gradient and optimiser behaviour if analysed.
+    \item Variability across seeds.
+\end{itemize}
+
+\subsection{Effect of Ensemble Size}
+\begin{itemize}
+    \item Predictive effect of increasing learner count.
+    \item Qubit, depth, gate and simulation-cost growth.
+    \item Point at which added learners stop being practical or beneficial.
+\end{itemize}
+
+\subsection{Effect of Meta-Circuit Design}
+\begin{itemize}
+    \item Main wires versus all wires, if evaluated.
+    \item Meta-layer count.
+    \item CZ versus RZZ.
+    \item Entanglement topology.
+\end{itemize}
+
+\subsection{Dataset-Dependent Effects}
+\begin{itemize}
+    \item Association with class count, base weakness, imbalance or feature complexity.
+    \item Distinguish robust patterns from isolated best scores.
+\end{itemize}
+
+\subsection{Research Questions 4 and 5}
+\begin{itemize}
+    \item Give direct answers on feasibility and predictive benefit.
+\end{itemize}
+
+\section{Resource and Scalability Analysis}
+\label{sec:results-resources}
+
+\subsection{Circuit Width}
+\begin{itemize}
+    \item Formula and measured values by ensemble size.
+\end{itemize}
+
+\subsection{Depth and Gate Counts}
+\begin{itemize}
+    \item Logical circuit depth.
+    \item Total gates.
+    \item Two-qubit gates.
+    \item Transpiled values where available.
+\end{itemize}
+
+\subsection{Training Time and Memory}
+\begin{itemize}
+    \item Runtime scaling by qubit and learner count.
+    \item Base training, fold training and coherent meta-training.
+    \item Peak memory or practical cluster limits.
+\end{itemize}
+
+\subsection{Performance--Cost Trade-Off}
+\begin{itemize}
+    \item Performance gain per additional qubit, two-qubit gate or training hour.
+    \item Identify configurations that are dominated by cheaper alternatives.
+    \item Answer Research Question 6.
+\end{itemize}
+
+\section{Noise or Hardware Results}
+\label{sec:results-noise}
+
+\resultplaceholder
+\begin{itemize}
+    \item Retain only if the corresponding methodology was executed.
+    \item Noiseless versus noisy simulation.
+    \item Simulator versus hardware.
+    \item Effect of transpilation and mitigation.
+    \item Whether any coherent advantage survives realistic noise.
+\end{itemize}
+
+\section{Statistical and Practical Significance}
+\label{sec:results-significance}
+
+\sectionbrief
+\begin{itemize}
+    \item Confidence intervals or standard deviations across repeats.
+    \item Paired comparisons using shared splits/seeds.
+    \item Friedman/Wilcoxon or another justified test when enough observations exist.
+    \item Effect sizes and consistency, not only $p$-values.
+    \item Distinguish numerical best scores from practically meaningful improvements.
+\end{itemize}
+
+\section{Summary by Research Question}
+\label{sec:results-rq-summary}
+
+\begin{table}[ht]
+    \centering
+    \caption{Summary of evidence and findings by research question.}
+    \label{tab:rq-summary}
+    \begin{tabular}{p{0.08\textwidth}p{0.42\textwidth}p{0.42\textwidth}}
+        \toprule
+        RQ & Evidence & Finding \\
+        \midrule
+        RQ1 & Individual VQC and direct QuantumECOC results & \textit{To complete} \\
+        RQ2 & Direct aggregation versus classical stacking & \textit{To complete} \\
+        RQ3 & Classical meta-learner versus quantum re-encoding & \textit{To complete} \\
+        RQ4 & Coherent implementation and scaling observations & \textit{To complete} \\
+        RQ5 & Coherent versus measured predictive results & \textit{To complete} \\
+        RQ6 & Width, depth, gates, time and memory & \textit{To complete} \\
+        RQ7 & Dataset and ensemble characteristic analysis & \textit{To complete} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+% =============================================================================
+% CHAPTER 5: DISCUSSION
+% =============================================================================
+\chapter{Discussion}
+\label{chap:discussion}
+
+\section{Interpretation of the Main Findings}
+\label{sec:discussion-main}
+
+\sectionbrief
+\begin{itemize}
+    \item Explain the overall pattern across direct aggregation, classical stacking, quantum re-encoding and coherent stacking.
+    \item Identify whether performance was mainly determined by base-learner quality, learned aggregation, quantum meta-model capacity or state preservation.
+    \item Interpret unsuccessful or unstable coherent experiments as evidence about feasibility rather than omitting them.
+\end{itemize}
+
+\section{Is Measurement an Information Bottleneck?}
+\label{sec:discussion-measurement}
+
+\sectionbrief
+\begin{itemize}
+    \item Return directly to the central hypothesis.
+    \item Separate three possibilities: coherent improvement, no meaningful difference or worse coherent performance.
+    \item Explain that poor coherent performance does not prove that the preserved state contains no useful information; optimisation, circuit design and resource limits may prevent its extraction.
+    \item Avoid equating simulator state access with a practical hardware advantage.
+\end{itemize}
+
+\section{When Does Stacking Help?}
+\label{sec:discussion-when}
+
+\sectionbrief
+\begin{itemize}
+    \item Relate stacking gains to base-learner weakness.
+    \item Examine class count, imbalance, feature dimensionality and dataset difficulty.
+    \item Discuss whether simple datasets leave little room for a meta-learner.
+    \item Discuss whether harder datasets benefit from learned aggregation but incur much higher training cost.
+    \item Answer Research Question 7.
+\end{itemize}
+
+\section{Quantum Meta-Learning versus Coherent Aggregation}
+\label{sec:discussion-meta-vs-coherent}
+
+\sectionbrief
+\begin{itemize}
+    \item Contrast placing a quantum model after measurement with maintaining a continuous quantum computation across base and meta stages.
+    \item Use the re-encoding condition to determine whether the meta-model type or the information boundary is more influential.
+    \item Discuss capacity matching and optimisation fairness between classical and quantum stackers.
+\end{itemize}
+
+\section{Performance--Cost Trade-Off}
+\label{sec:discussion-cost}
+
+\sectionbrief
+\begin{itemize}
+    \item Evaluate whether any coherent performance gain justifies the extra qubits, depth, gates, memory and runtime.
+    \item Discuss whether a smaller measured model is practically preferable even when coherent stacking achieves a slightly higher score.
+    \item Identify the most promising configuration under a balanced performance--resource criterion.
+\end{itemize}
+
+\section{Relationship to Existing Literature}
+\label{sec:discussion-literature}
+
+\sectionbrief
+\begin{itemize}
+    \item Compare the observed ensemble gains with measured quantum bagging and boosting studies.
+    \item Compare the classical stacking findings with measured quantum stacking literature.
+    \item Compare the re-encoding findings with quantum meta-learning work.
+    \item Compare coherent feasibility with theoretical or indexed coherent ensemble proposals.
+    \item Explain which findings confirm, extend or conflict with earlier studies.
+\end{itemize}
+
+\section{Limitations}
+\label{sec:discussion-limitations}
+
+\sectionbrief
+\begin{itemize}
+    \item Small or moderate tabular datasets.
+    \item Limited repeated runs for expensive configurations.
+    \item Restricted hyperparameter search for the coherent condition.
+    \item Exponential statevector simulation cost and resulting learner-count ceiling.
+    \item Simulator-only conclusions if no hardware experiments are completed.
+    \item Unequal representational capacity across classical and quantum meta-learners.
+    \item Dependence on selected ansatz families, feature mapping and output measurement.
+    \item Frozen-base training may prevent globally optimal end-to-end solutions.
+    \item Accuracy and macro-F1 provide indirect rather than information-theoretic evidence about measurement loss.
+    \item Internal student projects should be used as design guidance and clearly distinguished from peer-reviewed evidence~\cite{radojicic_reducing_2026,pinto_composing_2026}.
+\end{itemize}
+
+\section{Threats to Validity}
+\label{sec:discussion-validity}
+
+\subsection{Internal Validity}
+\begin{itemize}
+    \item Data leakage, preprocessing differences, random initialisation, feature selection and unequal optimisation budgets.
+\end{itemize}
+
+\subsection{Construct Validity}
+\begin{itemize}
+    \item Whether predictive metrics adequately represent preserved quantum information or information efficiency.
+\end{itemize}
+
+\subsection{External Validity}
+\begin{itemize}
+    \item Generalisation from small tabular datasets and simulation to larger datasets and physical devices.
+\end{itemize}
+
+\subsection{Conclusion Validity}
+\begin{itemize}
+    \item Number of repeats, failed runs, statistical power and sensitivity to selected datasets.
+\end{itemize}
+
+% =============================================================================
+% CHAPTER 6: CONCLUSION
+% =============================================================================
+\chapter{Conclusion and Future Work}
+\label{chap:conclusion}
+
+\section{Dissertation Summary}
+\label{sec:conclusion-summary}
+
+\sectionbrief
+\begin{itemize}
+    \item Restate the problem and motivation.
+    \item Summarise the progression from VQC selection and ECOC construction to the three stacking conditions.
+    \item Summarise the final experimental scope.
+\end{itemize}
+
+\section{Answers to the Research Questions}
+\label{sec:conclusion-rqs}
+
+\sectionbrief
+\begin{itemize}
+    \item Answer each research question explicitly in order.
+    \item Use concise evidence-based statements rather than repeating the whole results chapter.
+    \item State uncertainty and conditional conclusions where the experiments are limited.
+\end{itemize}
+
+\section{Contributions}
+\label{sec:conclusion-contributions}
+
+\sectionbrief
+\begin{itemize}
+    \item Restate only completed implementation contributions.
+    \item State empirical findings separately from software or methodological contributions.
+    \item Include informative negative results, practical scaling limits and failed approaches where they advance understanding.
+\end{itemize}
+
+\section{Overall Conclusion}
+\label{sec:conclusion-overall}
+
+\sectionbrief
+\begin{itemize}
+    \item Give the final judgement on whether measurement-free stacking was feasible.
+    \item State whether it offered a consistent predictive advantage.
+    \item State whether any gain justified its additional resource and optimisation cost.
+    \item Avoid broader quantum-advantage claims beyond the evidence.
+\end{itemize}
+
+\section{Future Work}
+\label{sec:conclusion-future}
+
+\sectionbrief
+\begin{itemize}
+    \item End-to-end fine-tuning after frozen-base meta-training.
+    \item Alternative cross-register meta-circuits and learned connectivity.
+    \item More direct diagnostics of phase, amplitude or mutual-information preservation.
+    \item Larger coherent ensembles using tensor-network, distributed or approximate simulation.
+    \item Hardware-aware training, topology-constrained meta-circuits and error mitigation.
+    \item Real IBM hardware evaluation of a reduced coherent configuration.
+    \item Stronger repeated-seed and statistical evaluation.
+    \item Capacity-matched monolithic VQC and classical neural meta-learner comparisons.
+    \item Automated selection based on prediction diversity rather than architecture labels alone.
+    \item Release or formal evaluation of the VQC architecture-search pipeline as a secondary research tool.
+\end{itemize}
+
+% =============================================================================
+% APPENDICES
+% =============================================================================
+\appendix
+
+\chapter{Dataset Details}
+\label{app:datasets}
+\begin{itemize}
+    \item Data sources and licences.
+    \item Original and cleaned dimensions.
+    \item Feature definitions and class distributions.
+    \item Dataset-specific preprocessing.
+\end{itemize}
+
+\chapter{VQC and Ansatz Configurations}
+\label{app:ansatze}
+\begin{itemize}
+    \item Layer specifications.
+    \item Final template JSON definitions.
+    \item Parameter and gate counts.
+    \item Representative circuit diagrams.
+\end{itemize}
+
+\chapter{Experimental Search Spaces}
+\label{app:search-spaces}
+\begin{itemize}
+    \item VQC search grid.
+    \item Ensemble composition grid.
+    \item Meta-circuit grid.
+    \item Final reduced stress-test configurations.
+\end{itemize}
+
+\chapter{Additional Results}
+\label{app:additional-results}
+\begin{itemize}
+    \item Full per-dataset tables.
+    \item Classification reports.
+    \item Confusion matrices.
+    \item Loss curves.
+    \item Failed-run summaries.
+\end{itemize}
+
+\chapter{Circuit and Resource Details}
+\label{app:circuits}
+\begin{itemize}
+    \item Individual VQC circuit.
+    \item Direct QuantumECOC information flow.
+    \item Re-encoding meta-VQC.
+    \item Measurement-free coherent circuit.
+    \item Logical and transpiled resource tables.
+\end{itemize}
+
+\chapter{Computational Environment and Reproducibility}
+\label{app:reproducibility}
+\begin{itemize}
+    \item Software versions.
+    \item HPC resources and Slurm scripts.
+    \item Commands for job generation, execution and aggregation.
+    \item Result schemas and dashboard instructions.
+\end{itemize}
+
+% =============================================================================
+% ACKNOWLEDGEMENTS AND BIBLIOGRAPHY
+% =============================================================================
+\chapter*{Acknowledgements}
+% Write after the main dissertation is complete.
+% Suggested people and resources to consider: Dr Simon Caton, programme staff,
+% UCD SONIC support, family and anyone who directly supported the project.
+
+\printbibliography
+
+\end{document}

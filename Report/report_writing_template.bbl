@@ -1,0 +1,1986 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.3 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{nty/global//global/global/global}
+    \entry{abdulsalam_explainable_2023}{article}{}{}
+      \name{author}{3}{}{%
+        {{hash=4f8b65de8c7cc38a921e8a0bd4d466ae}{%
+           family={Abdulsalam},
+           familyi={A\bibinitperiod},
+           given={Ghada},
+           giveni={G\bibinitperiod}}}%
+        {{hash=282d8160940930aa0eade4c45ba0b662}{%
+           family={Meshoul},
+           familyi={M\bibinitperiod},
+           given={Souham},
+           giveni={S\bibinitperiod}}}%
+        {{hash=5fe14c93858db94bbe6b59e2ac15cd8c}{%
+           family={Shaiba},
+           familyi={S\bibinitperiod},
+           given={Hadil},
+           giveni={H\bibinitperiod}}}%
+      }
+      \strng{namehash}{214760e58e9a8089cff82d66c2203e5a}
+      \strng{fullhash}{214760e58e9a8089cff82d66c2203e5a}
+      \strng{fullhashraw}{214760e58e9a8089cff82d66c2203e5a}
+      \strng{bibnamehash}{214760e58e9a8089cff82d66c2203e5a}
+      \strng{authorbibnamehash}{214760e58e9a8089cff82d66c2203e5a}
+      \strng{authornamehash}{214760e58e9a8089cff82d66c2203e5a}
+      \strng{authorfullhash}{214760e58e9a8089cff82d66c2203e5a}
+      \strng{authorfullhashraw}{214760e58e9a8089cff82d66c2203e5a}
+      \field{sortinit}{A}
+      \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Nowadays, quantum machine learning is attracting great interest in a wide range of ﬁelds due to its potential superior performance and capabilities. The massive increase in computational capacity and speed of quantum computers can lead to a quantum leap in the healthcare ﬁeld. Heart disease seriously threatens human health since it is the leading cause of death worldwide. Quantum machine learning methods can propose effective solutions to predict heart disease and aid in early diagnosis. In this study, an ensemble machine learning model based on quantum machine learning classiﬁers is proposed to predict the risk of heart disease. The proposed model is a bagging ensemble learning model where a quantum support vector classiﬁer was used as a base classiﬁer. Furthermore, in order to make the model’s outcomes more explainable, the importance of every single feature in the prediction is computed and visualized using {SHapley} Additive {exPlanations} ({SHAP}) framework. In the experimental study, other standalone quantum classiﬁers, namely, Quantum Support Vector Classiﬁer ({QSVC}), Quantum Neural Network ({QNN}), and Variational Quantum Classiﬁer ({VQC}) are applied and compared with classical machine learning classiﬁers such as Support Vector Machine ({SVM}), and Artiﬁcial Neural Network ({ANN}). The experimental results on the Cleveland dataset reveal the superiority of {QSVC} compared to the others, which explains its use in the proposed bagging model. The {BaggingQSVC} model outperforms all aforementioned classiﬁers with an accuracy of 90.16\% while showing great competitiveness compared to some state-of-the-art models using the same dataset. The results of the study indicate that quantum machine learning classiﬁers perform better than classical machine learning classiﬁers in predicting heart disease. In addition, the study reveals that the bagging ensemble learning technique is effective in improving the prediction accuracy of quantum classiﬁers.}
+      \field{issn}{1079-8587}
+      \field{journaltitle}{Intelligent Automation \& Soft Computing}
+      \field{langid}{english}
+      \field{number}{1}
+      \field{title}{Explainable Heart Disease Prediction Using Ensemble-Quantum Machine Learning Approach}
+      \field{urlday}{28}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{volume}{36}
+      \field{year}{2023}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{761\bibrangedash 779}
+      \range{pages}{19}
+      \verb{doi}
+      \verb 10.32604/iasc.2023.032262
+      \endverb
+      \verb{file}
+      \verb PDF:C\:\\Users\\edwar\\Zotero\\storage\\GLRTRAWJ\\Abdulsalam et al. - 2023 - Explainable Heart Disease Prediction Using Ensemble-Quantum Machine Learning Approach.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://www.techscience.com/iasc/v36n1/50016
+      \endverb
+      \verb{url}
+      \verb https://www.techscience.com/iasc/v36n1/50016
+      \endverb
+    \endentry
+    \entry{akrom_bloodbrain_2025}{article}{}{}
+      \name{author}{7}{}{%
+        {{hash=513646947720213681230c7e73e88f1d}{%
+           family={Akrom},
+           familyi={A\bibinitperiod},
+           given={Muhamad},
+           giveni={M\bibinitperiod}}}%
+        {{hash=98f7a17a3a5cdc3bdde623ae0c0e7368}{%
+           family={Rustad},
+           familyi={R\bibinitperiod},
+           given={Supriadi},
+           giveni={S\bibinitperiod}}}%
+        {{hash=7e8ad0bbbf51c7e0ae7b3052347cbe61}{%
+           family={Sutojo},
+           familyi={S\bibinitperiod},
+           given={Totok},
+           giveni={T\bibinitperiod}}}%
+        {{hash=41b36232c5b0192a703a2d287cd28dd6}{%
+           family={Ignatius\bibnamedelimb Moses\bibnamedelima Setiadi},
+           familyi={I\bibinitperiod\bibinitdelim M\bibinitperiod\bibinitdelim S\bibinitperiod},
+           given={De\bibnamedelima Rosal},
+           giveni={D\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+        {{hash=c51178cf4a8ba170b19349b5088dc1f3}{%
+           family={Dipojono},
+           familyi={D\bibinitperiod},
+           given={Hermawan\bibnamedelima Kresno},
+           giveni={H\bibinitperiod\bibinitdelim K\bibinitperiod}}}%
+        {{hash=17ba32163103d15a1281d5e72df123cb}{%
+           family={Maezono},
+           familyi={M\bibinitperiod},
+           given={Ryo},
+           giveni={R\bibinitperiod}}}%
+        {{hash=7c24dc028edaee6299e91d14d265c135}{%
+           family={Kasai},
+           familyi={K\bibinitperiod},
+           given={Hideaki},
+           giveni={H\bibinitperiod}}}%
+      }
+      \strng{namehash}{bc034922ff15f8917dbc08cdd1c0269c}
+      \strng{fullhash}{44f546cbab23488dabd122dedf256bbe}
+      \strng{fullhashraw}{44f546cbab23488dabd122dedf256bbe}
+      \strng{bibnamehash}{bc034922ff15f8917dbc08cdd1c0269c}
+      \strng{authorbibnamehash}{bc034922ff15f8917dbc08cdd1c0269c}
+      \strng{authornamehash}{bc034922ff15f8917dbc08cdd1c0269c}
+      \strng{authorfullhash}{44f546cbab23488dabd122dedf256bbe}
+      \strng{authorfullhashraw}{44f546cbab23488dabd122dedf256bbe}
+      \field{sortinit}{A}
+      \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{The blood–brain barrier plays a critical role in maintaining the stability of the central nervous system, yet it also limits drug delivery. Existing machine learning ({ML}) and deep learning ({DL}) approaches for predicting blood–brain barrier permeability ({BBBP}) often face challenges such as class imbalance, scalability, and high computational demands. To address these limitations, this study aims to develop a novel Stacking Ensemble–Quantum Support Vector Machine ({SEQSVM}) model that integrates classical ensemble learners ({AdaBoost}, {XGBoost}, and {CatBoost}) with a quantum meta-learner ({QSVM}). The proposed hybrid model incorporates {SMOTE} + Tomek for effectively handling class imbalance and a customized quantum feature map for molecular fingerprint encoding. Experimental results on two benchmark {BBBP} datasets demonstrate that {SEQSVM} achieves 95.0 \% accuracy on D1 (1970 samples) and 92.0 \% on D2 (8153 samples), consistently outperforming classical ensemble models by 3–6 \% in accuracy, sensitivity, and specificity. Compared to existing {ML} and {DL} models, {SEQSVM} offers a superior balance between accuracy, interpretability, and computational efficiency. It is a promising approach for {BBBP} prediction in real-world drug discovery applications.}
+      \field{day}{1}
+      \field{issn}{2468-1113}
+      \field{journaltitle}{Computational Toxicology}
+      \field{month}{12}
+      \field{shortjournal}{Computational Toxicology}
+      \field{title}{Blood–brain barrier permeability prediction via novel stacking classical-quantum hybrid model}
+      \field{urlday}{28}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{volume}{36}
+      \field{year}{2025}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{100388}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.1016/j.comtox.2025.100388
+      \endverb
+      \verb{file}
+      \verb PDF:C\:\\Users\\edwar\\Zotero\\storage\\4XF3BZ4X\\Akrom et al. - 2025 - Blood–brain barrier permeability prediction via novel stacking classical-quantum hybrid model.pdf:application/pdf;ScienceDirect Snapshot:C\:\\Users\\edwar\\Zotero\\storage\\UDQZWRQN\\S2468111325000489.html:text/html
+      \endverb
+      \verb{urlraw}
+      \verb https://www.sciencedirect.com/science/article/pii/S2468111325000489
+      \endverb
+      \verb{url}
+      \verb https://www.sciencedirect.com/science/article/pii/S2468111325000489
+      \endverb
+      \keyw{Binary classification,Blood–brain barrier permeability,Hybrid model,Quantum support vector machine}
+    \endentry
+    \entry{araujo_quantum_2020}{inproceedings}{}{}
+      \name{author}{2}{}{%
+        {{hash=5c17ba1936f96fdaee36f954f408087c}{%
+           family={Araujo},
+           familyi={A\bibinitperiod},
+           given={Ismael\bibnamedelimb C.\bibnamedelimi S.},
+           giveni={I\bibinitperiod\bibinitdelim C\bibinitperiod\bibinitdelim S\bibinitperiod}}}%
+        {{hash=513e7c032b5e90861f6042d12fc76b04}{%
+           family={Silva},
+           familyi={S\bibinitperiod},
+           given={Adenilton\bibnamedelima J.},
+           giveni={A\bibinitperiod\bibinitdelim J\bibinitperiod},
+           prefix={da},
+           prefixi={d\bibinitperiod}}}%
+      }
+      \strng{namehash}{7cf62e3bb85f4c85fd73fb9cee67e220}
+      \strng{fullhash}{7cf62e3bb85f4c85fd73fb9cee67e220}
+      \strng{fullhashraw}{7cf62e3bb85f4c85fd73fb9cee67e220}
+      \strng{bibnamehash}{7cf62e3bb85f4c85fd73fb9cee67e220}
+      \strng{authorbibnamehash}{7cf62e3bb85f4c85fd73fb9cee67e220}
+      \strng{authornamehash}{7cf62e3bb85f4c85fd73fb9cee67e220}
+      \strng{authorfullhash}{7cf62e3bb85f4c85fd73fb9cee67e220}
+      \strng{authorfullhashraw}{7cf62e3bb85f4c85fd73fb9cee67e220}
+      \field{sortinit}{A}
+      \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Through superposition, a quantum computer is capable of representing an exponentially large set of states, according to the number of qubits available. Quantum machine learning is a subfield of quantum computing that explores the potential of quantum computing to enhance machine learning algorithms. An approach of quantum machine learning named quantum ensembles of quantum classifiers consists of using superposition to build an exponentially large ensemble of classifiers to be trained with an optimization-free learning algorithm. In this work, we investigate how the quantum ensemble works with the addition of an optimization method. Experiments using benchmark datasets show the improvements obtained with the addition of the optimization step.}
+      \field{booktitle}{2020 International Joint Conference on Neural Networks ({IJCNN})}
+      \field{eventtitle}{2020 International Joint Conference on Neural Networks ({IJCNN})}
+      \field{issn}{2161-4407}
+      \field{month}{7}
+      \field{note}{{ISSN}: 2161-4407}
+      \field{title}{Quantum ensemble of trained classifiers}
+      \field{urlday}{28}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{year}{2020}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{1\bibrangedash 8}
+      \range{pages}{8}
+      \verb{doi}
+      \verb 10.1109/IJCNN48605.2020.9207488
+      \endverb
+      \verb{file}
+      \verb Full Text PDF:C\:\\Users\\edwar\\Zotero\\storage\\ERXESSQR\\Araujo and da Silva - 2020 - Quantum ensemble of trained classifiers.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://ieeexplore.ieee.org/abstract/document/9207488
+      \endverb
+      \verb{url}
+      \verb https://ieeexplore.ieee.org/abstract/document/9207488
+      \endverb
+      \keyw{Computational modeling,Logic gates,Machine learning,Machine learning algorithms,Optimization,quantum computing,Quantum computing,quantum ensemble of classifiers,quantum machine learning,Registers}
+    \endentry
+    \entry{biamonte_quantum_2017}{article}{}{}
+      \name{author}{6}{}{%
+        {{hash=392818d7b034b0b53362804f322ab7a5}{%
+           family={Biamonte},
+           familyi={B\bibinitperiod},
+           given={Jacob},
+           giveni={J\bibinitperiod}}}%
+        {{hash=f5a146c5713dd2c5d0bae5d5b944d722}{%
+           family={Wittek},
+           familyi={W\bibinitperiod},
+           given={Peter},
+           giveni={P\bibinitperiod}}}%
+        {{hash=b7f7b29051f4774bb6f5496c8bde3137}{%
+           family={Pancotti},
+           familyi={P\bibinitperiod},
+           given={Nicola},
+           giveni={N\bibinitperiod}}}%
+        {{hash=a16ddc4e1334ba284e93d2d9662ed1c3}{%
+           family={Rebentrost},
+           familyi={R\bibinitperiod},
+           given={Patrick},
+           giveni={P\bibinitperiod}}}%
+        {{hash=9906b78ec80183f9ac5008ae54ce7088}{%
+           family={Wiebe},
+           familyi={W\bibinitperiod},
+           given={Nathan},
+           giveni={N\bibinitperiod}}}%
+        {{hash=501c0933970931f080455b29b43e560d}{%
+           family={Lloyd},
+           familyi={L\bibinitperiod},
+           given={Seth},
+           giveni={S\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Nature Publishing Group}%
+      }
+      \strng{namehash}{de65f18da53209f6400cff1efb92e03a}
+      \strng{fullhash}{031ed5130f34284243a48743ae52d3e4}
+      \strng{fullhashraw}{031ed5130f34284243a48743ae52d3e4}
+      \strng{bibnamehash}{de65f18da53209f6400cff1efb92e03a}
+      \strng{authorbibnamehash}{de65f18da53209f6400cff1efb92e03a}
+      \strng{authornamehash}{de65f18da53209f6400cff1efb92e03a}
+      \strng{authorfullhash}{031ed5130f34284243a48743ae52d3e4}
+      \strng{authorfullhashraw}{031ed5130f34284243a48743ae52d3e4}
+      \field{sortinit}{B}
+      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Nature}
+      \field{number}{7671}
+      \field{title}{Quantum machine learning}
+      \field{volume}{549}
+      \field{year}{2017}
+      \field{pages}{195\bibrangedash 202}
+      \range{pages}{8}
+      \verb{doi}
+      \verb 10.1038/nature23474
+      \endverb
+    \endentry
+    \entry{cerezo_challenges_2022}{article}{}{}
+      \name{author}{5}{}{%
+        {{hash=cda5b62144e1a42caba2840a7224b769}{%
+           family={Cerezo},
+           familyi={C\bibinitperiod},
+           given={M.},
+           giveni={M\bibinitperiod}}}%
+        {{hash=8943c3f5d2e184d9ca754c0e84ec9196}{%
+           family={Verdon},
+           familyi={V\bibinitperiod},
+           given={Guillaume},
+           giveni={G\bibinitperiod}}}%
+        {{hash=557e8b0644394a4580aa21daabbdf021}{%
+           family={Huang},
+           familyi={H\bibinitperiod},
+           given={Hsin-Yuan},
+           giveni={H\bibinithyphendelim Y\bibinitperiod}}}%
+        {{hash=4a995a4c6263a9857f548527d6fff0c5}{%
+           family={Cincio},
+           familyi={C\bibinitperiod},
+           given={Lukasz},
+           giveni={L\bibinitperiod}}}%
+        {{hash=d10bd053b9868d0af6fa53be761e3350}{%
+           family={Coles},
+           familyi={C\bibinitperiod},
+           given={Patrick\bibnamedelima J.},
+           giveni={P\bibinitperiod\bibinitdelim J\bibinitperiod}}}%
+      }
+      \strng{namehash}{9f3fe252c8e07ea798c5758094bc02cd}
+      \strng{fullhash}{e69dfb1f30fc031386b09ab1c7585abb}
+      \strng{fullhashraw}{e69dfb1f30fc031386b09ab1c7585abb}
+      \strng{bibnamehash}{9f3fe252c8e07ea798c5758094bc02cd}
+      \strng{authorbibnamehash}{9f3fe252c8e07ea798c5758094bc02cd}
+      \strng{authornamehash}{9f3fe252c8e07ea798c5758094bc02cd}
+      \strng{authorfullhash}{e69dfb1f30fc031386b09ab1c7585abb}
+      \strng{authorfullhashraw}{e69dfb1f30fc031386b09ab1c7585abb}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{At the intersection of machine learning and quantum computing, Quantum Machine Learning ({QML}) has the potential of accelerating data analysis, especially for quantum data, with applications for quantum materials, biochemistry, and high-energy physics. Nevertheless, challenges remain regarding the trainability of {QML} models. Here we review current methods and applications for {QML}. We highlight differences between quantum and classical machine learning, with a focus on quantum neural networks and quantum deep learning. Finally, we discuss opportunities for quantum advantage with {QML}.}
+      \field{day}{15}
+      \field{eprinttype}{arxiv}
+      \field{issn}{2662-8457}
+      \field{journaltitle}{Nature Computational Science}
+      \field{month}{9}
+      \field{number}{9}
+      \field{shortjournal}{Nat Comput Sci}
+      \field{title}{Challenges and Opportunities in Quantum Machine Learning}
+      \field{urlday}{28}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{volume}{2}
+      \field{year}{2022}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{567\bibrangedash 576}
+      \range{pages}{10}
+      \verb{doi}
+      \verb 10.1038/s43588-022-00311-3
+      \endverb
+      \verb{eprint}
+      \verb 2303.09491 [quant-ph]
+      \endverb
+      \verb{file}
+      \verb Full Text PDF:C\:\\Users\\edwar\\Zotero\\storage\\P2RYLXIF\\Cerezo et al. - 2022 - Challenges and Opportunities in Quantum Machine Learning.pdf:application/pdf;Snapshot:C\:\\Users\\edwar\\Zotero\\storage\\G7II4C67\\2303.html:text/html
+      \endverb
+      \verb{urlraw}
+      \verb http://arxiv.org/abs/2303.09491
+      \endverb
+      \verb{url}
+      \verb http://arxiv.org/abs/2303.09491
+      \endverb
+      \keyw{Computer Science - Machine Learning,Quantum Physics,Statistics - Machine Learning}
+    \endentry
+    \entry{demir_modified_2018}{article}{}{}
+      \name{author}{2}{}{%
+        {{hash=9da97bf9bd9adac05b38a30a98dee286}{%
+           family={DemiR},
+           familyi={D\bibinitperiod},
+           given={Necati},
+           giveni={N\bibinitperiod}}}%
+        {{hash=650c66bf2a4f7a8a3d0bc97312d7e860}{%
+           family={Dalkiliç},
+           familyi={D\bibinitperiod},
+           given={Gökhan},
+           giveni={G\bibinitperiod}}}%
+      }
+      \strng{namehash}{db74a3038e11139fe6fc82a1d224fa6b}
+      \strng{fullhash}{db74a3038e11139fe6fc82a1d224fa6b}
+      \strng{fullhashraw}{db74a3038e11139fe6fc82a1d224fa6b}
+      \strng{bibnamehash}{db74a3038e11139fe6fc82a1d224fa6b}
+      \strng{authorbibnamehash}{db74a3038e11139fe6fc82a1d224fa6b}
+      \strng{authornamehash}{db74a3038e11139fe6fc82a1d224fa6b}
+      \strng{authorfullhash}{db74a3038e11139fe6fc82a1d224fa6b}
+      \strng{authorfullhashraw}{db74a3038e11139fe6fc82a1d224fa6b}
+      \field{sortinit}{D}
+      \field{sortinithash}{6f385f66841fb5e82009dc833c761848}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Detecting intrusions in a network traﬃc has remained an issue for researchers over the years. Advances in the area of machine learning provide opportunities to researchers to detect network intrusion without using a signature database. We studied and analyzed the performance of a stacking technique, which is an ensemble method that is used to combine diﬀerent classi cation models to create a better classi er, on the {KDD}'99 dataset. In this study, the stacking method is improved by modifying the model generation and selection techniques and by using diﬀerent classi cations algorithms as a combiner method. Model generation is performed using subsets of the dataset with randomly selected features and not all of these models are used as input for the combiner. Various metrics are used in model selection and only selected models are used as input for the combiner method. In our experiments, the stacking technique provided higher accuracy results all the time compared to pure machine learning techniques. The second important result in our experiments was obtaining the highest detection rate for user-to-root attacks compared to other studies.}
+      \field{issn}{13000632, 13036203}
+      \field{journaltitle}{{TURKISH} {JOURNAL} {OF} {ELECTRICAL} {ENGINEERING} \& {COMPUTER} {SCIENCES}}
+      \field{langid}{english}
+      \field{shortjournal}{Turk J Elec Eng \& Comp Sci}
+      \field{title}{Modified stacking ensemble approach to detect network intrusion}
+      \field{urlday}{28}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{volume}{26}
+      \field{year}{2018}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{418\bibrangedash 433}
+      \range{pages}{16}
+      \verb{doi}
+      \verb 10.3906/elk-1702-279
+      \endverb
+      \verb{file}
+      \verb PDF:C\:\\Users\\edwar\\Zotero\\storage\\3TV433BJ\\DemiR and Dalkiliç - 2018 - Modified stacking ensemble approach to detect network intrusion.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://journals.tubitak.gov.tr/elektrik/vol26/iss1/35
+      \endverb
+      \verb{url}
+      \verb https://journals.tubitak.gov.tr/elektrik/vol26/iss1/35
+      \endverb
+    \endentry
+    \entry{dong_survey_2020}{article}{}{}
+      \name{author}{5}{}{%
+        {{hash=c9ae780df1915fa209805181f6fac9c2}{%
+           family={Dong},
+           familyi={D\bibinitperiod},
+           given={Xibin},
+           giveni={X\bibinitperiod}}}%
+        {{hash=65ae00ff52a1f9d8174ffcad07d13bfd}{%
+           family={Yu},
+           familyi={Y\bibinitperiod},
+           given={Zhiwen},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=1a8823631580bd30727ec0c4ff04767a}{%
+           family={Cao},
+           familyi={C\bibinitperiod},
+           given={Wenming},
+           giveni={W\bibinitperiod}}}%
+        {{hash=6dc4c7018d106703feadd3a957c35470}{%
+           family={Shi},
+           familyi={S\bibinitperiod},
+           given={Yifan},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=b57469e515001f2ff1832a82c3867958}{%
+           family={Ma},
+           familyi={M\bibinitperiod},
+           given={Qianli},
+           giveni={Q\bibinitperiod}}}%
+      }
+      \strng{namehash}{b6c8a6d7a1d39568e78003892615bacb}
+      \strng{fullhash}{114a712ebdffee08de9744503738effc}
+      \strng{fullhashraw}{114a712ebdffee08de9744503738effc}
+      \strng{bibnamehash}{b6c8a6d7a1d39568e78003892615bacb}
+      \strng{authorbibnamehash}{b6c8a6d7a1d39568e78003892615bacb}
+      \strng{authornamehash}{b6c8a6d7a1d39568e78003892615bacb}
+      \strng{authorfullhash}{114a712ebdffee08de9744503738effc}
+      \strng{authorfullhashraw}{114a712ebdffee08de9744503738effc}
+      \field{sortinit}{D}
+      \field{sortinithash}{6f385f66841fb5e82009dc833c761848}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Despite significant successes achieved in knowledge discovery, traditional machine learning methods may fail to obtain satisfactory performances when dealing with complex data, such as imbalanced, high-dimensional, noisy data, etc. The reason behind is that it is difficult for these methods to capture multiple characteristics and underlying structure of data. In this context, it becomes an important topic in the data mining field that how to effectively construct an efficient knowledge discovery and mining model. Ensemble learning, as one research hot spot, aims to integrate data fusion, data modeling, and data mining into a unified framework. Specifically, ensemble learning firstly extracts a set of features with a variety of transformations. Based on these learned features, multiple learning algorithms are utilized to produce weak predictive results. Finally, ensemble learning fuses the informative knowledge from the above results obtained to achieve knowledge discovery and better predictive performance via voting schemes in an adaptive way. In this paper, we review the research progress of the mainstream approaches of ensemble learning and classify them based on different characteristics. In addition, we present challenges and possible research directions for each mainstream approach of ensemble learning, and we also give an extra introduction for the combination of ensemble learning with other machine learning hot spots such as deep learning, reinforcement learning, etc.}
+      \field{day}{1}
+      \field{issn}{2095-2236}
+      \field{journaltitle}{Frontiers of Computer Science}
+      \field{langid}{english}
+      \field{month}{4}
+      \field{number}{2}
+      \field{shortjournal}{Front. Comput. Sci.}
+      \field{title}{A survey on ensemble learning}
+      \field{urlday}{28}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{volume}{14}
+      \field{year}{2020}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{241\bibrangedash 258}
+      \range{pages}{18}
+      \verb{doi}
+      \verb 10.1007/s11704-019-8208-z
+      \endverb
+      \verb{file}
+      \verb Full Text PDF:C\:\\Users\\edwar\\Zotero\\storage\\CUT38JGY\\Dong et al. - 2020 - A survey on ensemble learning.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://doi.org/10.1007/s11704-019-8208-z
+      \endverb
+      \verb{url}
+      \verb https://doi.org/10.1007/s11704-019-8208-z
+      \endverb
+      \keyw{clustering ensemble,ensemble learning,semi-supervised clustering ensemble,semi-supervised ensemble classification,supervised ensemble classification}
+    \endentry
+    \entry{du_quantum_2025}{misc}{}{}
+      \name{author}{9}{}{%
+        {{hash=fe4973aab2c3055a052158be9a308188}{%
+           family={Du},
+           familyi={D\bibinitperiod},
+           given={Yuxuan},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=534a8b6879f07b1ba6a40630480ccd95}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Xinbiao},
+           giveni={X\bibinitperiod}}}%
+        {{hash=0815caddc76df38a0f5f86df255df778}{%
+           family={Guo},
+           familyi={G\bibinitperiod},
+           given={Naixu},
+           giveni={N\bibinitperiod}}}%
+        {{hash=c71af9ef293fd5a06be3dbcd09ffaa70}{%
+           family={Yu},
+           familyi={Y\bibinitperiod},
+           given={Zhan},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=8dd3d1cfda46deb5e5f955fecc5321f8}{%
+           family={Qian},
+           familyi={Q\bibinitperiod},
+           given={Yang},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=81a68a620c4b697564ce7361ec4fb4ba}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Kaining},
+           giveni={K\bibinitperiod}}}%
+        {{hash=c1d12822588c40116865d28a9c538739}{%
+           family={Hsieh},
+           familyi={H\bibinitperiod},
+           given={Min-Hsiu},
+           giveni={M\bibinithyphendelim H\bibinitperiod}}}%
+        {{hash=a16ddc4e1334ba284e93d2d9662ed1c3}{%
+           family={Rebentrost},
+           familyi={R\bibinitperiod},
+           given={Patrick},
+           giveni={P\bibinitperiod}}}%
+        {{hash=f15b34a2bc944a9f055fd6e2e3a7c460}{%
+           family={Tao},
+           familyi={T\bibinitperiod},
+           given={Dacheng},
+           giveni={D\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {arXiv}%
+      }
+      \strng{namehash}{bbb33efc18d43f0a75685febfa1065b3}
+      \strng{fullhash}{6584295cd1066b8f2208d0d993a730d8}
+      \strng{fullhashraw}{6584295cd1066b8f2208d0d993a730d8}
+      \strng{bibnamehash}{bbb33efc18d43f0a75685febfa1065b3}
+      \strng{authorbibnamehash}{bbb33efc18d43f0a75685febfa1065b3}
+      \strng{authornamehash}{bbb33efc18d43f0a75685febfa1065b3}
+      \strng{authorfullhash}{6584295cd1066b8f2208d0d993a730d8}
+      \strng{authorfullhashraw}{6584295cd1066b8f2208d0d993a730d8}
+      \field{sortinit}{D}
+      \field{sortinithash}{6f385f66841fb5e82009dc833c761848}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{shorttitle}
+      \field{abstract}{This tutorial intends to introduce readers with a background in {AI} to quantum machine learning ({QML}) -- a rapidly evolving field that seeks to leverage the power of quantum computers to reshape the landscape of machine learning. For self-consistency, this tutorial covers foundational principles, representative {QML} algorithms, their potential applications, and critical aspects such as trainability, generalization, and computational complexity. In addition, practical code demonstrations are provided in https://qml-tutorial.github.io/ to illustrate real-world implementations and facilitate hands-on learning. Together, these elements offer readers a comprehensive overview of the latest advancements in {QML}. By bridging the gap between classical machine learning and quantum computing, this tutorial serves as a valuable resource for those looking to engage with {QML} and explore the forefront of {AI} in the quantum era.}
+      \field{day}{3}
+      \field{eprinttype}{arxiv}
+      \field{month}{2}
+      \field{number}{{arXiv}:2502.01146}
+      \field{shorttitle}{Quantum Machine Learning}
+      \field{title}{Quantum Machine Learning: A Hands-on Tutorial for Machine Learning Practitioners and Researchers}
+      \field{urlday}{28}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{year}{2025}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \verb{doi}
+      \verb 10.48550/arXiv.2502.01146
+      \endverb
+      \verb{eprint}
+      \verb 2502.01146 [quant-ph]
+      \endverb
+      \verb{file}
+      \verb Preprint PDF:C\:\\Users\\edwar\\Zotero\\storage\\9LBFLPPY\\Du et al. - 2025 - Quantum Machine Learning A Hands-on Tutorial for Machine Learning Practitioners and Researchers.pdf:application/pdf;Snapshot:C\:\\Users\\edwar\\Zotero\\storage\\PTPPHX6N\\2502.html:text/html
+      \endverb
+      \verb{urlraw}
+      \verb http://arxiv.org/abs/2502.01146
+      \endverb
+      \verb{url}
+      \verb http://arxiv.org/abs/2502.01146
+      \endverb
+      \keyw{Computer Science - Artificial Intelligence,Computer Science - Machine Learning,Quantum Physics}
+    \endentry
+    \entry{friedrich_quantum_2025}{misc}{}{}
+      \name{author}{2}{}{%
+        {{hash=3ebf2c9f0c7e837340fa492d997ff55e}{%
+           family={Friedrich},
+           familyi={F\bibinitperiod},
+           given={Lucas},
+           giveni={L\bibinitperiod}}}%
+        {{hash=f7776f5642ff756843ba35a5cd0e492a}{%
+           family={Maziero},
+           familyi={M\bibinitperiod},
+           given={Jonas},
+           giveni={J\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {arXiv}%
+      }
+      \strng{namehash}{f4ea76b120ff6d482e8e0b9fa775f17b}
+      \strng{fullhash}{f4ea76b120ff6d482e8e0b9fa775f17b}
+      \strng{fullhashraw}{f4ea76b120ff6d482e8e0b9fa775f17b}
+      \strng{bibnamehash}{f4ea76b120ff6d482e8e0b9fa775f17b}
+      \strng{authorbibnamehash}{f4ea76b120ff6d482e8e0b9fa775f17b}
+      \strng{authornamehash}{f4ea76b120ff6d482e8e0b9fa775f17b}
+      \strng{authorfullhash}{f4ea76b120ff6d482e8e0b9fa775f17b}
+      \strng{authorfullhashraw}{f4ea76b120ff6d482e8e0b9fa775f17b}
+      \field{sortinit}{F}
+      \field{sortinithash}{2638baaa20439f1b5a8f80c6c08a13b4}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{The rapid development of quantum computers promises transformative impacts across diverse fields of science and technology. Quantum neural networks ({QNNs}), as a forefront application, hold substantial potential. Despite the multitude of proposed models in the literature, persistent challenges, notably the vanishing gradient ({VG}) and cost function concentration ({CFC}) problems, impede their widespread success. In this study, we introduce a novel approach to quantum neural network construction, specifically addressing the issues of {VG} and {CFC}. Our methodology employs ensemble learning, advocating for the simultaneous deployment of multiple quantum circuits with a depth equal to {\textbackslash}(1{\textbackslash}), a departure from the conventional use of a single quantum circuit with depth {\textbackslash}(L{\textbackslash}). We assess the efficacy of our proposed model through a comparative analysis with a conventionally constructed {QNN}. The evaluation unfolds in the context of a classification problem, yielding valuable insights into the potential advantages of our innovative approach.}
+      \field{day}{19}
+      \field{eprinttype}{arxiv}
+      \field{month}{5}
+      \field{number}{{arXiv}:2402.06026}
+      \field{title}{Quantum neural network with ensemble learning to mitigate barren plateaus and cost function concentration}
+      \field{urlday}{28}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{year}{2025}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \verb{doi}
+      \verb 10.48550/arXiv.2402.06026
+      \endverb
+      \verb{eprint}
+      \verb 2402.06026 [quant-ph]
+      \endverb
+      \verb{file}
+      \verb Preprint PDF:C\:\\Users\\edwar\\Zotero\\storage\\MPAXXQ34\\Friedrich and Maziero - 2025 - Quantum neural network with ensemble learning to mitigate barren plateaus and cost function concentr.pdf:application/pdf;Snapshot:C\:\\Users\\edwar\\Zotero\\storage\\7MVTWTT2\\2402.html:text/html
+      \endverb
+      \verb{urlraw}
+      \verb http://arxiv.org/abs/2402.06026
+      \endverb
+      \verb{url}
+      \verb http://arxiv.org/abs/2402.06026
+      \endverb
+      \keyw{Computer Science - Artificial Intelligence,Quantum Physics}
+    \endentry
+    \entry{incudini_resource_2023}{article}{}{}
+      \name{author}{7}{}{%
+        {{hash=e94dca38198dd99e3eec008766cccc7e}{%
+           family={Incudini},
+           familyi={I\bibinitperiod},
+           given={Massimiliano},
+           giveni={M\bibinitperiod}}}%
+        {{hash=f2dfb571aeb064a687368b8a5675ff87}{%
+           family={Grossi},
+           familyi={G\bibinitperiod},
+           given={Michele},
+           giveni={M\bibinitperiod}}}%
+        {{hash=b7cd57d5ff6ac8f9082f7aaab734e561}{%
+           family={Ceschini},
+           familyi={C\bibinitperiod},
+           given={Andrea},
+           giveni={A\bibinitperiod}}}%
+        {{hash=1d4d99e2726d93bde96ad0c723a94d43}{%
+           family={Mandarino},
+           familyi={M\bibinitperiod},
+           given={Antonio},
+           giveni={A\bibinitperiod}}}%
+        {{hash=9a00a3db12869113fffc5f79fbec12e8}{%
+           family={Panella},
+           familyi={P\bibinitperiod},
+           given={Massimo},
+           giveni={M\bibinitperiod}}}%
+        {{hash=0bb8ee718da0595bb50492135195ace6}{%
+           family={Vallecorsa},
+           familyi={V\bibinitperiod},
+           given={Sofia},
+           giveni={S\bibinitperiod}}}%
+        {{hash=7636490f9aef2e71f0b6e9d44c25a40d}{%
+           family={Windridge},
+           familyi={W\bibinitperiod},
+           given={David},
+           giveni={D\bibinitperiod}}}%
+      }
+      \strng{namehash}{b13ca53b5997da092df0263909949877}
+      \strng{fullhash}{d7d83f2d503be4876b7f2d72b4409ee4}
+      \strng{fullhashraw}{d7d83f2d503be4876b7f2d72b4409ee4}
+      \strng{bibnamehash}{b13ca53b5997da092df0263909949877}
+      \strng{authorbibnamehash}{b13ca53b5997da092df0263909949877}
+      \strng{authornamehash}{b13ca53b5997da092df0263909949877}
+      \strng{authorfullhash}{d7d83f2d503be4876b7f2d72b4409ee4}
+      \strng{authorfullhashraw}{d7d83f2d503be4876b7f2d72b4409ee4}
+      \field{sortinit}{I}
+      \field{sortinithash}{8d291c51ee89b6cd86bf5379f0b151d8}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Quantum neural networks hold significant promise for numerous applications, particularly as they can be executed on the current generation of quantum hardware. However, due to limited qubits or hardware noise, conducting large-scale experiments often requires significant resources. Moreover, the output of the model is susceptible to corruption by quantum hardware noise. To address this issue, we propose the use of ensemble techniques, which involve constructing a single machine learning model based on multiple instances of quantum neural networks. In particular, we implement bagging and {AdaBoost} techniques, with different data loading configurations, and evaluate their performance on both synthetic and real-world classification and regression tasks. To assess the potential performance improvement under different environments, we conducted experiments on both simulated, noiseless software and {IBM} superconducting-based {QPUs}, suggesting these techniques can mitigate the quantum hardware noise. Additionally, we quantify the amount of resources saved using these ensemble techniques. Our findings indicate that these methods enable the construction of large, powerful models even on relatively small quantum devices.}
+      \field{day}{29}
+      \field{issn}{2524-4914}
+      \field{journaltitle}{Quantum Machine Intelligence}
+      \field{langid}{english}
+      \field{month}{9}
+      \field{number}{2}
+      \field{shortjournal}{Quantum Mach. Intell.}
+      \field{title}{Resource saving via ensemble techniques for quantum neural networks}
+      \field{urlday}{28}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{volume}{5}
+      \field{year}{2023}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{39}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.1007/s42484-023-00126-z
+      \endverb
+      \verb{file}
+      \verb Full Text PDF:C\:\\Users\\edwar\\Zotero\\storage\\9QTQU5H8\\Incudini et al. - 2023 - Resource saving via ensemble techniques for quantum neural networks.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://doi.org/10.1007/s42484-023-00126-z
+      \endverb
+      \verb{url}
+      \verb https://doi.org/10.1007/s42484-023-00126-z
+      \endverb
+      \keyw{Bagging,Boosting,Ensemble technique,Quantum machine learning,Quantum neural network}
+    \endentry
+    \entry{kang_amino_2025}{article}{}{}
+      \name{author}{2}{}{%
+        {{hash=8839d301ba786c42ae5ba6c90c7447c3}{%
+           family={Kang},
+           familyi={K\bibinitperiod},
+           given={Seok-Jin},
+           giveni={S\bibinithyphendelim J\bibinitperiod}}}%
+        {{hash=8584db7d5495455e5ffca756a030f9c2}{%
+           family={Shin},
+           familyi={S\bibinitperiod},
+           given={Hongchul},
+           giveni={H\bibinitperiod}}}%
+      }
+      \strng{namehash}{ce57385d637be33eca21d98fc2ec5d50}
+      \strng{fullhash}{ce57385d637be33eca21d98fc2ec5d50}
+      \strng{fullhashraw}{ce57385d637be33eca21d98fc2ec5d50}
+      \strng{bibnamehash}{ce57385d637be33eca21d98fc2ec5d50}
+      \strng{authorbibnamehash}{ce57385d637be33eca21d98fc2ec5d50}
+      \strng{authornamehash}{ce57385d637be33eca21d98fc2ec5d50}
+      \strng{authorfullhash}{ce57385d637be33eca21d98fc2ec5d50}
+      \strng{authorfullhashraw}{ce57385d637be33eca21d98fc2ec5d50}
+      \field{sortinit}{K}
+      \field{sortinithash}{c02bf6bff1c488450c352b40f5d853ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Biologically traditional methods, such as the Uversky plot, which rely on hydrophobicity and net charge, have inherent limitations in accurately distinguishing intrinsically disordered regions ({IDRs}) from ordered protein regions. To overcome these constraints, we propose a novel ensemble framework integrating Machine Learning ({ML}), Deep Neural Networks ({DNN}), and Quantum Neural Networks ({QNN}) to enhance {IDR} classification accuracy. Notably, this study is the first to employ {QNNs} for {IDR} classification, leveraging quantum entanglement to model intricate feature interactions. Amino acid sequences were analyzed to extract biophysical features, including charge distribution, hydrophobicity, and structural properties, which served as inputs for the predictive models. {ML} was utilized for independent feature learning, {DNN} for hierarchical interaction modeling, and {QNN} for capturing high-order dependencies. Our meta-model demonstrated an accuracy of 0.85, surpassing individual classifiers and highlighting the importance of buried amino acids and feature interactions between scaled hydrophobicity and large, buried, and charged residues. This study advances computational protein science by demonstrating the applicability of {QNNs} in bioinformatics and establishing a robust framework for {IDR} classification.}
+      \field{day}{1}
+      \field{issn}{1476-9271}
+      \field{journaltitle}{Computational Biology and Chemistry}
+      \field{month}{10}
+      \field{shortjournal}{Computational Biology and Chemistry}
+      \field{title}{Amino acid sequence-based {IDR} classification using ensemble machine learning and quantum neural networks}
+      \field{urlday}{28}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{volume}{118}
+      \field{year}{2025}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{108480}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.1016/j.compbiolchem.2025.108480
+      \endverb
+      \verb{file}
+      \verb ScienceDirect Full Text PDF:C\:\\Users\\edwar\\Zotero\\storage\\2I4GM2GD\\Kang and Shin - 2025 - Amino acid sequence-based IDR classification using ensemble machine learning and quantum neural netw.pdf:application/pdf;ScienceDirect Snapshot:C\:\\Users\\edwar\\Zotero\\storage\\25AE99DN\\S1476927125001409.html:text/html
+      \endverb
+      \verb{urlraw}
+      \verb https://www.sciencedirect.com/science/article/pii/S1476927125001409
+      \endverb
+      \verb{url}
+      \verb https://www.sciencedirect.com/science/article/pii/S1476927125001409
+      \endverb
+      \keyw{Deep neural network,Intrinsically disordered region,Machine learning,Quantum neural network}
+    \endentry
+    \entry{liu_construction_2025}{inproceedings}{}{}
+      \name{author}{4}{}{%
+        {{hash=0d95971ded1d4c363863c18e43f7b7c6}{%
+           family={Liu},
+           familyi={L\bibinitperiod},
+           given={Jiarui},
+           giveni={J\bibinitperiod}}}%
+        {{hash=8a8ce34650f77cda26b488a123f84b59}{%
+           family={Wu},
+           familyi={W\bibinitperiod},
+           given={Xiaoxin},
+           giveni={X\bibinitperiod}}}%
+        {{hash=e09fb88b8167fa71138a461e2e08dd39}{%
+           family={Liao},
+           familyi={L\bibinitperiod},
+           given={Yiwei},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=0f3b6019d1c7a190e8feef3bf05f15a1}{%
+           family={Peng},
+           familyi={P\bibinitperiod},
+           given={Hui},
+           giveni={H\bibinitperiod}}}%
+      }
+      \strng{namehash}{919edaad505efccd8bd5ec404540d2ba}
+      \strng{fullhash}{b38ddbe5e12e889706fe3cc687efe898}
+      \strng{fullhashraw}{b38ddbe5e12e889706fe3cc687efe898}
+      \strng{bibnamehash}{919edaad505efccd8bd5ec404540d2ba}
+      \strng{authorbibnamehash}{919edaad505efccd8bd5ec404540d2ba}
+      \strng{authornamehash}{919edaad505efccd8bd5ec404540d2ba}
+      \strng{authorfullhash}{b38ddbe5e12e889706fe3cc687efe898}
+      \strng{authorfullhashraw}{b38ddbe5e12e889706fe3cc687efe898}
+      \field{sortinit}{L}
+      \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{{QBoost}, a quantum-inspired ensemble learning algorithm, has performance that depends on the quality of weak classifiers and efficiency of the optimization process. Existing methods suffer from insufficient diversity among weak classifiers and low efficiency in handling nonlinear data patterns, leading to unsatisfactory generalization ability. This study proposes a new weak classifier construction method based on pruned random decision trees-combined with a multi-objective optimized {QBoost} model-to fix these problems. Weak classifiers are constructed using random subspaces with adaptive tree pruning; this enhances diversity while cutting overfitting. For {QBoost}, the study introduces a multi-objective optimization framework to minimize classification loss and maximize weak classifier diversity at the same time, and uses an improved {AdamW} algorithm to speed up convergence. Experiments on {KDD} Cup 99, {IMDb}, and Covertype datasets show the proposed method hits 96.8 \% classification accuracy on {KDD} Cup 99- {\textbackslash}mathbf3. 3 \% higher than Gradient Boosting (93.5 \%) and 2.6 \% higher than standard {QBoost} (94.2 \%). Compared with standard {QBoost}, its training time drops by 37 \%, and it keeps 89.7 \% accuracy under 15 \% feature noise-proving better robustness. These findings confirm the proposed method effectively improves classification performance, efficiency, and diversity.}
+      \field{booktitle}{2025 5th International Conference on Electronic Information Engineering and Computer Science ({EIECS})}
+      \field{eventtitle}{2025 5th International Conference on Electronic Information Engineering and Computer Science ({EIECS})}
+      \field{month}{9}
+      \field{title}{Construction of Weak Classifiers and Optimized Implementation of {QBoost} Ensemble Model}
+      \field{urlday}{28}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{year}{2025}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{498\bibrangedash 502}
+      \range{pages}{5}
+      \verb{doi}
+      \verb 10.1109/EIECS67708.2025.11283264
+      \endverb
+      \verb{file}
+      \verb Full Text PDF:C\:\\Users\\edwar\\Zotero\\storage\\KDA5REYR\\Liu et al. - 2025 - Construction of Weak Classifiers and Optimized Implementation of QBoost Ensemble Model.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://ieeexplore.ieee.org/abstract/document/11283264
+      \endverb
+      \verb{url}
+      \verb https://ieeexplore.ieee.org/abstract/document/11283264
+      \endverb
+      \keyw{Accuracy,{AdamW},Boosting,Classification algorithms,Classifier diversity,Decision trees,Ensemble learning,Multi-objective optimization,Optimization,Overfitting,{QBoost},Random decision tree,Standards,Training,Tuning,Weak classifier}
+    \endentry
+    \entry{mcfarthing_classical_2024}{article}{}{}
+      \name{author}{4}{}{%
+        {{hash=04e137d8af9e8258b882839e8dc7a71e}{%
+           family={{McFarthing}},
+           familyi={M\bibinitperiod},
+           given={Shane},
+           giveni={S\bibinitperiod}}}%
+        {{hash=052ae1a62a496248912bdafbc2834041}{%
+           family={Pillay},
+           familyi={P\bibinitperiod},
+           given={Anban},
+           giveni={A\bibinitperiod}}}%
+        {{hash=4420a280a2de7246243c97bc939db0e2}{%
+           family={Sinayskiy},
+           familyi={S\bibinitperiod},
+           given={Ilya},
+           giveni={I\bibinitperiod}}}%
+        {{hash=4b215190f542b12fd214896e21eff64b}{%
+           family={Petruccione},
+           familyi={P\bibinitperiod},
+           given={Francesco},
+           giveni={F\bibinitperiod}}}%
+      }
+      \strng{namehash}{9b02687a74133c41f83f45269d6e12c3}
+      \strng{fullhash}{ff8b88b42ffdc6013587467f42458627}
+      \strng{fullhashraw}{ff8b88b42ffdc6013587467f42458627}
+      \strng{bibnamehash}{9b02687a74133c41f83f45269d6e12c3}
+      \strng{authorbibnamehash}{9b02687a74133c41f83f45269d6e12c3}
+      \strng{authornamehash}{9b02687a74133c41f83f45269d6e12c3}
+      \strng{authorfullhash}{ff8b88b42ffdc6013587467f42458627}
+      \strng{authorfullhashraw}{ff8b88b42ffdc6013587467f42458627}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{The quantum asymptotically universal multi-feature ({QAUM}) encoding architecture was recently introduced and showed improved expressivity and performance in classifying pulsar stars. The circuit uses generalized trainable layers of parameterized single-qubit rotation gates and single-qubit feature encoding gates. Although the improvement in classification accuracy is promising, the single-qubit nature of this architecture, combined with the circuit depth required for accuracy, limits its applications on {NISQ} devices due to their low coherence times. This work reports on the design, implementation, and evaluation of ensembles of single-qubit {QAUM} classifiers using classical bagging and boosting techniques. We demonstrate an improvement in validation accuracy for pulsar star classification. We find that this improvement is not dataset specific as we observe consistent improvements for the {MNIST} Digits and Wisconsin Cancer datasets. We also observe that the boosting ensemble achieves an acceptable level of accuracy with only a small amount of training, while the bagging ensemble achieves higher overall accuracy with ample training time. This shows that classical ensembles of single-qubit circuits present a new approach for certain classification problems.}
+      \field{day}{16}
+      \field{issn}{2524-4914}
+      \field{journaltitle}{Quantum Machine Intelligence}
+      \field{langid}{english}
+      \field{month}{11}
+      \field{number}{2}
+      \field{shortjournal}{Quantum Mach. Intell.}
+      \field{title}{Classical ensembles of single-qubit quantum variational circuits for classification}
+      \field{urlday}{28}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{volume}{6}
+      \field{year}{2024}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{81}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.1007/s42484-024-00211-x
+      \endverb
+      \verb{file}
+      \verb Full Text PDF:C\:\\Users\\edwar\\Zotero\\storage\\E3EYHRND\\McFarthing et al. - 2024 - Classical ensembles of single-qubit quantum variational circuits for classification.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://doi.org/10.1007/s42484-024-00211-x
+      \endverb
+      \verb{url}
+      \verb https://doi.org/10.1007/s42484-024-00211-x
+      \endverb
+      \keyw{Classical ensembles,Machine learning,Quantum classifiers,Quantum computing}
+    \endentry
+    \entry{nguyen_optimal_2021}{inproceedings}{}{}
+      \name{author}{5}{}{%
+        {{hash=2b29e7909e26874754e01191c51fab38}{%
+           family={Nguyen},
+           familyi={N\bibinitperiod},
+           given={Hieu\bibnamedelima D.},
+           giveni={H\bibinitperiod\bibinitdelim D\bibinitperiod}}}%
+        {{hash=c73fe595538b3f8ad0c89ee840b70fa3}{%
+           family={Lavalva},
+           familyi={L\bibinitperiod},
+           given={Lucas\bibnamedelima J.},
+           giveni={L\bibinitperiod\bibinitdelim J\bibinitperiod}}}%
+        {{hash=48e9f31f43bc0c80fa5af82823ac9562}{%
+           family={Ho},
+           familyi={H\bibinitperiod},
+           given={Shen-Shyang},
+           giveni={S\bibinithyphendelim S\bibinitperiod}}}%
+        {{hash=0c69b0b85727264c70fc1000198e3bde}{%
+           family={Khan},
+           familyi={K\bibinitperiod},
+           given={Mohammed\bibnamedelima Sarosh},
+           giveni={M\bibinitperiod\bibinitdelim S\bibinitperiod}}}%
+        {{hash=662c3fe6e9f54dbf884930be15557656}{%
+           family={Kaegi},
+           familyi={K\bibinitperiod},
+           given={Nicholas},
+           giveni={N\bibinitperiod}}}%
+      }
+      \strng{namehash}{22c11b4067abee73e77f743bddd4bbcf}
+      \strng{fullhash}{00021d3acdcdebb673a38c4017239e5c}
+      \strng{fullhashraw}{00021d3acdcdebb673a38c4017239e5c}
+      \strng{bibnamehash}{22c11b4067abee73e77f743bddd4bbcf}
+      \strng{authorbibnamehash}{22c11b4067abee73e77f743bddd4bbcf}
+      \strng{authornamehash}{22c11b4067abee73e77f743bddd4bbcf}
+      \strng{authorfullhash}{00021d3acdcdebb673a38c4017239e5c}
+      \strng{authorfullhashraw}{00021d3acdcdebb673a38c4017239e5c}
+      \field{sortinit}{N}
+      \field{sortinithash}{22369a73d5f88983a108b63f07f37084}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{cs.LG}
+      \field{eprinttype}{arXiv}
+      \field{title}{Optimal {N}-ary {ECOC} Matrices for Ensemble Classification}
+      \field{year}{2021}
+      \verb{eprint}
+      \verb 2110.02161
+      \endverb
+      \verb{urlraw}
+      \verb https://arxiv.org/abs/2110.02161
+      \endverb
+      \verb{url}
+      \verb https://arxiv.org/abs/2110.02161
+      \endverb
+    \endentry
+    \entry{park_addressing_2025}{misc}{}{}
+      \name{author}{5}{}{%
+        {{hash=a719d6fb27c04747134bcc5080e8c58b}{%
+           family={Park},
+           familyi={P\bibinitperiod},
+           given={Junghoon\bibnamedelima Justin},
+           giveni={J\bibinitperiod\bibinitdelim J\bibinitperiod}}}%
+        {{hash=215df1e9dfb3d5254ecf0b90a6c5db5c}{%
+           family={Cha},
+           familyi={C\bibinitperiod},
+           given={Jiook},
+           giveni={J\bibinitperiod}}}%
+        {{hash=9e097d42e7c19528e5ff45f31b0b4d05}{%
+           family={Chen},
+           familyi={C\bibinitperiod},
+           given={Samuel\bibnamedelima Yen-Chi},
+           giveni={S\bibinitperiod\bibinitdelim Y\bibinithyphendelim C\bibinitperiod}}}%
+        {{hash=e66c5be0dbd500b96ae1262fb13f53a0}{%
+           family={Tseng},
+           familyi={T\bibinitperiod},
+           given={Huan-Hsin},
+           giveni={H\bibinithyphendelim H\bibinitperiod}}}%
+        {{hash=da090c647f62a1cbdfe170b1a59fd90d}{%
+           family={Yoo},
+           familyi={Y\bibinitperiod},
+           given={Shinjae},
+           giveni={S\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {arXiv}%
+      }
+      \strng{namehash}{a1b3a495e34e8b4ab49a8ed2a09c5714}
+      \strng{fullhash}{77f1feafbadcf2f7e8f7751d51fb98a5}
+      \strng{fullhashraw}{77f1feafbadcf2f7e8f7751d51fb98a5}
+      \strng{bibnamehash}{a1b3a495e34e8b4ab49a8ed2a09c5714}
+      \strng{authorbibnamehash}{a1b3a495e34e8b4ab49a8ed2a09c5714}
+      \strng{authornamehash}{a1b3a495e34e8b4ab49a8ed2a09c5714}
+      \strng{authorfullhash}{77f1feafbadcf2f7e8f7751d51fb98a5}
+      \strng{authorfullhashraw}{77f1feafbadcf2f7e8f7751d51fb98a5}
+      \field{sortinit}{P}
+      \field{sortinithash}{ff3bcf24f47321b42cb156c2cc8a8422}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Practical Quantum Machine Learning ({QML}) is challenged by noise, limited scalability, and poor trainability in Variational Quantum Circuits ({VQCs}) on current hardware. We propose a multi-chip ensemble {VQC} framework that systematically overcomes these hurdles. By partitioning high-dimensional computations across ensembles of smaller, independently operating quantum chips and leveraging controlled inter-chip entanglement boundaries, our approach demonstrably mitigates barren plateaus, enhances generalization, and uniquely reduces both quantum error bias and variance simultaneously without additional mitigation overhead. This allows for robust processing of large-scale data, as validated on standard benchmarks ({MNIST}, {FashionMNIST}, {CIFAR}-10) and a real-world {PhysioNet} {EEG} dataset, aligning with emerging modular quantum hardware and paving the way for more scalable {QML}.}
+      \field{day}{20}
+      \field{eprinttype}{arxiv}
+      \field{month}{5}
+      \field{number}{{arXiv}:2505.08782}
+      \field{title}{Addressing the Current Challenges of Quantum Machine Learning through Multi-Chip Ensembles}
+      \field{urlday}{28}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{year}{2025}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \verb{doi}
+      \verb 10.48550/arXiv.2505.08782
+      \endverb
+      \verb{eprint}
+      \verb 2505.08782 [cs.LG]
+      \endverb
+      \verb{file}
+      \verb Preprint PDF:C\:\\Users\\edwar\\Zotero\\storage\\N9USJ25A\\Park et al. - 2025 - Addressing the Current Challenges of Quantum Machine Learning through Multi-Chip Ensembles.pdf:application/pdf;Snapshot:C\:\\Users\\edwar\\Zotero\\storage\\DVGH482U\\2505.html:text/html
+      \endverb
+      \verb{urlraw}
+      \verb http://arxiv.org/abs/2505.08782
+      \endverb
+      \verb{url}
+      \verb http://arxiv.org/abs/2505.08782
+      \endverb
+      \keyw{Computer Science - Computational Engineering,Finance,and Science,Computer Science - Machine Learning}
+    \endentry
+    \entry{pinto_composing_2026}{unpublished}{}{}
+      \name{author}{1}{}{%
+        {{hash=99c759f9b38180074c2635be3fafa79b}{%
+           family={Pinto},
+           familyi={P\bibinitperiod},
+           given={Roniya},
+           giveni={R\bibinitperiod}}}%
+      }
+      \strng{namehash}{99c759f9b38180074c2635be3fafa79b}
+      \strng{fullhash}{99c759f9b38180074c2635be3fafa79b}
+      \strng{fullhashraw}{99c759f9b38180074c2635be3fafa79b}
+      \strng{bibnamehash}{99c759f9b38180074c2635be3fafa79b}
+      \strng{authorbibnamehash}{99c759f9b38180074c2635be3fafa79b}
+      \strng{authornamehash}{99c759f9b38180074c2635be3fafa79b}
+      \strng{authorfullhash}{99c759f9b38180074c2635be3fafa79b}
+      \strng{authorfullhashraw}{99c759f9b38180074c2635be3fafa79b}
+      \field{sortinit}{P}
+      \field{sortinithash}{ff3bcf24f47321b42cb156c2cc8a8422}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{day}{11}
+      \field{month}{6}
+      \field{note}{Final Year Project, University College Dublin. Supervisor: Dr Simon Caton. Internal student project supplied by supervisor; replace or remove before final public submission if required.}
+      \field{title}{Composing Variational Quantum Classifiers Through Ensembling}
+      \field{year}{2026}
+      \field{dateera}{ce}
+    \endentry
+    \entry{radojicic_reducing_2026}{unpublished}{}{}
+      \name{author}{1}{}{%
+        {{hash=f6d99328b8c47a9da4736a2a161b71b9}{%
+           family={Radojicic},
+           familyi={R\bibinitperiod},
+           given={Ana},
+           giveni={A\bibinitperiod}}}%
+      }
+      \strng{namehash}{f6d99328b8c47a9da4736a2a161b71b9}
+      \strng{fullhash}{f6d99328b8c47a9da4736a2a161b71b9}
+      \strng{fullhashraw}{f6d99328b8c47a9da4736a2a161b71b9}
+      \strng{bibnamehash}{f6d99328b8c47a9da4736a2a161b71b9}
+      \strng{authorbibnamehash}{f6d99328b8c47a9da4736a2a161b71b9}
+      \strng{authornamehash}{f6d99328b8c47a9da4736a2a161b71b9}
+      \strng{authorfullhash}{f6d99328b8c47a9da4736a2a161b71b9}
+      \strng{authorfullhashraw}{f6d99328b8c47a9da4736a2a161b71b9}
+      \field{sortinit}{R}
+      \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{day}{11}
+      \field{month}{6}
+      \field{note}{Final Year Project, University College Dublin. Supervisor: Dr Simon Caton. Internal student project supplied by supervisor; replace or remove before final public submission if required.}
+      \field{title}{Reducing Circuit Complexity in Variational Quantum Classification using Random Subspace Method Ensembling}
+      \field{year}{2026}
+      \field{dateera}{ce}
+    \endentry
+    \entry{rathi_quantum_2025}{misc}{}{}
+      \name{author}{2}{}{%
+        {{hash=643bfaaa483e0f74b1f09579e822d881}{%
+           family={Rathi},
+           familyi={R\bibinitperiod},
+           given={Neeshu},
+           giveni={N\bibinitperiod}}}%
+        {{hash=da8d1aa29dfb02d040078f06d447f042}{%
+           family={Kumar},
+           familyi={K\bibinitperiod},
+           given={Sanjeev},
+           giveni={S\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {arXiv}%
+      }
+      \strng{namehash}{fe0156c9cf23fff55e8e1acf8c5e045a}
+      \strng{fullhash}{fe0156c9cf23fff55e8e1acf8c5e045a}
+      \strng{fullhashraw}{fe0156c9cf23fff55e8e1acf8c5e045a}
+      \strng{bibnamehash}{fe0156c9cf23fff55e8e1acf8c5e045a}
+      \strng{authorbibnamehash}{fe0156c9cf23fff55e8e1acf8c5e045a}
+      \strng{authornamehash}{fe0156c9cf23fff55e8e1acf8c5e045a}
+      \strng{authorfullhash}{fe0156c9cf23fff55e8e1acf8c5e045a}
+      \strng{authorfullhashraw}{fe0156c9cf23fff55e8e1acf8c5e045a}
+      \field{extraname}{1}
+      \field{sortinit}{R}
+      \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{The development of noise-resilient quantum machine learning ({QML}) algorithms is critical in the noisy intermediate-scale quantum ({NISQ}) era. In this work, we propose a quantum bagging framework that uses {QMeans} clustering as the base learner to reduce prediction variance and enhance robustness to label noise. Unlike bagging frameworks built on supervised learners, our method leverages the unsupervised nature of {QMeans}, combined with quantum bootstrapping via {QRAM}-based sampling and bagging aggregation through majority voting. Through extensive simulations on both noisy classification and regression tasks, we demonstrate that the proposed quantum bagging algorithm performs comparably to its classical counterpart using {KMeans} while exhibiting greater resilience to label corruption than supervised bagging methods. This highlights the potential of unsupervised quantum bagging in learning from unreliable data.}
+      \field{day}{8}
+      \field{eprinttype}{arxiv}
+      \field{month}{9}
+      \field{number}{{arXiv}:2509.07040}
+      \field{title}{A Quantum Bagging Algorithm with Unsupervised Base Learners for Label Corrupted Datasets}
+      \field{urlday}{28}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{year}{2025}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \verb{doi}
+      \verb 10.48550/arXiv.2509.07040
+      \endverb
+      \verb{eprint}
+      \verb 2509.07040 [quant-ph]
+      \endverb
+      \verb{file}
+      \verb Preprint PDF:C\:\\Users\\edwar\\Zotero\\storage\\JHWL2SNC\\Rathi and Kumar - 2025 - A Quantum Bagging Algorithm with Unsupervised Base Learners for Label Corrupted Datasets.pdf:application/pdf;Snapshot:C\:\\Users\\edwar\\Zotero\\storage\\N3BXFY7W\\2509.html:text/html
+      \endverb
+      \verb{urlraw}
+      \verb http://arxiv.org/abs/2509.07040
+      \endverb
+      \verb{url}
+      \verb http://arxiv.org/abs/2509.07040
+      \endverb
+      \keyw{Computer Science - Machine Learning,Quantum Physics}
+    \endentry
+    \entry{rathi_enhanced_2025}{article}{}{}
+      \name{author}{2}{}{%
+        {{hash=643bfaaa483e0f74b1f09579e822d881}{%
+           family={Rathi},
+           familyi={R\bibinitperiod},
+           given={Neeshu},
+           giveni={N\bibinitperiod}}}%
+        {{hash=da8d1aa29dfb02d040078f06d447f042}{%
+           family={Kumar},
+           familyi={K\bibinitperiod},
+           given={Sanjeev},
+           giveni={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{fe0156c9cf23fff55e8e1acf8c5e045a}
+      \strng{fullhash}{fe0156c9cf23fff55e8e1acf8c5e045a}
+      \strng{fullhashraw}{fe0156c9cf23fff55e8e1acf8c5e045a}
+      \strng{bibnamehash}{fe0156c9cf23fff55e8e1acf8c5e045a}
+      \strng{authorbibnamehash}{fe0156c9cf23fff55e8e1acf8c5e045a}
+      \strng{authornamehash}{fe0156c9cf23fff55e8e1acf8c5e045a}
+      \strng{authorfullhash}{fe0156c9cf23fff55e8e1acf8c5e045a}
+      \strng{authorfullhashraw}{fe0156c9cf23fff55e8e1acf8c5e045a}
+      \field{extraname}{2}
+      \field{sortinit}{R}
+      \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Ensemble learning plays a central role in improving the generalization of machine learning models, yet its full potential remains underexplored in the quantum domain. In this work, we propose a Quantum Ensemble Learning ({QEL}) algorithm that leverages the parallelism of quantum computing to construct diverse classifiers in a shallow-circuit ensemble. The method uses a control-qubit-based sampling strategy to create superpositions of training subsamples, enabling simultaneous evaluation of multiple weak learners. The algorithm proceeds through four stages: quantum state preparation, superposition-based sampling, learning via quantum interference, and final measurement. Our framework is flexible and allows different quantum classifiers to be used as base learners. We demonstrate this by implementing a robust {QSVM}-based ensemble with quantum feature extraction using {PauliFeatureMaps}. Unlike classical methods, this technique adds classifiers to time complexity additively rather than multiplicatively due to the parallelism of quantum computing. To demonstrate the workflow of the proposed algorithm, we include a step-by-step example using the {XOR} problem. Simulation results further validate the effectiveness of the {QEL} framework—enhanced by the integration of a Quantum Support Vector Machine ({QSVM}) classifier with quantum feature extraction—showing improved classification accuracy compared to existing algorithms across several {UCI} benchmark datasets using {IBM} Qiskit.}
+      \field{issn}{1532-0634}
+      \field{journaltitle}{Concurrency and Computation: Practice and Experience}
+      \field{langid}{english}
+      \field{note}{\_eprint: https://onlinelibrary.wiley.com/doi/pdf/10.1002/cpe.70166}
+      \field{number}{15}
+      \field{title}{Enhanced Quantum Ensemble Classification Algorithm With Shallow Circuit and Parallelism Mechanism}
+      \field{urlday}{28}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{volume}{37}
+      \field{year}{2025}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{e70166}
+      \range{pages}{-1}
+      \verb{doi}
+      \verb 10.1002/cpe.70166
+      \endverb
+      \verb{file}
+      \verb Full Text PDF:C\:\\Users\\edwar\\Zotero\\storage\\PWLP4ULL\\Rathi and Kumar - 2025 - Enhanced Quantum Ensemble Classification Algorithm With Shallow Circuit and Parallelism Mechanism.pdf:application/pdf;Snapshot:C\:\\Users\\edwar\\Zotero\\storage\\J577VBRI\\cpe.html:text/html
+      \endverb
+      \verb{urlraw}
+      \verb https://onlinelibrary.wiley.com/doi/abs/10.1002/cpe.70166
+      \endverb
+      \verb{url}
+      \verb https://onlinelibrary.wiley.com/doi/abs/10.1002/cpe.70166
+      \endverb
+      \keyw{binary classification,ensemble method,quantum feature extraction,quantum registers,quantum support vector machine}
+    \endentry
+    \entry{resch_quantum_2019}{misc}{}{}
+      \name{author}{2}{}{%
+        {{hash=18d37d6c6646e9219494c02977d98bf1}{%
+           family={Resch},
+           familyi={R\bibinitperiod},
+           given={Salonik},
+           giveni={S\bibinitperiod}}}%
+        {{hash=cb86f443947bad16501b29022c5cb754}{%
+           family={Karpuzcu},
+           familyi={K\bibinitperiod},
+           given={Ulya\bibnamedelima R.},
+           giveni={U\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {arXiv}%
+      }
+      \strng{namehash}{3ec3117f47c3c438561419446b8b5a9a}
+      \strng{fullhash}{3ec3117f47c3c438561419446b8b5a9a}
+      \strng{fullhashraw}{3ec3117f47c3c438561419446b8b5a9a}
+      \strng{bibnamehash}{3ec3117f47c3c438561419446b8b5a9a}
+      \strng{authorbibnamehash}{3ec3117f47c3c438561419446b8b5a9a}
+      \strng{authornamehash}{3ec3117f47c3c438561419446b8b5a9a}
+      \strng{authorfullhash}{3ec3117f47c3c438561419446b8b5a9a}
+      \strng{authorfullhashraw}{3ec3117f47c3c438561419446b8b5a9a}
+      \field{sortinit}{R}
+      \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{shorttitle}
+      \field{abstract}{Quantum computers, if fully realized, promise to be a revolutionary technology. As a result, quantum computing has become one of the hottest areas of research in the last few years. Much effort is being applied at all levels of the system stack, from the creation of quantum algorithms to the development of hardware devices. The quantum age appears to be arriving sooner rather than later as commercially useful small-to-medium sized machines have already been built. However, full-scale quantum computers, and the full-scale algorithms they would perform, remain out of reach for now. It is currently uncertain how the first such computer will be built. Many different technologies are competing to be the first scalable quantum computer.}
+      \field{day}{29}
+      \field{eprinttype}{arxiv}
+      \field{month}{10}
+      \field{number}{{arXiv}:1905.07240}
+      \field{shorttitle}{Quantum Computing}
+      \field{title}{Quantum Computing: An Overview Across the System Stack}
+      \field{urlday}{28}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{year}{2019}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \verb{doi}
+      \verb 10.48550/arXiv.1905.07240
+      \endverb
+      \verb{eprint}
+      \verb 1905.07240 [quant-ph]
+      \endverb
+      \verb{file}
+      \verb Preprint PDF:C\:\\Users\\edwar\\Zotero\\storage\\5RTR8AW8\\Resch and Karpuzcu - 2019 - Quantum Computing An Overview Across the System Stack.pdf:application/pdf;Snapshot:C\:\\Users\\edwar\\Zotero\\storage\\T2NMV58W\\1905.html:text/html
+      \endverb
+      \verb{urlraw}
+      \verb http://arxiv.org/abs/1905.07240
+      \endverb
+      \verb{url}
+      \verb http://arxiv.org/abs/1905.07240
+      \endverb
+      \keyw{Quantum Physics}
+    \endentry
+    \entry{safina_quantum_2023}{article}{}{}
+      \name{author}{1}{}{%
+        {{hash=d27ea54b798c8e076ba2661f50c03aee}{%
+           family={Safina},
+           familyi={S\bibinitperiod},
+           given={L.\bibnamedelimi I.},
+           giveni={L\bibinitperiod\bibinitdelim I\bibinitperiod}}}%
+      }
+      \strng{namehash}{d27ea54b798c8e076ba2661f50c03aee}
+      \strng{fullhash}{d27ea54b798c8e076ba2661f50c03aee}
+      \strng{fullhashraw}{d27ea54b798c8e076ba2661f50c03aee}
+      \strng{bibnamehash}{d27ea54b798c8e076ba2661f50c03aee}
+      \strng{authorbibnamehash}{d27ea54b798c8e076ba2661f50c03aee}
+      \strng{authornamehash}{d27ea54b798c8e076ba2661f50c03aee}
+      \strng{authorfullhash}{d27ea54b798c8e076ba2661f50c03aee}
+      \strng{authorfullhashraw}{d27ea54b798c8e076ba2661f50c03aee}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{In this work, we present our experiment’s results where we simulate the quantum amplitude amplification algorithm for a prediction problem. The problem is to calculate the total probability of a good class by an ensemble model. Theoretically, the quantum prediction will be quadratically faster than a classical prediction. We need to get outputs (probabilities of the good class) of all classifiers. After that, by summation the probabilities the ensemble model returns the total probability of the good class for an input object. Let us demonstrate how the quantum amplitude amplification algorithm allows us to estimate the total probability. In this experiment, we count an iterations number of quantum search running to estimate the total probability.}
+      \field{day}{1}
+      \field{issn}{1818-9962}
+      \field{journaltitle}{Lobachevskii Journal of Mathematics}
+      \field{langid}{english}
+      \field{month}{2}
+      \field{number}{2}
+      \field{shortjournal}{Lobachevskii J Math}
+      \field{title}{Quantum Amplitude Amplification Algorithm Simulation for Prediction of a Binary Classification Problem}
+      \field{urlday}{28}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{volume}{44}
+      \field{year}{2023}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{747\bibrangedash 756}
+      \range{pages}{10}
+      \verb{doi}
+      \verb 10.1134/S1995080223020324
+      \endverb
+      \verb{file}
+      \verb Full Text PDF:C\:\\Users\\edwar\\Zotero\\storage\\D92INUMM\\Safina - 2023 - Quantum Amplitude Amplification Algorithm Simulation for Prediction of a Binary Classification Probl.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://doi.org/10.1134/S1995080223020324
+      \endverb
+      \verb{url}
+      \verb https://doi.org/10.1134/S1995080223020324
+      \endverb
+      \keyw{quantum amplitude amplification,quantum machine learning,quantum simulation}
+    \endentry
+    \entry{salmenpera_impact_2024}{misc}{}{}
+      \name{author}{4}{}{%
+        {{hash=c490c39881fe57a9eae049ce582b05eb}{%
+           family={Salmenperä},
+           familyi={S\bibinitperiod},
+           given={Ilmo},
+           giveni={I\bibinitperiod}}}%
+        {{hash=5b6cf3f9c94d3adddbd68feed59d689d}{%
+           family={Kuhtarskis},
+           familyi={K\bibinitperiod},
+           given={Ilmars},
+           giveni={I\bibinitperiod}}}%
+        {{hash=05b702fa3d07e02c7e7d4a97fc179335}{%
+           family={Griend},
+           familyi={G\bibinitperiod},
+           given={Arianne\bibnamedelimb Meijer\bibnamedelimb van\bibnamedelima de},
+           giveni={A\bibinitperiod\bibinitdelim M\bibinitperiod\bibinitdelim v\bibinitperiod\bibinitdelim d\bibinitperiod}}}%
+        {{hash=2864a1913a743aff3fb290f702057dc6}{%
+           family={Nurminen},
+           familyi={N\bibinitperiod},
+           given={Jukka\bibnamedelima K.},
+           giveni={J\bibinitperiod\bibinitdelim K\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {arXiv}%
+      }
+      \strng{namehash}{49a1760b325d54f101a0b1441ef1eb7a}
+      \strng{fullhash}{0ed21d36b64223a78ae21e6526630f10}
+      \strng{fullhashraw}{0ed21d36b64223a78ae21e6526630f10}
+      \strng{bibnamehash}{49a1760b325d54f101a0b1441ef1eb7a}
+      \strng{authorbibnamehash}{49a1760b325d54f101a0b1441ef1eb7a}
+      \strng{authornamehash}{49a1760b325d54f101a0b1441ef1eb7a}
+      \strng{authorfullhash}{0ed21d36b64223a78ae21e6526630f10}
+      \strng{authorfullhashraw}{0ed21d36b64223a78ae21e6526630f10}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Designing a useful feature map for a quantum kernel is a critical task when attempting to achieve an advantage over classical machine learning models. The choice of circuit architecture, i.e. how feature-dependent gates should be interwoven with other gates is a relatively unexplored problem and becomes very important when using a model of quantum kernels called Quantum Embedding Kernels ({QEK}). We study and categorize various architectural patterns in {QEKs} and show that existing architectural styles do not behave as the literature supposes. We also produce a novel alternative architecture based on the old ones and show that it performs equally well while containing fewer gates than its older counterparts.}
+      \field{day}{20}
+      \field{eprinttype}{arxiv}
+      \field{month}{9}
+      \field{number}{{arXiv}:2409.13147}
+      \field{title}{The Impact of Feature Embedding Placement in the Ansatz of a Quantum Kernel in {QSVMs}}
+      \field{urlday}{28}
+      \field{urlmonth}{6}
+      \field{urlyear}{2026}
+      \field{year}{2024}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \verb{doi}
+      \verb 10.48550/arXiv.2409.13147
+      \endverb
+      \verb{eprint}
+      \verb 2409.13147 [quant-ph]
+      \endverb
+      \verb{urlraw}
+      \verb http://arxiv.org/abs/2409.13147
+      \endverb
+      \verb{url}
+      \verb http://arxiv.org/abs/2409.13147
+      \endverb
+      \keyw{Computer Science - Artificial Intelligence,Quantum Physics}
+    \endentry
+    \entry{schuld_quantum_2018}{article}{}{}
+      \name{author}{2}{}{%
+        {{hash=566bc76219b4c730f8c2d46f5dcc455a}{%
+           family={Schuld},
+           familyi={S\bibinitperiod},
+           given={Maria},
+           giveni={M\bibinitperiod}}}%
+        {{hash=4b215190f542b12fd214896e21eff64b}{%
+           family={Petruccione},
+           familyi={P\bibinitperiod},
+           given={Francesco},
+           giveni={F\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Nature Publishing Group}%
+      }
+      \strng{namehash}{2aeac50fe58b98b77f0aec56f0b52e2e}
+      \strng{fullhash}{2aeac50fe58b98b77f0aec56f0b52e2e}
+      \strng{fullhashraw}{2aeac50fe58b98b77f0aec56f0b52e2e}
+      \strng{bibnamehash}{2aeac50fe58b98b77f0aec56f0b52e2e}
+      \strng{authorbibnamehash}{2aeac50fe58b98b77f0aec56f0b52e2e}
+      \strng{authornamehash}{2aeac50fe58b98b77f0aec56f0b52e2e}
+      \strng{authorfullhash}{2aeac50fe58b98b77f0aec56f0b52e2e}
+      \strng{authorfullhashraw}{2aeac50fe58b98b77f0aec56f0b52e2e}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Quantum machine learning witnesses an increasing amount of quantum algorithms for data-driven decision making, a problem with potential applications ranging from automated image recognition to medical diagnosis. Many of those algorithms are implementations of quantum classifiers, or models for the classification of data inputs with a quantum computer. Following the success of collective decision making with ensembles in classical machine learning, this paper introduces the concept of quantum ensembles of quantum classifiers. Creating the ensemble corresponds to a state preparation routine, after which the quantum classifiers are evaluated in parallel and their combined decision is accessed by a single-qubit measurement. This framework naturally allows for exponentially large ensembles in which – similar to Bayesian learning – the individual classifiers do not have to be trained. As an example, we analyse an exponentially large quantum ensemble in which each classifier is weighed according to its performance in classifying the training data, leading to new results for quantum as well as classical machine learning.}
+      \field{day}{9}
+      \field{issn}{2045-2322}
+      \field{journaltitle}{Scientific Reports}
+      \field{langid}{english}
+      \field{month}{2}
+      \field{number}{1}
+      \field{shortjournal}{Sci Rep}
+      \field{title}{Quantum ensembles of quantum classifiers}
+      \field{urlday}{28}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{volume}{8}
+      \field{year}{2018}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{2772}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.1038/s41598-018-20403-3
+      \endverb
+      \verb{file}
+      \verb Full Text PDF:C\:\\Users\\edwar\\Zotero\\storage\\C6PWL7BL\\Schuld and Petruccione - 2018 - Quantum ensembles of quantum classifiers.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://www.nature.com/articles/s41598-018-20403-3
+      \endverb
+      \verb{url}
+      \verb https://www.nature.com/articles/s41598-018-20403-3
+      \endverb
+      \keyw{Computational science,Quantum information}
+    \endentry
+    \entry{schuld_introduction_2015}{article}{}{}
+      \name{author}{3}{}{%
+        {{hash=566bc76219b4c730f8c2d46f5dcc455a}{%
+           family={Schuld},
+           familyi={S\bibinitperiod},
+           given={Maria},
+           giveni={M\bibinitperiod}}}%
+        {{hash=4420a280a2de7246243c97bc939db0e2}{%
+           family={Sinayskiy},
+           familyi={S\bibinitperiod},
+           given={Ilya},
+           giveni={I\bibinitperiod}}}%
+        {{hash=4b215190f542b12fd214896e21eff64b}{%
+           family={Petruccione},
+           familyi={P\bibinitperiod},
+           given={Francesco},
+           giveni={F\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Taylor \& Francis}%
+      }
+      \strng{namehash}{5c795382f74acd024799d40614a227fd}
+      \strng{fullhash}{5c795382f74acd024799d40614a227fd}
+      \strng{fullhashraw}{5c795382f74acd024799d40614a227fd}
+      \strng{bibnamehash}{5c795382f74acd024799d40614a227fd}
+      \strng{authorbibnamehash}{5c795382f74acd024799d40614a227fd}
+      \strng{authornamehash}{5c795382f74acd024799d40614a227fd}
+      \strng{authorfullhash}{5c795382f74acd024799d40614a227fd}
+      \strng{authorfullhashraw}{5c795382f74acd024799d40614a227fd}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Machine learning algorithms learn a desired input-output relation from examples in order to interpret new inputs. This is important for tasks such as image and speech recognition or strategy optimisation, with growing applications in the {IT} industry. In the last couple of years, researchers investigated if quantum computing can help to improve classical machine learning algorithms. Ideas range from running computationally costly algorithms or their subroutines efficiently on a quantum computer to the translation of stochastic methods into the language of quantum theory. This contribution gives a systematic overview of the emerging field of quantum machine learning. It presents the approaches as well as technical details in an accessible way, and discusses the potential of a future theory of quantum learning.}
+      \field{day}{3}
+      \field{issn}{0010-7514}
+      \field{journaltitle}{Contemporary Physics}
+      \field{month}{4}
+      \field{note}{\_eprint: https://doi.org/10.1080/00107514.2014.964942}
+      \field{number}{2}
+      \field{title}{An introduction to quantum machine learning}
+      \field{urlday}{28}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{volume}{56}
+      \field{year}{2015}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{172\bibrangedash 185}
+      \range{pages}{14}
+      \verb{doi}
+      \verb 10.1080/00107514.2014.964942
+      \endverb
+      \verb{file}
+      \verb Full Text PDF:C\:\\Users\\edwar\\Zotero\\storage\\WUIPU2FS\\Schuld et al. - 2015 - An introduction to quantum machine learning.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://doi.org/10.1080/00107514.2014.964942
+      \endverb
+      \verb{url}
+      \verb https://doi.org/10.1080/00107514.2014.964942
+      \endverb
+      \keyw{artificial intelligence,machine learning,quantum computing,quantum machine learning}
+    \endentry
+    \entry{song_quantum_2024}{misc}{}{}
+      \name{author}{33}{}{%
+        {{hash=6e13595bc707c04198ec8fd174353628}{%
+           family={Song},
+           familyi={S\bibinitperiod},
+           given={Chao},
+           giveni={C\bibinitperiod}}}%
+        {{hash=21f0460263632295e3b51ed9d3b17cbb}{%
+           family={Chen},
+           familyi={C\bibinitperiod},
+           given={Jiachen},
+           giveni={J\bibinitperiod}}}%
+        {{hash=70f3ed4b485a76c6ffeeb3920634e66b}{%
+           family={Wu},
+           familyi={W\bibinitperiod},
+           given={Yaozu},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=77454d4baaf8934f9e9d764df5fdef37}{%
+           family={Yang},
+           familyi={Y\bibinitperiod},
+           given={Zhen},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=9b26f56d8401886ca64cc43c6d36d98f}{%
+           family={Xu},
+           familyi={X\bibinitperiod},
+           given={Shibo},
+           giveni={S\bibinitperiod}}}%
+        {{hash=31514f3993d4222ab6d7f8840749d08c}{%
+           family={Ye},
+           familyi={Y\bibinitperiod},
+           given={Xuan},
+           giveni={X\bibinitperiod}}}%
+        {{hash=9977c03c4025bd86cbe014ceb976aabe}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Ke},
+           giveni={K\bibinitperiod}}}%
+        {{hash=479bb69e363819eee650f9b358a844ce}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Chuanyu},
+           giveni={C\bibinitperiod}}}%
+        {{hash=548d291605ae25c6e69cabd2c44b78fe}{%
+           family={Jin},
+           familyi={J\bibinitperiod},
+           given={Feitong},
+           giveni={F\bibinitperiod}}}%
+        {{hash=a4bbecc25541579855bb0846108b292f}{%
+           family={Zhu},
+           familyi={Z\bibinitperiod},
+           given={Xuhao},
+           giveni={X\bibinitperiod}}}%
+        {{hash=2c77663ba135caa9dfff35b526185da9}{%
+           family={Gao},
+           familyi={G\bibinitperiod},
+           given={Yu},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=bf6ab28a9c709e377770a84310e3e642}{%
+           family={Tan},
+           familyi={T\bibinitperiod},
+           given={Ziqi},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=b29b13d350cde9cbc1ea60c02deddf4c}{%
+           family={Cui},
+           familyi={C\bibinitperiod},
+           given={Zhengyi},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=32e003257fa9a0e7702b5bc5519634fd}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Aosai},
+           giveni={A\bibinitperiod}}}%
+        {{hash=bc9736b40ca170d1b1ff5b2a9bb2545b}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Ning},
+           giveni={N\bibinitperiod}}}%
+        {{hash=9c044cf65d0598ba53bf33e2c3c6221d}{%
+           family={Zou},
+           familyi={Z\bibinitperiod},
+           given={Yiren},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=875b7bb8e78a4404d2d444dfae696c7d}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Tingting},
+           giveni={T\bibinitperiod}}}%
+        {{hash=2dc5d0330a2e8f1beea04bc10f5659f4}{%
+           family={Shen},
+           familyi={S\bibinitperiod},
+           given={Fanhao},
+           giveni={F\bibinitperiod}}}%
+        {{hash=43a5d861c4f6b9c0913e642dbefd4aaa}{%
+           family={Zhong},
+           familyi={Z\bibinitperiod},
+           given={Jiarun},
+           giveni={J\bibinitperiod}}}%
+        {{hash=bb12fc2f8522265ab8766073800d9178}{%
+           family={Bao},
+           familyi={B\bibinitperiod},
+           given={Zehang},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=d20cb11248bd95d808a96f8c3ff946c2}{%
+           family={Zhu},
+           familyi={Z\bibinitperiod},
+           given={Zitian},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=59faad8807a721d24e5e3eb06a703dd9}{%
+           family={Song},
+           familyi={S\bibinitperiod},
+           given={Zixuan},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=791a23cbca6a5fd3dd10deefc1672b44}{%
+           family={Deng},
+           familyi={D\bibinitperiod},
+           given={Jinfeng},
+           giveni={J\bibinitperiod}}}%
+        {{hash=db3d622835e8759fff0eb35e0e195530}{%
+           family={Dong},
+           familyi={D\bibinitperiod},
+           given={Hang},
+           giveni={H\bibinitperiod}}}%
+        {{hash=8139bad61e635eae85ffadb7c124bb9d}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Pengfei},
+           giveni={P\bibinitperiod}}}%
+        {{hash=fc6c43889d596dad950896a42433e7cf}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Daili},
+           giveni={D\bibinitperiod}}}%
+        {{hash=25bbf4047d900f3760c65b01ee899dba}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Wei},
+           giveni={W\bibinitperiod}}}%
+        {{hash=c249ae4489dce92997b0231c8f89ff61}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Hekang},
+           giveni={H\bibinitperiod}}}%
+        {{hash=969c874d1eddd418382d0b0aa8562920}{%
+           family={Guo},
+           familyi={G\bibinitperiod},
+           given={Qiujiang},
+           giveni={Q\bibinitperiod}}}%
+        {{hash=d23f8780b31a9738eb2ec5f9c954bcb4}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Zhen},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=96641b60b95eb223b3df53d9263f63ff}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Ying},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=e2b6c9e3d274832da114a8433a343b0d}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Xiaoting},
+           giveni={X\bibinitperiod}}}%
+        {{hash=39856f0439f35f79a8eed8b12d26166c}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={H.},
+           giveni={H\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {In Review}%
+      }
+      \strng{namehash}{934da343001d5ea1cbf7a9adc7f6496c}
+      \strng{fullhash}{cf0c45556494cc68c357bb2431922ec0}
+      \strng{fullhashraw}{cf0c45556494cc68c357bb2431922ec0}
+      \strng{bibnamehash}{934da343001d5ea1cbf7a9adc7f6496c}
+      \strng{authorbibnamehash}{934da343001d5ea1cbf7a9adc7f6496c}
+      \strng{authornamehash}{934da343001d5ea1cbf7a9adc7f6496c}
+      \strng{authorfullhash}{cf0c45556494cc68c357bb2431922ec0}
+      \strng{authorfullhashraw}{cf0c45556494cc68c357bb2431922ec0}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Abstract Quantum machine learning is among the most exciting potential applications of quantum computing. However, the vulnerability of quantum information to environmental noises and the consequent high cost for realizing fault tolerance has impeded the quantum models from learning complex datasets. Here, we introduce Adaboost.Q, a quantum adaptation of the classical adaptive boosting (Adaboost) algorithm designed to enhance learning capabilities of quantum classifiers. Based on the probabilistic nature of quantum measurement, the algorithm improves the prediction accuracy by refining the attention mechanism during the adaptive training and combination of quantum classifiers. We experimentally demonstrate the versatility of our approach on a programmable superconducting processor, where we observe notable performance enhancements across various quantum machine learning models, including quantum neural networks and quantum convolutional neural networks. With Adaboost.Q, we achieve an accuracy above 86\% for a ten-class classification task over 10,000 test samples, and an accuracy of 100\% for a quantum feature recognition task over 1,564 test samples. Our results demonstrate a foundational tool for advancing quantum machine learning towards practical applications, which has broad applicability to both the current noisy and the future fault-tolerant quantum devices.}
+      \field{day}{25}
+      \field{langid}{english}
+      \field{month}{11}
+      \field{title}{Quantum ensemble learning with a programmable superconducting processor}
+      \field{urlday}{28}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{year}{2024}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \verb{doi}
+      \verb 10.21203/rs.3.rs-5289422/v1
+      \endverb
+      \verb{file}
+      \verb PDF:C\:\\Users\\edwar\\Zotero\\storage\\2CT7ANIJ\\Song et al. - 2024 - Quantum ensemble learning with a programmable superconducting processor.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://www.researchsquare.com/article/rs-5289422/v1
+      \endverb
+      \verb{url}
+      \verb https://www.researchsquare.com/article/rs-5289422/v1
+      \endverb
+    \endentry
+    \entry{tolotti_weighted_2025}{article}{}{}
+      \name{author}{3}{}{%
+        {{hash=109e37bb76484adb865d58ba1fec6ebf}{%
+           family={Tolotti},
+           familyi={T\bibinitperiod},
+           given={Emiliano},
+           giveni={E\bibinitperiod}}}%
+        {{hash=b89c283397f4c791b0905d40a8be38c4}{%
+           family={Blanzieri},
+           familyi={B\bibinitperiod},
+           given={Enrico},
+           giveni={E\bibinitperiod}}}%
+        {{hash=0efa81d44a2f36634d09a706441cbfa7}{%
+           family={Pastorello},
+           familyi={P\bibinitperiod},
+           given={Davide},
+           giveni={D\bibinitperiod}}}%
+      }
+      \strng{namehash}{6f66069bbf65304dd67bd3a7291678b3}
+      \strng{fullhash}{6f66069bbf65304dd67bd3a7291678b3}
+      \strng{fullhashraw}{6f66069bbf65304dd67bd3a7291678b3}
+      \strng{bibnamehash}{6f66069bbf65304dd67bd3a7291678b3}
+      \strng{authorbibnamehash}{6f66069bbf65304dd67bd3a7291678b3}
+      \strng{authornamehash}{6f66069bbf65304dd67bd3a7291678b3}
+      \strng{authorfullhash}{6f66069bbf65304dd67bd3a7291678b3}
+      \strng{authorfullhashraw}{6f66069bbf65304dd67bd3a7291678b3}
+      \field{sortinit}{T}
+      \field{sortinithash}{9af77f0292593c26bde9a56e688eaee9}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Ensemble methods in machine learning aim to improve prediction accuracy by combining multiple models. This is achieved by ensuring diversity among predictors to capture different data aspects. Homogeneous ensembles use identical models, achieving diversity through different data subsets, and weighted-average ensembles assign higher influence to more accurate models through a weight learning procedure. We propose a method to achieve a weighted homogeneous quantum ensemble using quantum classifiers with indexing registers for data encoding. This approach leverages instance-based quantum classifiers, enabling feature and training point subsampling through superposition and controlled unitaries, and allowing for a quantum-parallel execution of diverse internal classifiers with different data compositions in superposition. The method integrates a learning process involving circuit execution and classical weight optimization, for a trained ensemble execution with weights encoded in the circuit at test-time. Empirical evaluation demonstrate the effectiveness of the proposed method, offering insights into its performance.}
+      \field{day}{31}
+      \field{issn}{2524-4914}
+      \field{journaltitle}{Quantum Machine Intelligence}
+      \field{langid}{english}
+      \field{month}{10}
+      \field{number}{2}
+      \field{shortjournal}{Quantum Mach. Intell.}
+      \field{title}{A weighted quantum ensemble of homogeneous quantum classifiers}
+      \field{urlday}{28}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{volume}{7}
+      \field{year}{2025}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{100}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.1007/s42484-025-00323-y
+      \endverb
+      \verb{file}
+      \verb Full Text PDF:C\:\\Users\\edwar\\Zotero\\storage\\EMIJNIVD\\Tolotti et al. - 2025 - A weighted quantum ensemble of homogeneous quantum classifiers.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://doi.org/10.1007/s42484-025-00323-y
+      \endverb
+      \verb{url}
+      \verb https://doi.org/10.1007/s42484-025-00323-y
+      \endverb
+      \keyw{Binary classification,Ensemble methods,Quantum classifiers,Quantum computing,Quantum machine learning}
+    \endentry
+    \entry{tolotti_ensembles_2024}{article}{}{}
+      \name{author}{4}{}{%
+        {{hash=109e37bb76484adb865d58ba1fec6ebf}{%
+           family={Tolotti},
+           familyi={T\bibinitperiod},
+           given={Emiliano},
+           giveni={E\bibinitperiod}}}%
+        {{hash=6f64ccbdc46c3302f42a2fa1bb1f0cbb}{%
+           family={Zardini},
+           familyi={Z\bibinitperiod},
+           given={Enrico},
+           giveni={E\bibinitperiod}}}%
+        {{hash=b89c283397f4c791b0905d40a8be38c4}{%
+           family={Blanzieri},
+           familyi={B\bibinitperiod},
+           given={Enrico},
+           giveni={E\bibinitperiod}}}%
+        {{hash=0efa81d44a2f36634d09a706441cbfa7}{%
+           family={Pastorello},
+           familyi={P\bibinitperiod},
+           given={Davide},
+           giveni={D\bibinitperiod}}}%
+      }
+      \strng{namehash}{31b563300fcbf55952e6168d5e4e4e20}
+      \strng{fullhash}{110e34037047537e4988f91965d6cd41}
+      \strng{fullhashraw}{110e34037047537e4988f91965d6cd41}
+      \strng{bibnamehash}{31b563300fcbf55952e6168d5e4e4e20}
+      \strng{authorbibnamehash}{31b563300fcbf55952e6168d5e4e4e20}
+      \strng{authornamehash}{31b563300fcbf55952e6168d5e4e4e20}
+      \strng{authorfullhash}{110e34037047537e4988f91965d6cd41}
+      \strng{authorfullhashraw}{110e34037047537e4988f91965d6cd41}
+      \field{sortinit}{T}
+      \field{sortinithash}{9af77f0292593c26bde9a56e688eaee9}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{In the current era, known as Noisy Intermediate-Scale Quantum ({NISQ}), encoding large amounts of data in the quantum devices is challenging and the impact of noise significantly affects the quality of the obtained results. A viable approach for the execution of quantum classification algorithms is the introduction of a well-known machine learning paradigm, namely, the ensemble methods. Indeed, the ensembles combine multiple internal classifiers, which are characterized by compact sizes due to the smaller data subsets used for training, to achieve more accurate and robust prediction performance. In this way, it is possible to reduce the qubits requirements with respect to a single larger classifier while achieving comparable or improved performance. In this work, we present an implementation and an extensive empirical evaluation of ensembles of quantum classifiers for binary classification, with the purpose of providing insights into their effectiveness, limitations, and potential for enhancing the performance of basic quantum models. In particular, three classical ensemble methods and three quantum classifiers have been taken into account here. Hence, the scheme that has been implemented (in Python) has a hybrid nature. The results (obtained on real-world datasets) have shown an accuracy advantage for the ensemble techniques with respect to the single quantum classifiers, and also an improvement in robustness. In fact, the ensembles have turned out to be able to mitigate both unsuitable data normalizations and repeated measurement inaccuracies, making quantum classifiers more stable.}
+      \field{eprinttype}{arxiv}
+      \field{issn}{15337146}
+      \field{journaltitle}{Quantum Information \& Computation}
+      \field{month}{3}
+      \field{number}{3}
+      \field{shortjournal}{{QIC}}
+      \field{title}{Ensembles of Quantum Classifiers}
+      \field{urlday}{28}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{volume}{24}
+      \field{year}{2024}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{181\bibrangedash 209}
+      \range{pages}{29}
+      \verb{doi}
+      \verb 10.26421/QIC24.3-4-1
+      \endverb
+      \verb{eprint}
+      \verb 2311.09750 [cs.ET]
+      \endverb
+      \verb{file}
+      \verb Preprint PDF:C\:\\Users\\edwar\\Zotero\\storage\\K5U3NT5R\\Tolotti et al. - 2024 - Ensembles of Quantum Classifiers.pdf:application/pdf;Snapshot:C\:\\Users\\edwar\\Zotero\\storage\\RTCSHFDT\\2311.html:text/html
+      \endverb
+      \verb{urlraw}
+      \verb http://arxiv.org/abs/2311.09750
+      \endverb
+      \verb{url}
+      \verb http://arxiv.org/abs/2311.09750
+      \endverb
+      \keyw{Computer Science - Emerging Technologies,Quantum Physics}
+    \endentry
+    \entry{vasan_exploring_2025}{inproceedings}{}{}
+      \name{author}{6}{}{%
+        {{hash=7702cb77ac35bc0c2c1b1f40de8adec6}{%
+           family={Vasan},
+           familyi={V\bibinitperiod},
+           given={Danish},
+           giveni={D\bibinitperiod}}}%
+        {{hash=38a7768cfcb09e3cf8286a4e80bd9601}{%
+           family={Shameem},
+           familyi={S\bibinitperiod},
+           given={Mohammad},
+           giveni={M\bibinitperiod}}}%
+        {{hash=83c39386dc1d7f07ad180001dc3183d1}{%
+           family={Hammoudeh},
+           familyi={H\bibinitperiod},
+           given={Mohammad},
+           giveni={M\bibinitperiod}}}%
+        {{hash=5dae851bb64661d7a6e44bd645584266}{%
+           family={Rahim},
+           familyi={R\bibinitperiod},
+           given={Mussadiq\bibnamedelima Abdul},
+           giveni={M\bibinitperiod\bibinitdelim A\bibinitperiod}}}%
+        {{hash=7fb1382520f012d1da5c7921c45bf819}{%
+           family={Naeem},
+           familyi={N\bibinitperiod},
+           given={Hamad},
+           giveni={H\bibinitperiod}}}%
+        {{hash=2193aef19c71b1f28e14a964b8e25ec8}{%
+           family={Ahmed},
+           familyi={A\bibinitperiod},
+           given={Adel\bibnamedelima F.},
+           giveni={A\bibinitperiod\bibinitdelim F\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {New York, {NY}, {USA}}%
+      }
+      \list{publisher}{1}{%
+        {Association for Computing Machinery}%
+      }
+      \strng{namehash}{f8afa9a9bb3bc4537a00713bbf368d6f}
+      \strng{fullhash}{e3bbf306941069467f3bd56c57ffe69f}
+      \strng{fullhashraw}{e3bbf306941069467f3bd56c57ffe69f}
+      \strng{bibnamehash}{f8afa9a9bb3bc4537a00713bbf368d6f}
+      \strng{authorbibnamehash}{f8afa9a9bb3bc4537a00713bbf368d6f}
+      \strng{authornamehash}{f8afa9a9bb3bc4537a00713bbf368d6f}
+      \strng{authorfullhash}{e3bbf306941069467f3bd56c57ffe69f}
+      \strng{authorfullhashraw}{e3bbf306941069467f3bd56c57ffe69f}
+      \field{sortinit}{V}
+      \field{sortinithash}{afb52128e5b4dc4b843768c0113d673b}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{The escalating complexity and sophistication of cyber threats targeting Industrial Control Systems ({ICS}) demand innovative solutions to ensure robust security. Quantum computing, with its unprecedented computational capabilities, emerges as a promising technology in this domain. In this paper, we present an advanced stacking ensemble framework that integrates three quantum classifiers: the Quantum Variational Classifier ({QVC}), the Quantum Support Vector Classifier ({QSVC}), and the Quantum Neural Network ({QNN}). Our ensemble approach optimizes qubit efficiency while delivering superior classification performance. We evaluated our approach on a real-time, imbalanced {ICS} power system dataset comprising 78, 345 samples representing natural and attack scenarios. The results demonstrate that our advanced ensemble framework outperforms baseline quantum classifiers and achieves these results with minimal qubit usage. This demonstrates our approach's practical viability in enhancing cybersecurity in {ICS} through quantum computing.}
+      \field{booktitle}{Proceedings of the 33rd {ACM} International Conference on the Foundations of Software Engineering}
+      \field{day}{28}
+      \field{isbn}{979-8-4007-1276-0}
+      \field{month}{7}
+      \field{series}{{FSE} Companion '25}
+      \field{title}{Exploring Advanced Quantum Ensemble for Industrial Control Systems Security}
+      \field{urlday}{28}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{year}{2025}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{1690\bibrangedash 1698}
+      \range{pages}{9}
+      \verb{doi}
+      \verb 10.1145/3696630.3731620
+      \endverb
+      \verb{file}
+      \verb Full Text PDF:C\:\\Users\\edwar\\Zotero\\storage\\6KPDBVUA\\Vasan et al. - 2025 - Exploring Advanced Quantum Ensemble for Industrial Control Systems Security.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://dl.acm.org/doi/10.1145/3696630.3731620
+      \endverb
+      \verb{url}
+      \verb https://dl.acm.org/doi/10.1145/3696630.3731620
+      \endverb
+    \endentry
+    \entry{xiong_hybrid_2024}{article}{}{}
+      \name{author}{7}{}{%
+        {{hash=cf6f760136628bea691e0e9ef377c4f5}{%
+           family={Xiong},
+           familyi={X\bibinitperiod},
+           given={Qibing},
+           giveni={Q\bibinitperiod}}}%
+        {{hash=aca3494d62f0a8d46d1c9dd732ebf837}{%
+           family={Ding},
+           familyi={D\bibinitperiod},
+           given={Xiaodong},
+           giveni={X\bibinitperiod}}}%
+        {{hash=43cf4f0600e81741ffe1de847d4fc684}{%
+           family={Fei},
+           familyi={F\bibinitperiod},
+           given={Yangyang},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=35b53a5f450cc6a8ce8bce633606e1de}{%
+           family={Zhou},
+           familyi={Z\bibinitperiod},
+           given={Xin},
+           giveni={X\bibinitperiod}}}%
+        {{hash=f64128d1a68e625686d63214585ecb3c}{%
+           family={Du},
+           familyi={D\bibinitperiod},
+           given={Qiming},
+           giveni={Q\bibinitperiod}}}%
+        {{hash=6526e5100337331d9bae5694a4e94fa9}{%
+           family={Feng},
+           familyi={F\bibinitperiod},
+           given={Congcong},
+           giveni={C\bibinitperiod}}}%
+        {{hash=aa6a893674c35dc2fadcb9ab7ff80378}{%
+           family={Shan},
+           familyi={S\bibinitperiod},
+           given={Zheng},
+           giveni={Z\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {{IOP} Publishing}%
+      }
+      \strng{namehash}{76c31f349eb94cb566a074e0cba0a091}
+      \strng{fullhash}{0a1fbdf7d0ff94177f1745f4742dda78}
+      \strng{fullhashraw}{0a1fbdf7d0ff94177f1745f4742dda78}
+      \strng{bibnamehash}{76c31f349eb94cb566a074e0cba0a091}
+      \strng{authorbibnamehash}{76c31f349eb94cb566a074e0cba0a091}
+      \strng{authornamehash}{76c31f349eb94cb566a074e0cba0a091}
+      \strng{authorfullhash}{0a1fbdf7d0ff94177f1745f4742dda78}
+      \strng{authorfullhashraw}{0a1fbdf7d0ff94177f1745f4742dda78}
+      \field{sortinit}{X}
+      \field{sortinithash}{1965c258adceecf23ce3d67b05113442}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Quantum computing as a new computing model with parallel computing capability and high information carrying capacity, has attracted a lot of attention from researchers. Ensemble learning is an effective strategy often used in machine learning to improve the performance of weak classifiers. Currently, the classification performance of quantum classifiers is not satisfactory enough due to factors such as the depth of quantum circuit, quantum noise, and quantum coding method, etc. For this reason, this paper combined the ensemble learning idea and quantum classifiers to design a novel hybrid quantum machine learning model. Firstly, we run the Stacking method in classical machine learning to realize the dimensionality reduction of high-latitude data while ensuring the validity of data features. Secondly, we used the Bagging method and Bayesian hyperparameter optimization method applied to quantum support vector machine ({QSVM}), quantum K nearest neighbors ({QKNN}), variational quantum classifier ({VQC}). Thirdly, the voting method is used to ensemble the predict results of {QSVM}, {QKNN}, {VQC} as the final result. We applied the hybrid quantum ensemble machine learning model to malicious code detection. The experimental results show that the classification precision (accuracy, F1-score) of this model has been improved to 98.9\% (94.5\%, 94.24\%). Combined with the acceleration of quantum computing and the higher precision rate, it can effectively deal with the growing trend of malicious codes, which is of great significance to cyberspace security.}
+      \field{issn}{2058-9565}
+      \field{journaltitle}{Quantum Science and Technology}
+      \field{langid}{english}
+      \field{month}{5}
+      \field{number}{3}
+      \field{shortjournal}{Quantum Sci. Technol.}
+      \field{title}{A hybrid quantum ensemble learning model for malicious code detection}
+      \field{urlday}{28}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{volume}{9}
+      \field{year}{2024}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{035021}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.1088/2058-9565/ad40cb
+      \endverb
+      \verb{file}
+      \verb PDF:C\:\\Users\\edwar\\Zotero\\storage\\8TBTU26J\\Xiong et al. - 2024 - A hybrid quantum ensemble learning model for malicious code detection.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://doi.org/10.1088/2058-9565/ad40cb
+      \endverb
+      \verb{url}
+      \verb https://doi.org/10.1088/2058-9565/ad40cb
+      \endverb
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+
