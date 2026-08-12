@@ -126,7 +126,7 @@ def train_model(name, dataset, model_args, fit_args=None, job_id=None):
                 )["ansatz"]
             },
             n_classes=c,
-            n_total_features=model_args["n_learners"]
+            n_total_features=len(model_args["templates"])
         ).to("cpu")
         model = StackedECOC(meta_learner=metaVQC, **model_args).to(DEVICE)
         model.fit(X_train, y_train, X_test, y_test, verbosity=1, **fit_args)

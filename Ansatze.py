@@ -546,12 +546,11 @@ def build_ansatz(
         # Encoding block
         if encoding_style != "none":
             for feat_idx in range(feats_per_qubit):
-                gate = encoding_gates[feat_idx % len(encoding_gates)]
                 if encoding_style == "angle":
                     layers.append([
                         "angle_encoding",
                         {
-                            "gate": gate,
+                            "gate": encoding_gates[feat_idx % len(encoding_gates)],
                             "feature_strategy": feature_strategy,
                         },
                     ])
@@ -559,7 +558,6 @@ def build_ansatz(
                     layers.append([
                         "linear_pairwise_encoding",
                         {
-                            "gate": gate,
                             "feature_strategy": feature_strategy,
                         },
                         ])
@@ -567,7 +565,6 @@ def build_ansatz(
                     layers.append([
                         "parallel_pairwise_encoding",
                         {
-                            "gate": gate,
                             "feature_strategy": feature_strategy,
                         },
                     ])

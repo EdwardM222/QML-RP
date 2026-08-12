@@ -2,7 +2,7 @@
     "default": {
         "n_qubits": 2,
         "measurement_mode": "min",
-        "ansatz": "default"
+        "ansatz": "hea_cz_ring"
     },
     "hea_2q_min": {
         "n_qubits": 2,

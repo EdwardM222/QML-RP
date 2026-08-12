@@ -17,6 +17,8 @@ from random import sample, choices
 import json
 from pathlib import Path
 from typeguard import typechecked
+from qiskit_ibm_runtime import fake_provider
+from qiskit_aer import AerSimulator
 
 from Ansatze import AnsatzSpec, LayerSpec
 
@@ -122,6 +124,19 @@ def resolve_vqc_template(template: str | dict, template_path: str | Path = "vqcs
         "measurement_mode": config.get("measurement_mode", "min"),
     }
 
+def resolve_device(device):
+    if isinstance(device, str) and device.startswith("Fake"):
+        fake_backend = getattr(fake_provider, device)()
+        simulator = AerSimulator.from_backend(fake_backend)
+
+        return "qiskit.aer", {
+            "backend": simulator,
+            "compile_backend": fake_backend,
+            "shots": 256,
+        }
+
+    return device, {}
+
 def to_json_safe(value):
     if isinstance(value, dict):
         return {str(k): to_json_safe(v) for k, v in value.items()}
@@ -170,7 +185,7 @@ class VQC(nn.Module):
         self.n_classes = n_classes
         self.feats = feats
         self.template = template
-        self.qml_device = qml_device
+        self.qml_device, self.qml_device_kwargs = resolve_device(qml_device)
         self.diff_method = diff_method
 
         if measurement_mode not in {"min", "full"}:
@@ -267,6 +282,7 @@ class VQC(nn.Module):
         self.qlayer, self.circuit = (
             self.ansatz.build_qlayer(
                 device_name=self.qml_device,
+                device_kwargs=self.qml_device_kwargs,
                 measurement_wires=self.n_qubits if self.measurement_mode == "full" else int(np.ceil(np.log2(self.n_classes))),
                 diff_method=self.diff_method
             )
@@ -989,10 +1005,10 @@ class CoherentECOC(QuantumECOC):
         n_learners: int | None = None,
         templates: str | list = "default",
         ecoc_depth: int = 2,
-        meta_device: str = "default.qubit",
-        meta_diff_method: str = "best",
         base_device: str = "default.qubit",
         base_diff_method: str = "best",
+        meta_device: str = "default.qubit",
+        meta_diff_method: str = "best",
         **kwargs,
     ):
         super().__init__(n_learners=n_learners, templates=templates, ecoc_depth=ecoc_depth, device=base_device, diff_method=base_diff_method, **kwargs)
@@ -1007,7 +1023,7 @@ class CoherentECOC(QuantumECOC):
             raise ValueError(f"Unknown meta_measurement '{meta_measurement}'. Supported values are 'min' and 'full'.")
         self.meta_measurement = meta_measurement
 
-        self.meta_device = meta_device
+        self.meta_device, self.meta_device_kwargs = resolve_device(meta_device)
         self.meta_diff_method = meta_diff_method
 
     def initialise_ensemble(self, X: DataFrame, y: Series, verbosity: int = 0):
@@ -1037,7 +1053,7 @@ class CoherentECOC(QuantumECOC):
         self.meta_wires = list(range(self.n_qubits)) if self.meta_design == "full" else self.main_wires
         self.measurement_wires = self.meta_wires if self.meta_measurement == "full" else self.meta_wires[:int(np.ceil(np.log2(self.n_classes)))]
 
-        coherent_device = qml.device(self.meta_device, wires=self.n_qubits)
+        coherent_device = qml.device(self.meta_device, **self.meta_device_kwargs, wires=self.n_qubits)
         @qml.qnode(coherent_device, interface="torch", diff_method=self.meta_diff_method)
         def coherent_circuit(inputs, weights):
             n_params = 0
@@ -1335,27 +1351,33 @@ if __name__ == "__main__":
     X_tr = scaler.fit_transform(X_train)
     X_te = scaler.transform(X_test)
 
-    y_tr = y_train.map({label: idx for idx, label in enumerate(sorted(y_train.unique()))}).values
-    y_te = y_test.map({label: idx for idx, label in enumerate(sorted(y_test.unique()))}).values
+    # y_tr = y_train.map({label: idx for idx, label in enumerate(sorted(y_train.unique()))}).values
+    # y_te = y_test.map({label: idx for idx, label in enumerate(sorted(y_test.unique()))}).values
 
     # vqc = VQC.from_template(
-    #     template='meta',
+    #     template='default',
     #     n_classes=len(np.unique(y_train)),
     #     n_total_features=X_train.shape[1],
     # ).to("cpu")
-    vqc = VQC(
-        n_qubits=12,
-        n_classes=len(np.unique(y_train)),
-        feats=list(range(X_train.shape[1])),
-        qml_device="default.qubit",
-        diff_method="best",
-    )
-    vqc.fit(X_tr, y_tr, X_te, y_te, epochs=200, plot=False, verbosity=2)
-    print(f"VQC Classification Report:\n{classification_report(y_te, vqc.predict(X_te), zero_division=0)}\n")
-    # vqc.ansatz.draw_mpl(decimals=2, weights=vqc.qlayer.weights.detach().cpu().numpy())
+    # vqc.fit(X_tr, y_tr, X_te, y_te, epochs=200, plot=False, verbosity=2)
+    # print(f"VQC Classification Report:\n{classification_report(y_te, vqc.predict(X_te), zero_division=0)}\n")
 
-    # ens = QuantumECOC(templates='hea_cz_ring').to("cpu")
-    # ens.fit(X_train, y_train, X_test, y_test, epochs=100, plot=False, verbosity=1)
+    # vqc = VQC.from_template(
+    #     template='default',
+    #     n_classes=len(np.unique(y_train)),
+    #     n_total_features=X_train.shape[1],
+    #     qml_device='FakeKingston'
+    # ).to("cpu")
+    # vqc.fit(X_tr, y_tr, X_te, y_te, epochs=200, plot=False, verbosity=2)
+    # print(f"VQC Classification Report:\n{classification_report(y_te, vqc.predict(X_te), zero_division=0)}\n")
+
+    # ens = QuantumECOC().to("cpu")
+    # ens.fit(X_train, y_train, X_test, y_test, epochs=100, plot=False, verbosity=2)
+    # preds = ens.predict(X_test)
+    # print(f"QuantumECOC Classification Report:\n{classification_report(y_test, preds, zero_division=0)}\n")
+
+    # ens = QuantumECOC(device='FakeKingston').to("cpu")
+    # ens.fit(X_train, y_train, X_test, y_test, epochs=100, plot=False, verbosity=2)
     # preds = ens.predict(X_test)
     # print(f"QuantumECOC Classification Report:\n{classification_report(y_test, preds, zero_division=0)}\n")
 
@@ -1382,6 +1404,10 @@ if __name__ == "__main__":
     # plt.grid(True)
     # plt.show()
 
-    # model = CoherentECOC().to("cpu") 
-    # model.fit(X_train, y_train, X_test, y_test, k_folds=5, epochs=200, plot=False, verbosity=2, tune_size=0.1)
-    # print(f"CoherentECOC Classification Report:\n{classification_report(y_test, model.predict(X_test), zero_division=0)}\n")
+    model = CoherentECOC().to("cpu")
+    model.fit(X_train, y_train, X_test, y_test, k_folds=5, epochs=100, plot=False, verbosity=2, tune_size=0.1)
+    print(f"CoherentECOC Classification Report:\n{classification_report(y_test, model.predict(X_test), zero_division=0)}\n")
+
+    model = CoherentECOC(base_device='FakeKingston', meta_device='FakeKingston').to("cpu") 
+    model.fit(X_train, y_train, X_test, y_test, k_folds=5, epochs=100, plot=False, verbosity=2, tune_size=0.1)
+    print(f"CoherentECOC Classification Report:\n{classification_report(y_test, model.predict(X_test), zero_division=0)}\n")
