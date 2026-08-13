@@ -1,6 +1,28 @@
 from qiskit_ibm_runtime import QiskitRuntimeService
+from qiskit_ibm_runtime.fake_provider import FakeFez, FakeKingston, FakeMarrakesh
 
-service = QiskitRuntimeService(
-    channel="ibm_quantum",
-    token="ApiKey-1588aef2-e240-44f2-af7c-f6b7c42206bb"
+service = QiskitRuntimeService(token="YOUR_IBM_QUANTUM_API_TOKEN")
+
+backend = FakeFez()
+backend.refresh(
+    service=service,
+    use_fractional_gates=True,
 )
+backend = FakeFez()
+
+backend = FakeKingston()
+backend.refresh(
+    service=service,
+    use_fractional_gates=True,
+)
+backend = FakeKingston()
+
+backend = FakeMarrakesh()
+backend.refresh(
+    service=service,
+    use_fractional_gates=True,
+)
+backend = FakeMarrakesh()
+
+if __name__ == "__main__":
+    print(service.backends())
