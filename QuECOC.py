@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import copy
 import time
 import torch
@@ -19,6 +21,8 @@ from pathlib import Path
 from typeguard import typechecked
 from qiskit_ibm_runtime import fake_provider
 from qiskit_aer import AerSimulator
+from qiskit_aer.noise import NoiseModel
+from pennylane_qiskit import load_noise_model
 
 from Ansatze import AnsatzSpec, LayerSpec
 
@@ -124,19 +128,6 @@ def resolve_vqc_template(template: str | dict, template_path: str | Path = "vqcs
         "measurement_mode": config.get("measurement_mode", "min"),
     }
 
-def resolve_device(device):
-    if isinstance(device, str) and device.startswith("Fake"):
-        fake_backend = getattr(fake_provider, device)()
-        simulator = AerSimulator.from_backend(fake_backend)
-
-        return "qiskit.aer", {
-            "backend": simulator,
-            "compile_backend": fake_backend,
-            "shots": 256,
-        }
-
-    return device, {}
-
 def to_json_safe(value):
     if isinstance(value, dict):
         return {str(k): to_json_safe(v) for k, v in value.items()}
@@ -185,7 +176,7 @@ class VQC(nn.Module):
         self.n_classes = n_classes
         self.feats = feats
         self.template = template
-        self.qml_device, self.qml_device_kwargs = resolve_device(qml_device)
+        self.qml_device = qml_device
         self.diff_method = diff_method
 
         if measurement_mode not in {"min", "full"}:
@@ -282,7 +273,6 @@ class VQC(nn.Module):
         self.qlayer, self.circuit = (
             self.ansatz.build_qlayer(
                 device_name=self.qml_device,
-                device_kwargs=self.qml_device_kwargs,
                 measurement_wires=self.n_qubits if self.measurement_mode == "full" else int(np.ceil(np.log2(self.n_classes))),
                 diff_method=self.diff_method
             )
@@ -1023,7 +1013,7 @@ class CoherentECOC(QuantumECOC):
             raise ValueError(f"Unknown meta_measurement '{meta_measurement}'. Supported values are 'min' and 'full'.")
         self.meta_measurement = meta_measurement
 
-        self.meta_device, self.meta_device_kwargs = resolve_device(meta_device)
+        self.meta_device = meta_device
         self.meta_diff_method = meta_diff_method
 
     def initialise_ensemble(self, X: DataFrame, y: Series, verbosity: int = 0):
@@ -1053,7 +1043,20 @@ class CoherentECOC(QuantumECOC):
         self.meta_wires = list(range(self.n_qubits)) if self.meta_design == "full" else self.main_wires
         self.measurement_wires = self.meta_wires if self.meta_measurement == "full" else self.meta_wires[:int(np.ceil(np.log2(self.n_classes)))]
 
-        coherent_device = qml.device(self.meta_device, **self.meta_device_kwargs, wires=self.n_qubits)
+        if isinstance(self.meta_device, str) and self.meta_device.startswith("Fake"):
+            backend_cls = getattr(fake_provider, self.meta_device, None)
+            if backend_cls is None:
+                raise ValueError(f"Unknown fake backend '{self.meta_device}'.")
+            fake_backend = backend_cls()
+
+            qiskit_noise = NoiseModel.from_backend(fake_backend, gate_error=True, thermal_relaxation=False, readout_error=False)
+            noise_model = load_noise_model(qiskit_noise)
+
+            coherent_device = qml.device("default.mixed", wires=self.n_qubits)
+            coherent_device = qml.noise.add_noise(coherent_device, noise_model)
+        else:
+            coherent_device = qml.device(self.meta_device, wires=self.n_qubits)
+
         @qml.qnode(coherent_device, interface="torch", diff_method=self.meta_diff_method)
         def coherent_circuit(inputs, weights):
             n_params = 0
@@ -1404,10 +1407,10 @@ if __name__ == "__main__":
     # plt.grid(True)
     # plt.show()
 
-    model = CoherentECOC().to("cpu")
-    model.fit(X_train, y_train, X_test, y_test, k_folds=5, epochs=100, plot=False, verbosity=2, tune_size=0.1)
-    print(f"CoherentECOC Classification Report:\n{classification_report(y_test, model.predict(X_test), zero_division=0)}\n")
+    # model = CoherentECOC().to("cpu")
+    # model.fit(X_train, y_train, X_test, y_test, k_folds=5, epochs=100, plot=False, verbosity=3, tune_size=0.1)
+    # print(f"CoherentECOC Classification Report:\n{classification_report(y_test, model.predict(X_test), zero_division=0)}\n")
 
     model = CoherentECOC(base_device='FakeKingston', meta_device='FakeKingston').to("cpu") 
-    model.fit(X_train, y_train, X_test, y_test, k_folds=5, epochs=100, plot=False, verbosity=2, tune_size=0.1)
+    model.fit(X_train, y_train, X_test, y_test, k_folds=5, epochs=100, plot=False, verbosity=3, tune_size=0.1)
     print(f"CoherentECOC Classification Report:\n{classification_report(y_test, model.predict(X_test), zero_division=0)}\n")

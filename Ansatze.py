@@ -11,6 +11,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pennylane as qml
 
+from qiskit_ibm_runtime import fake_provider
+from qiskit_aer import AerSimulator
+from qiskit_aer.noise import NoiseModel
+from pennylane_qiskit import load_noise_model
+
 import  warnings
 warnings.filterwarnings(
     "ignore",
@@ -865,19 +870,29 @@ class AnsatzSpec:
     ):
         """Build a PennyLane QNode from this ansatz."""
 
-        device_kwargs = dict(device_kwargs or {})
-        device_kwargs["wires"] = list(range(self.n_qubits))
-
-        if shots is not None:
-            device_kwargs["shots"] = shots
-
         if wires is None:
             wires = list(range(self.n_qubits))
 
-        dev = qml.device(device_name, **device_kwargs)
+        device_kwargs = dict(device_kwargs or {})
+        device_kwargs["wires"] = wires
+
+        if isinstance(device_name, str) and device_name.startswith("Fake"):
+            backend_cls = getattr(fake_provider, device_name, None)
+            if backend_cls is None:
+                raise ValueError(f"Unknown fake backend '{device_name}'.")
+            fake_backend = backend_cls()
+
+            qiskit_noise = NoiseModel.from_backend(fake_backend, gate_error=True, thermal_relaxation=False, readout_error=False)
+            noise_model = load_noise_model(qiskit_noise)
+
+            dev = qml.device("default.mixed", **device_kwargs)
+            dev = qml.noise.add_noise(dev, noise_model)
+        else:
+            dev = qml.device(device_name, **device_kwargs)
 
         qnode_kwargs: dict[str, Any] = {
             "interface": interface,
+            "shots": shots,
         }
 
         if diff_method is not None:
