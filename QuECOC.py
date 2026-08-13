@@ -330,6 +330,7 @@ class VQC(nn.Module):
         patience: int = 10,
         warmup: int = 15,
         min_delta: float = 1e-3,
+        batch_size: int = 64,
         plot: bool = False,
         title_prefix: str = "",
         restore_best: bool = True,
@@ -343,12 +344,12 @@ class VQC(nn.Module):
 
         X_tr = torch.tensor(X, dtype=torch.float32).to(self.cuda_device)
         y_tr = torch.tensor(y, dtype=torch.long).to(self.cuda_device)
-        train_loader = DataLoader(TensorDataset(X_tr, y_tr), batch_size=64, shuffle=True)
+        train_loader = DataLoader(TensorDataset(X_tr, y_tr), batch_size=batch_size, shuffle=True)
 
         if X_test is not None and y_test is not None:
             X_te = torch.tensor(X_test, dtype=torch.float32).to(self.cuda_device)
             y_te = torch.tensor(y_test, dtype=torch.long).to(self.cuda_device)
-            test_loader = DataLoader(TensorDataset(X_te, y_te), batch_size=64, shuffle=False)
+            test_loader = DataLoader(TensorDataset(X_te, y_te), batch_size=batch_size, shuffle=False)
         else:
             test_loader = None
         
@@ -1193,7 +1194,7 @@ class CoherentECOC(QuantumECOC):
                 if verbosity > 0:
                     print(f"Training full circuit on fold {f + 1}")
 
-                self.coherent_vqc.fit(X_val, y_val.values, X_test_s, y_test_m.values, plot=plot, verbosity=verbosity-1, **fit_params)
+                self.coherent_vqc.fit(X_val, y_val.values, X_test_s, y_test_m.values, batch_size=1, plot=plot, verbosity=verbosity-1, **fit_params)
 
                 self.reset_ensemble()
 
@@ -1215,7 +1216,7 @@ class CoherentECOC(QuantumECOC):
                 print(f"Training full circuit with {'frozen' if freeze_base_main else 'tunable'} base circuits...")
             
             self.build_coherent_circuit(freeze_base=freeze_base_main)
-            self.coherent_vqc.fit(X_main_s, y_main_m.values, X_test_s, y_test_m.values, plot=plot, verbosity=verbosity-1, **fit_params)
+            self.coherent_vqc.fit(X_main_s, y_main_m.values, X_test_s, y_test_m.values, batch_size=1, plot=plot, verbosity=verbosity-1, **fit_params)
         else:
             if verbosity > 0:
                 print(f"Training on a single train/validation split...\n")
@@ -1243,7 +1244,7 @@ class CoherentECOC(QuantumECOC):
                 print(f"Training full circuit with {'frozen' if freeze_base_main else 'tunable'} base circuits...")
             
             self.build_coherent_circuit(freeze_base=freeze_base_main)
-            self.coherent_vqc.fit(X_val, y_val.values, X_test_s, y_test_m.values, plot=plot, verbosity=verbosity-1, **fit_params)
+            self.coherent_vqc.fit(X_val, y_val.values, X_test_s, y_test_m.values, batch_size=1, plot=plot, verbosity=verbosity-1, **fit_params)
         
         if tune_size > 0.0 and tune_size < 1.0:
             if verbosity > 0:
@@ -1253,7 +1254,7 @@ class CoherentECOC(QuantumECOC):
             y_tune_m = y_tune.map(self.label_to_int)
 
             self.build_coherent_circuit(freeze_base=freeze_base_tune)
-            self.coherent_vqc.fit(X_tune_s, y_tune_m.values, X_test_s, y_test_m.values, plot=plot, verbosity=verbosity-1, **fit_params)
+            self.coherent_vqc.fit(X_tune_s, y_tune_m.values, X_test_s, y_test_m.values, batch_size=1, plot=plot, verbosity=verbosity-1, **fit_params)
 
         self.training_time = TimeInt(time.time() - start_time)
         if verbosity > 0:

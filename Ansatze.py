@@ -11,7 +11,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pennylane as qml
 
-from qiskit_ibm_runtime import fake_provider
+from qiskit_ibm_runtime import fake_provider, QiskitRuntimeService
 from qiskit_aer import AerSimulator
 from qiskit_aer.noise import NoiseModel
 from pennylane_qiskit import load_noise_model
@@ -877,10 +877,14 @@ class AnsatzSpec:
         device_kwargs["wires"] = wires
 
         if isinstance(device_name, str) and device_name.startswith("Fake"):
+            service = QiskitRuntimeService()
+
             backend_cls = getattr(fake_provider, device_name, None)
             if backend_cls is None:
                 raise ValueError(f"Unknown fake backend '{device_name}'.")
             fake_backend = backend_cls()
+            
+            fake_backend.refresh(service=service, use_fractional_gates=True)
 
             qiskit_noise = NoiseModel.from_backend(fake_backend, gate_error=True, thermal_relaxation=False, readout_error=False)
             noise_model = load_noise_model(qiskit_noise)
