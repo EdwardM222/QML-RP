@@ -10,8 +10,19 @@ from typing import Any, Callable
 import numpy as np
 import matplotlib.pyplot as plt
 import pennylane as qml
+import time
 
-from qiskit_ibm_runtime import fake_provider, QiskitRuntimeService
+from qiskit import transpile
+from qiskit.circuit import ParameterVector
+from pennylane_qiskit import AerDevice
+from pennylane.measurements import (
+    ClassicalShadowMP,
+    CountsMP,
+    SampleMP,
+    ShadowExpvalMP,
+)
+
+from qiskit_ibm_runtime import fake_provider
 import qiskit_service
 from qiskit_aer import AerSimulator
 from qiskit_aer.noise import NoiseModel
@@ -73,6 +84,395 @@ class LayerSpec:
             raise TypeError(f"Layer args must be a dictionary, got {type(args)}: {args}")
 
         return cls(name=name, args=copy.deepcopy(args))
+
+SAMPLE_TYPES = (
+    SampleMP,
+    CountsMP,
+    ClassicalShadowMP,
+    ShadowExpvalMP,
+)
+
+
+class CachedAerDevice(AerDevice):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # One compiled parameterised circuit per circuit structure.
+        self._compiled_cache = {}
+
+        # Debug/performance stats.
+        self.transpile_count = 0
+        self.transpile_time = 0.0
+        self.cache_hits = 0
+
+        self.aer_jobs = 0
+        self.aer_time = 0.0
+        self.parameter_sets = 0
+
+        # Let Aer bind parameter sets internally.
+        self.backend.set_options(
+            runtime_parameter_bind_enable=True
+        )
+
+    def _structure_key(self, circuit):
+        """Return a hashable description of circuit structure."""
+
+        return (
+            circuit.num_qubits,
+            circuit.num_clbits,
+            tuple(
+                (
+                    inst.operation.name,
+                    len(inst.operation.params),
+                    tuple(
+                        circuit.find_bit(q).index
+                        for q in inst.qubits
+                    ),
+                    tuple(
+                        circuit.find_bit(c).index
+                        for c in inst.clbits
+                    ),
+                )
+                for inst in circuit.data
+            ),
+        )
+
+    def _parameterise_circuit(self, circuit):
+        """Replace numerical gate parameters with Qiskit Parameters."""
+
+        n_params = sum(
+            len(inst.operation.params)
+            for inst in circuit.data
+        )
+
+        params = ParameterVector("p", n_params)
+
+        parameterised = circuit.copy_empty_like()
+
+        values = []
+        idx = 0
+
+        for inst in circuit.data:
+            op = inst.operation.to_mutable()
+
+            if op.params:
+                new_params = []
+
+                for value in op.params:
+                    values.append(float(value))
+                    new_params.append(params[idx])
+                    idx += 1
+
+                op.params = new_params
+
+            qargs = [
+                parameterised.qubits[
+                    circuit.find_bit(q).index
+                ]
+                for q in inst.qubits
+            ]
+
+            cargs = [
+                parameterised.clbits[
+                    circuit.find_bit(c).index
+                ]
+                for c in inst.clbits
+            ]
+
+            parameterised.append(
+                op,
+                qargs,
+                cargs,
+            )
+
+        return parameterised, list(params), values
+
+    def _parameter_values(self, circuit):
+        """Extract numerical gate parameters in circuit order."""
+
+        return [
+            float(value)
+            for inst in circuit.data
+            for value in inst.operation.params
+        ]
+
+    def _build_qiskit_circuit(self, circuit):
+        """Convert one PennyLane tape to a numerical Qiskit circuit."""
+
+        self.reset()
+
+        self.create_circuit_object(
+            circuit.operations,
+            rotations=circuit.diagonalizing_gates,
+        )
+
+        return self._circuit
+
+    def _compile_template(self, qiskit_circuit):
+        """Get or create a transpiled parameterised circuit."""
+
+        key = self._structure_key(qiskit_circuit)
+
+        values = self._parameter_values(
+            qiskit_circuit
+        )
+
+        if key in self._compiled_cache:
+            self.cache_hits += 1
+
+            compiled, params = (
+                self._compiled_cache[key]
+            )
+
+            return key, compiled, params, values
+
+        parameterised, params, values = (
+            self._parameterise_circuit(
+                qiskit_circuit
+            )
+        )
+
+        start = time.time()
+
+        compiled = transpile(
+            parameterised,
+            backend=(
+                self.compile_backend
+                or self.backend
+            ),
+            **self.transpile_args,
+            routing_method="none",
+        )
+
+        self.transpile_time += (
+            time.time() - start
+        )
+
+        self.transpile_count += 1
+
+        self._compiled_cache[key] = (
+            compiled,
+            params,
+        )
+
+        return key, compiled, params, values
+
+    def compile_circuits(self, circuits):
+        """
+        Cached version of PennyLane's ordinary compile path.
+
+        This is retained for executions that do not use the
+        runtime-binding batch path.
+        """
+
+        compiled_circuits = []
+
+        for circuit in circuits:
+            qiskit_circuit = (
+                self._build_qiskit_circuit(
+                    circuit
+                )
+            )
+
+            (
+                _,
+                compiled,
+                params,
+                values,
+            ) = self._compile_template(
+                qiskit_circuit
+            )
+
+            bound = compiled.assign_parameters(
+                dict(zip(params, values)),
+                inplace=False,
+            )
+
+            bound.name = (
+                f"circ{len(compiled_circuits)}"
+            )
+
+            compiled_circuits.append(bound)
+
+        return compiled_circuits
+
+    def batch_execute(
+        self,
+        circuits,
+        timeout: int = None,
+    ):
+        """
+        Execute identical circuit structures using one
+        transpiled parameterised circuit and Aer runtime
+        parameter binding.
+        """
+
+        if not circuits:
+            return []
+
+        qiskit_circuits = [
+            self._build_qiskit_circuit(
+                circuit
+            )
+            for circuit in circuits
+        ]
+
+        keys = [
+            self._structure_key(circuit)
+            for circuit in qiskit_circuits
+        ]
+
+        # Runtime parameter binding needs one common structure.
+        # Fall back to the standard cached path otherwise.
+        if len(set(keys)) != 1:
+            return super().batch_execute(
+                circuits,
+                timeout=timeout,
+            )
+
+        key = keys[0]
+
+        if key in self._compiled_cache:
+            compiled, params = (
+                self._compiled_cache[key]
+            )
+
+            self.cache_hits += len(circuits)
+
+        else:
+            (
+                _,
+                compiled,
+                params,
+                _,
+            ) = self._compile_template(
+                qiskit_circuits[0]
+            )
+
+            # First one caused compilation;
+            # the remaining circuits reuse it.
+            self.cache_hits += (
+                len(circuits) - 1
+            )
+
+        values = [
+            self._parameter_values(circuit)
+            for circuit in qiskit_circuits
+        ]
+
+        n_params = len(params)
+
+        if any(
+            len(v) != n_params
+            for v in values
+        ):
+            raise RuntimeError(
+                "Parameter count changed between "
+                "identical circuit structures."
+            )
+
+        parameter_binds = {
+            param: [
+                circuit_values[i]
+                for circuit_values in values
+            ]
+            for i, param in enumerate(params)
+        }
+
+        shots = (
+            circuits[0].shots.total_shots
+            or self.shots
+        )
+
+        if not self.shots:
+            self._shots = shots
+
+        start = time.time()
+
+        self._current_job = self.backend.run(
+            [compiled],
+            parameter_binds=[
+                parameter_binds
+            ],
+            shots=shots,
+            **self.run_args,
+        )
+
+        try:
+            result = self._current_job.result(
+                timeout=timeout
+            )
+        except TypeError:
+            result = (
+                self._current_job.result()
+            )
+
+        self.aer_time += (
+            time.time() - start
+        )
+
+        self.aer_jobs += 1
+        self.parameter_sets += len(circuits)
+
+        if len(result.results) != len(circuits):
+            raise RuntimeError(
+                f"Aer returned "
+                f"{len(result.results)} results "
+                f"for {len(circuits)} "
+                f"parameter sets."
+            )
+
+        self._num_executions += 1
+
+        results = []
+
+        for i, circuit in enumerate(circuits):
+
+            if self.tracker.active:
+                self.tracker.update(
+                    executions=1,
+                    shots=shots,
+                )
+                self.tracker.record()
+
+            if self._is_state_backend:
+                self._state = self._get_state(
+                    result,
+                    experiment=i,
+                )
+
+            if (
+                shots is not None
+                or any(
+                    isinstance(
+                        measurement,
+                        SAMPLE_TYPES,
+                    )
+                    for measurement
+                    in circuit.measurements
+                )
+            ):
+                self._samples = (
+                    self.generate_samples(i)
+                )
+
+            res = self.statistics(circuit)
+
+            if len(circuit.measurements) == 1:
+                res = res[0]
+            else:
+                res = tuple(res)
+
+            results.append(res)
+
+        if self.tracker.active:
+            self.tracker.update(
+                batches=1,
+                batch_len=len(circuits),
+            )
+            self.tracker.record()
+
+        return results
     
 # --- Gate Helper ---
 
@@ -877,6 +1277,11 @@ class AnsatzSpec:
         device_kwargs = dict(device_kwargs or {})
         device_kwargs["wires"] = wires
 
+        qnode_kwargs = {
+            "interface": interface,
+            "shots": 256,
+        }
+
         if isinstance(device_name, str) and device_name.startswith("Fake"):
             backend_cls = getattr(fake_provider, device_name, None)
             if backend_cls is None:
@@ -884,17 +1289,28 @@ class AnsatzSpec:
             fake_backend = backend_cls()
 
             qiskit_noise = NoiseModel.from_backend(fake_backend, gate_error=True, thermal_relaxation=False, readout_error=False)
-            noise_model = load_noise_model(qiskit_noise)
+            # noise_model = load_noise_model(qiskit_noise)
 
-            dev = qml.device("default.mixed", **device_kwargs)
-            dev = qml.noise.add_noise(dev, noise_model)
+            # dev = qml.device("default.mixed", **device_kwargs)
+            # dev = qml.noise.add_noise(dev, noise_model)
+
+            simulator = AerSimulator(
+                noise_model=qiskit_noise,
+                precision="single",
+                runtime_parameter_bind_enable=True,
+            )
+
+            dev = CachedAerDevice(
+                wires=wires,
+                backend=simulator,
+            )
+            diff_method = "spsa"
+            qnode_kwargs["gradient_kwargs"] = {
+                "h": 0.03,
+                "num_directions": 2,
+            }
         else:
             dev = qml.device(device_name, **device_kwargs)
-
-        qnode_kwargs: dict[str, Any] = {
-            "interface": interface,
-            "shots": shots,
-        }
 
         if diff_method is not None:
             qnode_kwargs["diff_method"] = diff_method

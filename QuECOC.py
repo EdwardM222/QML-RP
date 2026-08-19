@@ -24,7 +24,7 @@ from qiskit_aer import AerSimulator
 from qiskit_aer.noise import NoiseModel
 from pennylane_qiskit import load_noise_model
 
-from Ansatze import AnsatzSpec, LayerSpec
+from Ansatze import AnsatzSpec, CachedAerDevice
 
 import  warnings
 warnings.filterwarnings(
@@ -167,7 +167,7 @@ class VQC(nn.Module):
             feats: list[int] | None = None,
             template: str | dict = "default",
             measurement_mode: str = "min",
-            qml_device: str | qml.devices.Device = "default.qubit",
+            qml_device: str | qml.devices.Device | qml.devices.QubitDevice = "default.qubit",
             diff_method: str = "best",
             **kwargs
         ):
@@ -371,7 +371,7 @@ class VQC(nn.Module):
             epoch_loss = 0.0
             self.train()
             for batch_idx, (X_batch, y_batch) in enumerate(train_loader):
-                if verbosity > 1:
+                if verbosity > 2:
                     print(f"[Epoch {epoch + 1}/{epochs}] Batch {batch_idx + 1}/{len(train_loader)}", end="\r")
 
                 X_batch = X_batch.to(self.cuda_device)
@@ -382,8 +382,23 @@ class VQC(nn.Module):
                 probs = self(X_batch)
                 loss = criterion(torch.log(probs.clamp(min=1e-8)), y_batch)
 
+                # before = self.qlayer.weights.detach().clone()
+
                 loss.backward()
+
+                # grad_norm = self.qlayer.weights.grad.norm().item()
+
                 self.optimizer.step()
+
+                # weight_delta = (
+                #     self.qlayer.weights.detach() - before
+                # ).norm().item()
+
+                # if batch_idx == 0:
+                #     print(
+                #         f"Grad norm: {grad_norm:.6f} | "
+                #         f"Weight delta: {weight_delta:.6f}"
+                #     )
 
                 epoch_loss += loss.item()
 
@@ -472,6 +487,15 @@ class VQC(nn.Module):
         if X_test is not None and y_test is not None:
             self.val_probs = self.predict_proba(X_test)
             self.val_report = ValReport(classification_report(y_test, self.val_probs.argmax(axis=1), zero_division=0, output_dict=True))
+
+        dev = self.circuit.device
+        if hasattr(dev, "transpile_count"):
+            print(f"Transpiles: {dev.transpile_count}")
+            print(f"Transpile time: {dev.transpile_time}")
+            print(f"Cache hits: {dev.cache_hits}")
+            print(f"Aer jobs: {dev.aer_jobs}")
+            print(f"Parameter sets: {dev.parameter_sets}")
+            print(f"Aer time: {dev.aer_time:.3f}s")
 
         return self.qlayer.weights.detach().cpu().numpy()
 
@@ -592,7 +616,7 @@ class QuantumECOC:
         self.label_to_int = {label: idx for idx, label in enumerate(self.labels)}
         self.int_to_label = {idx: label for idx, label in enumerate(self.labels)}
         if verbosity > 0:
-            print(f"Label mapping: {self.label_to_int}")
+            print(f"Label mapping: {self.label_to_int}\n")
 
         if self.n_learners is None:
             self.n_learners = 2 * len(self.labels)
@@ -1044,6 +1068,11 @@ class CoherentECOC(QuantumECOC):
         self.meta_wires = list(range(self.n_qubits)) if self.meta_design == "full" else self.main_wires
         self.measurement_wires = self.meta_wires if self.meta_measurement == "full" else self.meta_wires[:int(np.ceil(np.log2(self.n_classes)))]
 
+        qnode_kwargs = {
+            "interface": "torch",
+            "shots": 256,
+        }
+
         if isinstance(self.meta_device, str) and self.meta_device.startswith("Fake"):
             backend_cls = getattr(fake_provider, self.meta_device, None)
             if backend_cls is None:
@@ -1051,14 +1080,31 @@ class CoherentECOC(QuantumECOC):
             fake_backend = backend_cls()
 
             qiskit_noise = NoiseModel.from_backend(fake_backend, gate_error=True, thermal_relaxation=False, readout_error=False)
-            noise_model = load_noise_model(qiskit_noise)
+            # noise_model = load_noise_model(qiskit_noise)
 
-            coherent_device = qml.device("default.mixed", wires=self.n_qubits)
-            coherent_device = qml.noise.add_noise(coherent_device, noise_model)
+            # coherent_device = qml.device("default.mixed", wires=self.n_qubits)
+            # coherent_device = qml.noise.add_noise(coherent_device, noise_model)
+
+            simulator = AerSimulator(
+                noise_model=qiskit_noise,
+                precision="single",
+                runtime_parameter_bind_enable=True,
+            )
+
+            coherent_device = CachedAerDevice(
+                wires=self.n_qubits,
+                backend=simulator,
+            )
+            if self.meta_diff_method == "best":
+                self.meta_diff_method = "spsa"
+                qnode_kwargs["gradient_kwargs"] = {
+                    "h": 0.1,
+                    "num_directions": 2,
+                }
         else:
             coherent_device = qml.device(self.meta_device, wires=self.n_qubits)
 
-        @qml.qnode(coherent_device, interface="torch", diff_method=self.meta_diff_method)
+        @qml.qnode(coherent_device, diff_method=self.meta_diff_method, **qnode_kwargs)
         def coherent_circuit(inputs, weights):
             n_params = 0
             idx = 0
@@ -1137,6 +1183,8 @@ class CoherentECOC(QuantumECOC):
         y: Series,
         X_test: DataFrame | None = None,
         y_test: Series | None = None,
+        base_epochs: int = 200,
+        meta_epochs: int = 100,
         k_folds: int = 5,
         tune_size: float = 0.1,
         freeze_base_main: bool = True,
@@ -1162,8 +1210,6 @@ class CoherentECOC(QuantumECOC):
 
         k_folds = min(k_folds, int(y.value_counts().min()))
         if k_folds > 1:
-            self.build_coherent_circuit(freeze_base=True)
-
             skf = StratifiedKFold(n_splits=k_folds, shuffle=True, random_state=2)
             for f, (train_index, val_index) in enumerate(skf.split(X_main, y_main)):
                 if verbosity > 0:
@@ -1184,6 +1230,7 @@ class CoherentECOC(QuantumECOC):
                     y_train,
                     X_val,
                     y_val,
+                    epochs=base_epochs,
                     fold=f,
                     bagging=bagging,
                     plot=False,
@@ -1194,7 +1241,8 @@ class CoherentECOC(QuantumECOC):
                 if verbosity > 0:
                     print(f"Training full circuit on fold {f + 1}")
 
-                self.coherent_vqc.fit(X_val, y_val.values, X_test_s, y_test_m.values, batch_size=1, plot=plot, verbosity=verbosity-1, **fit_params)
+                self.build_coherent_circuit(freeze_base=True)
+                self.coherent_vqc.fit(X_val, y_val.values, X_test_s, y_test_m.values, epochs=meta_epochs, batch_size=32, lr=0.003, plot=plot, verbosity=verbosity-1, **fit_params)
 
                 self.reset_ensemble()
 
@@ -1206,6 +1254,8 @@ class CoherentECOC(QuantumECOC):
                 y_main_m,
                 X_test_s,
                 y_test_m,
+                epochs=base_epochs,
+                fold=k_folds,
                 bagging=bagging,
                 plot=plot,
                 verbosity=verbosity-1,
@@ -1216,7 +1266,7 @@ class CoherentECOC(QuantumECOC):
                 print(f"Training full circuit with {'frozen' if freeze_base_main else 'tunable'} base circuits...")
             
             self.build_coherent_circuit(freeze_base=freeze_base_main)
-            self.coherent_vqc.fit(X_main_s, y_main_m.values, X_test_s, y_test_m.values, batch_size=1, plot=plot, verbosity=verbosity-1, **fit_params)
+            self.coherent_vqc.fit(X_main_s, y_main_m.values, X_test_s, y_test_m.values, epochs=meta_epochs, batch_size=32, lr=0.003, plot=plot, verbosity=verbosity-1, **fit_params)
         else:
             if verbosity > 0:
                 print(f"Training on a single train/validation split...\n")
@@ -1234,6 +1284,7 @@ class CoherentECOC(QuantumECOC):
                 y_train,
                 X_val,
                 y_val,
+                epochs=base_epochs,
                 bagging=bagging,
                 plot=plot,
                 verbosity=verbosity-1,
@@ -1244,7 +1295,7 @@ class CoherentECOC(QuantumECOC):
                 print(f"Training full circuit with {'frozen' if freeze_base_main else 'tunable'} base circuits...")
             
             self.build_coherent_circuit(freeze_base=freeze_base_main)
-            self.coherent_vqc.fit(X_val, y_val.values, X_test_s, y_test_m.values, batch_size=1, plot=plot, verbosity=verbosity-1, **fit_params)
+            self.coherent_vqc.fit(X_val, y_val.values, X_test_s, y_test_m.values, epochs=meta_epochs, batch_size=32, lr=0.003, plot=plot, verbosity=verbosity-1, **fit_params)
         
         if tune_size > 0.0 and tune_size < 1.0:
             if verbosity > 0:
@@ -1254,7 +1305,7 @@ class CoherentECOC(QuantumECOC):
             y_tune_m = y_tune.map(self.label_to_int)
 
             self.build_coherent_circuit(freeze_base=freeze_base_tune)
-            self.coherent_vqc.fit(X_tune_s, y_tune_m.values, X_test_s, y_test_m.values, batch_size=1, plot=plot, verbosity=verbosity-1, **fit_params)
+            self.coherent_vqc.fit(X_tune_s, y_tune_m.values, X_test_s, y_test_m.values, epochs=meta_epochs, batch_size=32, lr=0.003, plot=plot, verbosity=verbosity-1, **fit_params)
 
         self.training_time = TimeInt(time.time() - start_time)
         if verbosity > 0:
@@ -1413,5 +1464,5 @@ if __name__ == "__main__":
     # print(f"CoherentECOC Classification Report:\n{classification_report(y_test, model.predict(X_test), zero_division=0)}\n")
 
     model = CoherentECOC(base_device='FakeKingston', meta_device='FakeKingston').to("cpu") 
-    model.fit(X_train, y_train, X_test, y_test, k_folds=5, epochs=100, plot=False, verbosity=3, tune_size=0.1)
+    model.fit(X_train, y_train, X_test, y_test, k_folds=5, base_epochs=100, meta_epochs=10, plot=False, verbosity=3, tune_size=0.1)
     print(f"CoherentECOC Classification Report:\n{classification_report(y_test, model.predict(X_test), zero_division=0)}\n")
