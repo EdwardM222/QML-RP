@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.3.31)  28 JUN 2026 19:59
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.3.31)  24 AUG 2026 12:09
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -219,31 +219,65 @@ Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
 Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 284.
 )
 \Hy@SectionHShift=\skip65
-) (c:/tools/TinyTeX/texmf-dist/tex/latex/amsmath/amsmath.sty
+) (c:/tools/TinyTeX/texmf-dist/tex/latex/acronym/acronym.sty
+Package: acronym 2025/01/17 v1.50 Support for acronyms (Tobias Oetiker)
+ (c:/tools/TinyTeX/texmf-dist/tex/latex/bigfoot/suffix.sty
+Package: suffix 2006/07/15 1.5a Variant command support
+) (c:/tools/TinyTeX/texmf-dist/tex/generic/xstring/xstring.sty (c:/tools/TinyTeX/texmf-dist/tex/generic/xstring/xstring.tex
+\xs_counta=\count308
+\xs_countb=\count309
+)
+Package: xstring 2023/08/22 v1.86 String manipulations (CT)
+)
+\AC@clearlist=\toks21
+) (c:/tools/TinyTeX/texmf-dist/tex/latex/glossaries-extra/glossaries-extra.sty
+Package: glossaries-extra 2026/04/21 v2.1 (NLCT)
+ (c:/tools/TinyTeX/texmf-dist/tex/latex/xkeyval/xkeyval.sty
+Package: xkeyval 2025/11/04 v2.10 package option processing (HA)
+ (c:/tools/TinyTeX/texmf-dist/tex/generic/xkeyval/xkeyval.tex (c:/tools/TinyTeX/texmf-dist/tex/generic/xkeyval/xkvutils.tex
+\XKV@toks=\toks22
+\XKV@tempa@toks=\toks23
+\XKV@tempb@toks=\toks24
+)
+\XKV@depth=\count310
+File: xkeyval.tex 2014/12/03 v2.7a key=value parser (HA)
+)) (c:/tools/TinyTeX/texmf-dist/tex/latex/glossaries/base/glossaries.sty
+Package: glossaries 2026/04/21 v5.1 (NLCT)
+ (c:/tools/TinyTeX/texmf-dist/tex/latex/base/ifthen.sty
+Package: ifthen 2024/03/16 v1.1e Standard LaTeX ifthen package (DPC)
+) (c:/tools/TinyTeX/texmf-dist/tex/latex/mfirstuc/mfirstuc.sty
+Package: mfirstuc 2025/04/03 v2.09 (NLCT)
+\@glsmfirst=\toks25
+\@glsmrest=\toks26
+) (c:/tools/TinyTeX/texmf-dist/tex/latex/xfor/xfor.sty
+Package: xfor 2009/02/05 v1.05 (NLCT)
+) (c:/tools/TinyTeX/texmf-dist/tex/latex/amsmath/amsgen.sty
+File: amsgen.sty 1999/11/30 v2.0 generic functions
+\@emptytoks=\toks27
+\ex@=\dimen167
+) (c:/tools/TinyTeX/texmf-dist/tex/latex/datatool/datatool-base.sty
+Package: datatool-base 2026/07/31 v3.4.4 (NLCT)
+ (c:/tools/TinyTeX/texmf-dist/tex/latex/amsmath/amsmath.sty
 Package: amsmath 2025/07/09 v2.17z AMS math features
 \@mathmargin=\skip66
 
 For additional information on amsmath, use the `?' option.
 (c:/tools/TinyTeX/texmf-dist/tex/latex/amsmath/amstext.sty
 Package: amstext 2024/11/17 v2.01 AMS text
- (c:/tools/TinyTeX/texmf-dist/tex/latex/amsmath/amsgen.sty
-File: amsgen.sty 1999/11/30 v2.0 generic functions
-\@emptytoks=\toks21
-\ex@=\dimen167
-)) (c:/tools/TinyTeX/texmf-dist/tex/latex/amsmath/amsbsy.sty
+) (c:/tools/TinyTeX/texmf-dist/tex/latex/amsmath/amsbsy.sty
 Package: amsbsy 1999/11/29 v1.2d Bold Symbols
 \pmbraise@=\dimen168
 ) (c:/tools/TinyTeX/texmf-dist/tex/latex/amsmath/amsopn.sty
 Package: amsopn 2022/04/08 v2.04 operator names
 )
-\inf@bad=\count308
+\inf@bad=\count311
 LaTeX Info: Redefining \frac on input line 233.
-\uproot@=\count309
-\leftroot@=\count310
+\uproot@=\count312
+\leftroot@=\count313
 LaTeX Info: Redefining \overline on input line 398.
 LaTeX Info: Redefining \colon on input line 409.
-\classnum@=\count311
-\DOTSCASE@=\count312
+\classnum@=\count314
+\DOTSCASE@=\count315
 LaTeX Info: Redefining \ldots on input line 495.
 LaTeX Info: Redefining \dots on input line 498.
 LaTeX Info: Redefining \cdots on input line 619.
@@ -256,33 +290,134 @@ LaTeX Info: Redefining \Bigg on input line 724.
 \big@size=\dimen169
 LaTeX Font Info:    Redeclaring font encoding OML on input line 742.
 LaTeX Font Info:    Redeclaring font encoding OMS on input line 743.
-\macc@depth=\count313
+\macc@depth=\count316
 LaTeX Info: Redefining \bmod on input line 904.
 LaTeX Info: Redefining \pmod on input line 909.
 LaTeX Info: Redefining \smash on input line 939.
 LaTeX Info: Redefining \relbar on input line 969.
 LaTeX Info: Redefining \Relbar on input line 970.
-\c@MaxMatrixCols=\count314
+\c@MaxMatrixCols=\count317
 \dotsspace@=\muskip18
-\c@parentequation=\count315
-\dspbrk@lvl=\count316
-\tag@help=\toks22
-\row@=\count317
-\column@=\count318
-\maxfields@=\count319
-\andhelp@=\toks23
+\c@parentequation=\count318
+\dspbrk@lvl=\count319
+\tag@help=\toks28
+\row@=\count320
+\column@=\count321
+\maxfields@=\count322
+\andhelp@=\toks29
 \eqnshift@=\dimen170
 \alignsep@=\dimen171
 \tagshift@=\dimen172
 \tagwidth@=\dimen173
 \totwidth@=\dimen174
 \lineht@=\dimen175
-\@envbody=\toks24
+\@envbody=\toks30
 \multlinegap=\skip67
 \multlinetaggap=\skip68
-\mathdisplay@stack=\toks25
+\mathdisplay@stack=\toks31
 LaTeX Info: Redefining \[ on input line 2950.
 LaTeX Info: Redefining \] on input line 2951.
+) (c:/tools/TinyTeX/texmf-dist/tex/latex/tracklang/tracklang.sty
+Package: tracklang 2026/05/24 v1.6.8 (NLCT) Track Languages
+ (c:/tools/TinyTeX/texmf-dist/tex/generic/tracklang/tracklang.tex))
+\l__datatool_tmpa_int=\count323
+\l__datatool_tmpb_int=\count324
+\l__datatool_tmpc_int=\count325
+\l__datatool_tmpd_int=\count326
+\l__datatool_count_int=\count327
+\l__datatool_tmp_datatype_int=\count328
+\l__datatool_tmpa_dim=\dimen176
+\l__datatool_tmpb_dim=\dimen177
+ (c:/tools/TinyTeX/texmf-dist/tex/latex/datatool/datatool-l3fp.def
+File: datatool-l3fp.def 2026/07/31 v3.4.4 (NLCT)
+)
+\@dtl@toks=\toks32
+\@dtl@tmpcount=\count329
+\dtl@tmplength=\skip69
+\l__datatool_measure_box=\box57
+\dtl@sortresult=\count330
+ (c:/tools/TinyTeX/texmf-dist/tex/latex/datatool/datatool-utf8.ldf
+File: datatool-utf8.ldf 2026/07/31 v3.4.4 (NLCT)
+)
+\@dtl@datatype=\count331
+\c_datatool_unknown_int=\count332
+\l__datatool_year_int=\count333
+\l__datatool_month_int=\count334
+\l__datatool_day_int=\count335
+\l__datatool_hour_int=\count336
+\l__datatool_minute_int=\count337
+\l__datatool_second_int=\count338
+\l__datatool_tzhour_int=\count339
+\l__datatool_tzminute_int=\count340
+\l__datatool_julian_int=\count341
+\l__datatool_local_julian_int=\count342
+\l__datatool_prefix_int=\count343
+\l__datatool_suffix_int=\count344
+\@dtl@foreach@level=\count345
+\dtl@codeA=\count346
+\dtl@codeB=\count347
+)
+\gls@level=\count348
+\@gls@tmpb=\toks33
+\gls@tmplen=\skip70
+\l__glossaries_tmpa_dim=\dimen178
+\l__glossaries_tmpb_dim=\dimen179
+\glskeylisttok=\toks34
+\glslabeltok=\toks35
+\glsshorttok=\toks36
+\glslongtok=\toks37
+ (c:/tools/TinyTeX/texmf-dist/tex/latex/glossaries/styles/glossary-hypernav.sty
+Package: glossary-hypernav 2026/04/21 v5.1 (NLCT)
+) (c:/tools/TinyTeX/texmf-dist/tex/latex/glossaries/styles/glossary-list.sty
+Package: glossary-list 2026/04/21 v5.1 (NLCT)
+\glslistdottedwidth=\skip71
+) (c:/tools/TinyTeX/texmf-dist/tex/latex/glossaries/styles/glossary-long.sty
+Package: glossary-long 2026/04/21 v5.1 (NLCT)
+ (c:/tools/TinyTeX/texmf-dist/tex/latex/tools/longtable.sty
+Package: longtable 2025-10-13 v4.24 Multi-page Table package (DPC)
+\LTleft=\skip72
+\LTright=\skip73
+\LTpre=\skip74
+\LTpost=\skip75
+\LTchunksize=\count349
+\LTcapwidth=\dimen180
+\LT@head=\box58
+\LT@firsthead=\box59
+\LT@foot=\box60
+\LT@lastfoot=\box61
+\LT@gbox=\box62
+\LT@cols=\count350
+\LT@rows=\count351
+\c@LT@tables=\count352
+\c@LT@chunks=\count353
+\LT@p@ftn=\toks38
+)
+\glsdescwidth=\skip76
+\glspagelistwidth=\skip77
+) (c:/tools/TinyTeX/texmf-dist/tex/latex/glossaries/styles/glossary-tree.sty
+Package: glossary-tree 2026/04/21 v5.1 (NLCT)
+\l__glossaries_tree_max_known_level_int=\count354
+\l__glossaries_tree_offset_dim=\dimen181
+\l__glossaries_tree_namewidth_dim=\dimen182
+\l__glossaries_tree_symbolwidth_dim=\dimen183
+\l__glossaries_tree_prenamesym_width_dim=\dimen184
+\l__glossaries_tree_presubnamesym_width_dim=\dimen185
+\l__glossaries_tree_namewidth_padding_dim=\dimen186
+\l__glossaries_tree_symbolwidth_padding_dim=\dimen187
+\l__glossaries_tree_namesymbolwidth_dim=\dimen188
+\l__glossaries_tree_namesymbolwidth_padding_dim=\dimen189
+\l__glossaries_tree_level_int=\count355
+\glstreeindent=\skip78
+))
+\@glsxtr@leveloffset=\count356
+\glsxtrresourcecount=\count357
+\@glsxtrnewgls@inner=\count358
+\glsshortpltok=\toks39
+\glslongpltok=\toks40
+ (c:/tools/TinyTeX/texmf-dist/tex/latex/glossaries-extra/glossaries-extra-abbrstyles.def
+File: glossaries-extra-abbrstyles.def 2026/04/21 v2.1 (NLCT)
+)
+\mglselementindex=\count359
 ) (c:/tools/TinyTeX/texmf-dist/tex/latex/amsfonts/amssymb.sty
 Package: amssymb 2013/01/14 v3.01 AMS font symbols
  (c:/tools/TinyTeX/texmf-dist/tex/latex/amsfonts/amsfonts.sty
@@ -294,32 +429,32 @@ LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
 (Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
 )) (c:/tools/TinyTeX/texmf-dist/tex/latex/booktabs/booktabs.sty
 Package: booktabs 2020/01/12 v1.61803398 Publication quality tables
-\heavyrulewidth=\dimen176
-\lightrulewidth=\dimen177
-\cmidrulewidth=\dimen178
-\belowrulesep=\dimen179
-\belowbottomsep=\dimen180
-\aboverulesep=\dimen181
-\abovetopsep=\dimen182
-\cmidrulesep=\dimen183
-\cmidrulekern=\dimen184
-\defaultaddspace=\dimen185
-\@cmidla=\count320
-\@cmidlb=\count321
-\@aboverulesep=\dimen186
-\@belowrulesep=\dimen187
-\@thisruleclass=\count322
-\@lastruleclass=\count323
-\@thisrulewidth=\dimen188
+\heavyrulewidth=\dimen190
+\lightrulewidth=\dimen191
+\cmidrulewidth=\dimen192
+\belowrulesep=\dimen193
+\belowbottomsep=\dimen194
+\aboverulesep=\dimen195
+\abovetopsep=\dimen196
+\cmidrulesep=\dimen197
+\cmidrulekern=\dimen198
+\defaultaddspace=\dimen199
+\@cmidla=\count360
+\@cmidlb=\count361
+\@aboverulesep=\dimen256
+\@belowrulesep=\dimen257
+\@thisruleclass=\count362
+\@lastruleclass=\count363
+\@thisrulewidth=\dimen258
 ) (c:/tools/TinyTeX/texmf-dist/tex/latex/tools/array.sty
 Package: array 2025/09/25 v2.6n Tabular extension package (FMi)
-\col@sep=\dimen189
-\ar@mcellbox=\box57
-\extrarowheight=\dimen190
-\NC@list=\toks26
-\extratabsurround=\skip69
-\backup@length=\skip70
-\ar@cellbox=\box58
+\col@sep=\dimen259
+\ar@mcellbox=\box63
+\extrarowheight=\dimen260
+\NC@list=\toks41
+\extratabsurround=\skip79
+\backup@length=\skip80
+\ar@cellbox=\box64
 ) (c:/tools/TinyTeX/texmf-dist/tex/latex/xcolor/xcolor.sty
 Package: xcolor 2024/09/29 v3.02 LaTeX color extensions (UK)
  (c:/tools/TinyTeX/texmf-dist/tex/latex/graphics-cfg/color.cfg
@@ -336,73 +471,106 @@ Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1369.
 Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1370.
 Package xcolor Info: Model `Gray' substituted by `gray' on input line 1371.
 Package xcolor Info: Model `wave' substituted by `hsb' on input line 1372.
-) (c:/tools/TinyTeX/texmf-dist/tex/latex/braket/braket.sty) (c:/tools/TinyTeX/texmf-dist/tex/latex/biblatex/biblatex.sty
+) (c:/tools/TinyTeX/texmf-dist/tex/latex/braket/braket.sty) (c:/tools/TinyTeX/texmf-dist/tex/latex/caption/subcaption.sty
+Package: subcaption 2023/07/28 v1.6b Sub-captions (AR)
+ (c:/tools/TinyTeX/texmf-dist/tex/latex/caption/caption.sty
+Package: caption 2023/08/05 v3.6o Customizing captions (AR)
+ (c:/tools/TinyTeX/texmf-dist/tex/latex/caption/caption3.sty
+Package: caption3 2023/07/31 v2.4d caption3 kernel (AR)
+\caption@tempdima=\dimen261
+\captionmargin=\dimen262
+\caption@leftmargin=\dimen263
+\caption@rightmargin=\dimen264
+\caption@width=\dimen265
+\caption@indent=\dimen266
+\caption@parindent=\dimen267
+\caption@hangindent=\dimen268
+Package caption Info: Standard document class detected.
+)
+\c@caption@flags=\count364
+\c@continuedfloat=\count365
+Package caption Info: hyperref package is loaded.
+Package caption Info: listings package is loaded.
+Package caption Info: longtable package is loaded.
+ (c:/tools/TinyTeX/texmf-dist/tex/latex/caption/ltcaption.sty
+Package: ltcaption 2021/01/08 v1.4c longtable captions (AR)
+))
+Package caption Info: New subtype `subfigure' on input line 238.
+\c@subfigure=\count366
+Package caption Info: New subtype `subtable' on input line 238.
+\c@subtable=\count367
+) (c:/tools/TinyTeX/texmf-dist/tex/latex/graphics/rotating.sty
+Package: rotating 2025/01/14 v2.16e rotated objects in LaTeX
+\c@r@tfl@t=\count368
+\rotFPtop=\skip81
+\rotFPbot=\skip82
+\rot@float@box=\box65
+\rot@mess@toks=\toks42
+) (c:/tools/TinyTeX/texmf-dist/tex/latex/biblatex/biblatex.sty
 Package: biblatex 2025/07/10 v3.21 programmable bibliographies (PK/MW)
  (c:/tools/TinyTeX/texmf-dist/tex/latex/logreq/logreq.sty
 Package: logreq 2010/08/04 v1.0 xml request logger
-\lrq@indent=\count324
+\lrq@indent=\count369
  (c:/tools/TinyTeX/texmf-dist/tex/latex/logreq/logreq.def
 File: logreq.def 2010/08/04 v1.0 logreq spec v1.0
-)) (c:/tools/TinyTeX/texmf-dist/tex/latex/base/ifthen.sty
-Package: ifthen 2024/03/16 v1.1e Standard LaTeX ifthen package (DPC)
-)
-\c@tabx@nest=\count325
-\c@listtotal=\count326
-\c@listcount=\count327
-\c@liststart=\count328
-\c@liststop=\count329
-\c@citecount=\count330
-\c@citetotal=\count331
-\c@multicitecount=\count332
-\c@multicitetotal=\count333
-\c@instcount=\count334
-\c@maxnames=\count335
-\c@minnames=\count336
-\c@maxitems=\count337
-\c@minitems=\count338
-\c@citecounter=\count339
-\c@maxcitecounter=\count340
-\c@savedcitecounter=\count341
-\c@uniquelist=\count342
-\c@uniquename=\count343
-\c@refsection=\count344
-\c@refsegment=\count345
-\c@maxextratitle=\count346
-\c@maxextratitleyear=\count347
-\c@maxextraname=\count348
-\c@maxextradate=\count349
-\c@maxextraalpha=\count350
-\c@abbrvpenalty=\count351
-\c@highnamepenalty=\count352
-\c@lownamepenalty=\count353
-\c@maxparens=\count354
-\c@parenlevel=\count355
-\blx@tempcnta=\count356
-\blx@tempcntb=\count357
-\blx@tempcntc=\count358
-\c@blx@maxsection=\count359
-\blx@maxsegment@0=\count360
-\blx@notetype=\count361
-\blx@parenlevel@text=\count362
-\blx@parenlevel@foot=\count363
-\blx@sectionciteorder@0=\count364
-\blx@sectionciteorderinternal@0=\count365
-\blx@entrysetcounter=\count366
-\blx@biblioinstance=\count367
-\labelnumberwidth=\skip71
-\labelalphawidth=\skip72
-\biblabelsep=\skip73
-\bibitemsep=\skip74
-\bibnamesep=\skip75
-\bibinitsep=\skip76
-\bibparsep=\skip77
-\bibhang=\skip78
+))
+\c@tabx@nest=\count370
+\c@listtotal=\count371
+\c@listcount=\count372
+\c@liststart=\count373
+\c@liststop=\count374
+\c@citecount=\count375
+\c@citetotal=\count376
+\c@multicitecount=\count377
+\c@multicitetotal=\count378
+\c@instcount=\count379
+\c@maxnames=\count380
+\c@minnames=\count381
+\c@maxitems=\count382
+\c@minitems=\count383
+\c@citecounter=\count384
+\c@maxcitecounter=\count385
+\c@savedcitecounter=\count386
+\c@uniquelist=\count387
+\c@uniquename=\count388
+\c@refsection=\count389
+\c@refsegment=\count390
+\c@maxextratitle=\count391
+\c@maxextratitleyear=\count392
+\c@maxextraname=\count393
+\c@maxextradate=\count394
+\c@maxextraalpha=\count395
+\c@abbrvpenalty=\count396
+\c@highnamepenalty=\count397
+\c@lownamepenalty=\count398
+\c@maxparens=\count399
+\c@parenlevel=\count400
+\blx@tempcnta=\count401
+\blx@tempcntb=\count402
+\blx@tempcntc=\count403
+\c@blx@maxsection=\count404
+\blx@maxsegment@0=\count405
+\blx@notetype=\count406
+\blx@parenlevel@text=\count407
+\blx@parenlevel@foot=\count408
+\blx@sectionciteorder@0=\count409
+\blx@sectionciteorderinternal@0=\count410
+\blx@entrysetcounter=\count411
+\blx@biblioinstance=\count412
+\labelnumberwidth=\skip83
+\labelalphawidth=\skip84
+\biblabelsep=\skip85
+\bibitemsep=\skip86
+\bibnamesep=\skip87
+\bibinitsep=\skip88
+\bibparsep=\skip89
+\bibhang=\skip90
 \blx@bcfin=\read2
 \blx@bcfout=\write3
 \blx@langwohyphens=\language3
-\c@mincomprange=\count368
-\c@maxcomprange=\count369
-\c@mincompwidth=\count370
+\c@mincomprange=\count413
+\c@maxcomprange=\count414
+\c@mincompwidth=\count415
 Package biblatex Info: Trying to load biblatex default data model...
 Package biblatex Info: ... file 'blx-dm.def' found.
  (c:/tools/TinyTeX/texmf-dist/tex/latex/biblatex/blx-dm.def
@@ -410,88 +578,88 @@ File: blx-dm.def 2025/07/10 v3.21 biblatex datamodel (PK/MW)
 )
 Package biblatex Info: Trying to load biblatex custom data model...
 Package biblatex Info: ... file 'biblatex-dm.cfg' not found.
-\c@afterword=\count371
-\c@savedafterword=\count372
-\c@annotator=\count373
-\c@savedannotator=\count374
-\c@author=\count375
-\c@savedauthor=\count376
-\c@bookauthor=\count377
-\c@savedbookauthor=\count378
-\c@commentator=\count379
-\c@savedcommentator=\count380
-\c@editor=\count381
-\c@savededitor=\count382
-\c@editora=\count383
-\c@savededitora=\count384
-\c@editorb=\count385
-\c@savededitorb=\count386
-\c@editorc=\count387
-\c@savededitorc=\count388
-\c@foreword=\count389
-\c@savedforeword=\count390
-\c@holder=\count391
-\c@savedholder=\count392
-\c@introduction=\count393
-\c@savedintroduction=\count394
-\c@namea=\count395
-\c@savednamea=\count396
-\c@nameb=\count397
-\c@savednameb=\count398
-\c@namec=\count399
-\c@savednamec=\count400
-\c@translator=\count401
-\c@savedtranslator=\count402
-\c@shortauthor=\count403
-\c@savedshortauthor=\count404
-\c@shorteditor=\count405
-\c@savedshorteditor=\count406
-\c@labelname=\count407
-\c@savedlabelname=\count408
-\c@institution=\count409
-\c@savedinstitution=\count410
-\c@lista=\count411
-\c@savedlista=\count412
-\c@listb=\count413
-\c@savedlistb=\count414
-\c@listc=\count415
-\c@savedlistc=\count416
-\c@listd=\count417
-\c@savedlistd=\count418
-\c@liste=\count419
-\c@savedliste=\count420
-\c@listf=\count421
-\c@savedlistf=\count422
-\c@location=\count423
-\c@savedlocation=\count424
-\c@organization=\count425
-\c@savedorganization=\count426
-\c@origlocation=\count427
-\c@savedoriglocation=\count428
-\c@origpublisher=\count429
-\c@savedorigpublisher=\count430
-\c@publisher=\count431
-\c@savedpublisher=\count432
-\c@language=\count433
-\c@savedlanguage=\count434
-\c@origlanguage=\count435
-\c@savedoriglanguage=\count436
-\c@pageref=\count437
-\c@savedpageref=\count438
-\shorthandwidth=\skip79
-\shortjournalwidth=\skip80
-\shortserieswidth=\skip81
-\shorttitlewidth=\skip82
-\shortauthorwidth=\skip83
-\shorteditorwidth=\skip84
-\locallabelnumberwidth=\skip85
-\locallabelalphawidth=\skip86
-\localshorthandwidth=\skip87
-\localshortjournalwidth=\skip88
-\localshortserieswidth=\skip89
-\localshorttitlewidth=\skip90
-\localshortauthorwidth=\skip91
-\localshorteditorwidth=\skip92
+\c@afterword=\count416
+\c@savedafterword=\count417
+\c@annotator=\count418
+\c@savedannotator=\count419
+\c@author=\count420
+\c@savedauthor=\count421
+\c@bookauthor=\count422
+\c@savedbookauthor=\count423
+\c@commentator=\count424
+\c@savedcommentator=\count425
+\c@editor=\count426
+\c@savededitor=\count427
+\c@editora=\count428
+\c@savededitora=\count429
+\c@editorb=\count430
+\c@savededitorb=\count431
+\c@editorc=\count432
+\c@savededitorc=\count433
+\c@foreword=\count434
+\c@savedforeword=\count435
+\c@holder=\count436
+\c@savedholder=\count437
+\c@introduction=\count438
+\c@savedintroduction=\count439
+\c@namea=\count440
+\c@savednamea=\count441
+\c@nameb=\count442
+\c@savednameb=\count443
+\c@namec=\count444
+\c@savednamec=\count445
+\c@translator=\count446
+\c@savedtranslator=\count447
+\c@shortauthor=\count448
+\c@savedshortauthor=\count449
+\c@shorteditor=\count450
+\c@savedshorteditor=\count451
+\c@labelname=\count452
+\c@savedlabelname=\count453
+\c@institution=\count454
+\c@savedinstitution=\count455
+\c@lista=\count456
+\c@savedlista=\count457
+\c@listb=\count458
+\c@savedlistb=\count459
+\c@listc=\count460
+\c@savedlistc=\count461
+\c@listd=\count462
+\c@savedlistd=\count463
+\c@liste=\count464
+\c@savedliste=\count465
+\c@listf=\count466
+\c@savedlistf=\count467
+\c@location=\count468
+\c@savedlocation=\count469
+\c@organization=\count470
+\c@savedorganization=\count471
+\c@origlocation=\count472
+\c@savedoriglocation=\count473
+\c@origpublisher=\count474
+\c@savedorigpublisher=\count475
+\c@publisher=\count476
+\c@savedpublisher=\count477
+\c@language=\count478
+\c@savedlanguage=\count479
+\c@origlanguage=\count480
+\c@savedoriglanguage=\count481
+\c@pageref=\count482
+\c@savedpageref=\count483
+\shorthandwidth=\skip91
+\shortjournalwidth=\skip92
+\shortserieswidth=\skip93
+\shorttitlewidth=\skip94
+\shortauthorwidth=\skip95
+\shorteditorwidth=\skip96
+\locallabelnumberwidth=\skip97
+\locallabelalphawidth=\skip98
+\localshorthandwidth=\skip99
+\localshortjournalwidth=\skip100
+\localshortserieswidth=\skip101
+\localshorttitlewidth=\skip102
+\localshortauthorwidth=\skip103
+\localshorteditorwidth=\skip104
 Package biblatex Info: Trying to load compatibility code...
 Package biblatex Info: ... file 'blx-compat.def' found.
  (c:/tools/TinyTeX/texmf-dist/tex/latex/biblatex/blx-compat.def
@@ -501,19 +669,19 @@ Package biblatex Info: Trying to load generic definitions...
 Package biblatex Info: ... file 'biblatex.def' found.
  (c:/tools/TinyTeX/texmf-dist/tex/latex/biblatex/biblatex.def
 File: biblatex.def 2025/07/10 v3.21 biblatex compatibility (PK/MW)
-\c@textcitecount=\count439
-\c@textcitetotal=\count440
-\c@textcitemaxnames=\count441
-\c@biburlbigbreakpenalty=\count442
-\c@biburlbreakpenalty=\count443
-\c@biburlnumpenalty=\count444
-\c@biburlucpenalty=\count445
-\c@biburllcpenalty=\count446
+\c@textcitecount=\count484
+\c@textcitetotal=\count485
+\c@textcitemaxnames=\count486
+\c@biburlbigbreakpenalty=\count487
+\c@biburlbreakpenalty=\count488
+\c@biburlnumpenalty=\count489
+\c@biburlucpenalty=\count490
+\c@biburllcpenalty=\count491
 \biburlbigskip=\muskip19
 \biburlnumskip=\muskip20
 \biburlucskip=\muskip21
 \biburllcskip=\muskip22
-\c@smartand=\count447
+\c@smartand=\count492
 )
 Package biblatex Info: Trying to load bibliography style 'numeric'...
 Package biblatex Info: ... file 'numeric.bbx' found.
@@ -523,8 +691,8 @@ Package biblatex Info: Trying to load bibliography style 'standard'...
 Package biblatex Info: ... file 'standard.bbx' found.
  (c:/tools/TinyTeX/texmf-dist/tex/latex/biblatex/bbx/standard.bbx
 File: standard.bbx 2025/07/10 v3.21 biblatex bibliography style (PK/MW)
-\c@bbx:relatedcount=\count448
-\c@bbx:relatedtotal=\count449
+\c@bbx:relatedcount=\count493
+\c@bbx:relatedtotal=\count494
 ))
 Package biblatex Info: Trying to load citation style 'numeric'...
 Package biblatex Info: ... file 'numeric.cbx' found.
@@ -553,7 +721,7 @@ Package biblatex Info: Document encoding is UTF8 ....
 Package: expl3 2026-01-19 L3 programming layer (loader) 
  (c:/tools/TinyTeX/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
 File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count450
+\l__color_backend_stack_int=\count495
 ))
 Package biblatex Info: ... and expl3
 (biblatex)             2026-01-19 L3 programming layer (loader) 
@@ -563,296 +731,36 @@ Package biblatex Info: ... and expl3
 Package: xparse 2025-10-09 L3 Experimental document command parser
 )
 Package: blx-case-expl3 2025/07/10 v3.21 expl3 case changing code for biblatex
-)) (c:/tools/TinyTeX/texmf-dist/tex/latex/caption/subcaption.sty
-Package: subcaption 2023/07/28 v1.6b Sub-captions (AR)
- (c:/tools/TinyTeX/texmf-dist/tex/latex/caption/caption.sty
-Package: caption 2023/08/05 v3.6o Customizing captions (AR)
- (c:/tools/TinyTeX/texmf-dist/tex/latex/caption/caption3.sty
-Package: caption3 2023/07/31 v2.4d caption3 kernel (AR)
-\caption@tempdima=\dimen191
-\captionmargin=\dimen192
-\caption@leftmargin=\dimen193
-\caption@rightmargin=\dimen194
-\caption@width=\dimen195
-\caption@indent=\dimen196
-\caption@parindent=\dimen197
-\caption@hangindent=\dimen198
-Package caption Info: Standard document class detected.
-)
-\c@caption@flags=\count451
-\c@continuedfloat=\count452
-Package caption Info: hyperref package is loaded.
-Package caption Info: listings package is loaded.
-)
-Package caption Info: New subtype `subfigure' on input line 238.
-\c@subfigure=\count453
-Package caption Info: New subtype `subtable' on input line 238.
-\c@subtable=\count454
-) (c:/tools/TinyTeX/texmf-dist/tex/latex/pgfgantt/pgfgantt.sty
-Package: pgfgantt 2024/06/19 v5.0a Draw Gantt diagrams with TikZ
- (c:/tools/TinyTeX/texmf-dist/tex/latex/pgf/frontendlayer/tikz.sty (c:/tools/TinyTeX/texmf-dist/tex/latex/pgf/basiclayer/pgf.sty (c:/tools/TinyTeX/texmf-dist/tex/latex/pgf/utilities/pgfrcs.sty (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/utilities/pgfutil-common.tex
-\pgfutil@everybye=\toks27
-\pgfutil@tempdima=\dimen199
-\pgfutil@tempdimb=\dimen256
-) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/utilities/pgfutil-latex.def
-\pgfutil@abb=\box59
-) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/utilities/pgfrcs.code.tex (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/pgf.revision.tex)
-Package: pgfrcs 2025-08-29 v3.1.11a (3.1.11a)
 ))
-Package: pgf 2025-08-29 v3.1.11a (3.1.11a)
- (c:/tools/TinyTeX/texmf-dist/tex/latex/pgf/basiclayer/pgfcore.sty (c:/tools/TinyTeX/texmf-dist/tex/latex/pgf/systemlayer/pgfsys.sty (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/systemlayer/pgfsys.code.tex
-Package: pgfsys 2025-08-29 v3.1.11a (3.1.11a)
- (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code.tex
-\pgfkeys@pathtoks=\toks28
-\pgfkeys@temptoks=\toks29
- (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/utilities/pgfkeyslibraryfiltered.code.tex
-\pgfkeys@tmptoks=\toks30
-))
-\pgf@x=\dimen257
-\pgf@y=\dimen258
-\pgf@xa=\dimen259
-\pgf@ya=\dimen260
-\pgf@xb=\dimen261
-\pgf@yb=\dimen262
-\pgf@xc=\dimen263
-\pgf@yc=\dimen264
-\pgf@xd=\dimen265
-\pgf@yd=\dimen266
-\w@pgf@writea=\write4
-\r@pgf@reada=\read3
-\c@pgf@counta=\count455
-\c@pgf@countb=\count456
-\c@pgf@countc=\count457
-\c@pgf@countd=\count458
-\t@pgf@toka=\toks31
-\t@pgf@tokb=\toks32
-\t@pgf@tokc=\toks33
-\pgf@sys@id@count=\count459
- (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/systemlayer/pgf.cfg
-File: pgf.cfg 2025-08-29 v3.1.11a (3.1.11a)
-)
-Driver file for pgf: pgfsys-pdftex.def
- (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-pdftex.def
-File: pgfsys-pdftex.def 2025-08-29 v3.1.11a (3.1.11a)
- (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-common-pdf.def
-File: pgfsys-common-pdf.def 2025-08-29 v3.1.11a (3.1.11a)
-))) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/systemlayer/pgfsyssoftpath.code.tex
-File: pgfsyssoftpath.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgfsyssoftpath@smallbuffer@items=\count460
-\pgfsyssoftpath@bigbuffer@items=\count461
-) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/systemlayer/pgfsysprotocol.code.tex
-File: pgfsysprotocol.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-)) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/basiclayer/pgfcore.code.tex
-Package: pgfcore 2025-08-29 v3.1.11a (3.1.11a)
- (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/math/pgfmathutil.code.tex) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/math/pgfmathparser.code.tex
-\pgfmath@dimen=\dimen267
-\pgfmath@count=\count462
-\pgfmath@box=\box60
-\pgfmath@toks=\toks34
-\pgfmath@stack@operand=\toks35
-\pgfmath@stack@operation=\toks36
-) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.code.tex) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.basic.code.tex) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.trigonometric.code.tex) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.random.code.tex) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.comparison.code.tex) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.base.code.tex) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.round.code.tex) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.misc.code.tex) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.integerarithmetics.code.tex) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/math/pgfmathcalc.code.tex) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/math/pgfmathfloat.code.tex
-\c@pgfmathroundto@lastzeros=\count463
-)) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/math/pgfint.code.tex) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepoints.code.tex
-File: pgfcorepoints.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgf@picminx=\dimen268
-\pgf@picmaxx=\dimen269
-\pgf@picminy=\dimen270
-\pgf@picmaxy=\dimen271
-\pgf@pathminx=\dimen272
-\pgf@pathmaxx=\dimen273
-\pgf@pathminy=\dimen274
-\pgf@pathmaxy=\dimen275
-\pgf@xx=\dimen276
-\pgf@xy=\dimen277
-\pgf@yx=\dimen278
-\pgf@yy=\dimen279
-\pgf@zx=\dimen280
-\pgf@zy=\dimen281
-) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepathconstruct.code.tex
-File: pgfcorepathconstruct.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgf@path@lastx=\dimen282
-\pgf@path@lasty=\dimen283
-) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepathusage.code.tex
-File: pgfcorepathusage.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgf@shorten@end@additional=\dimen284
-\pgf@shorten@start@additional=\dimen285
-) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/basiclayer/pgfcorescopes.code.tex
-File: pgfcorescopes.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgfpic=\box61
-\pgf@hbox=\box62
-\pgf@layerbox@main=\box63
-\pgf@picture@serial@count=\count464
-) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/basiclayer/pgfcoregraphicstate.code.tex
-File: pgfcoregraphicstate.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgflinewidth=\dimen286
-) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/basiclayer/pgfcoretransformations.code.tex
-File: pgfcoretransformations.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgf@pt@x=\dimen287
-\pgf@pt@y=\dimen288
-\pgf@pt@temp=\dimen289
-) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/basiclayer/pgfcorequick.code.tex
-File: pgfcorequick.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreobjects.code.tex
-File: pgfcoreobjects.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepathprocessing.code.tex
-File: pgfcorepathprocessing.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/basiclayer/pgfcorearrows.code.tex
-File: pgfcorearrows.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgfarrowsep=\dimen290
-) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreshade.code.tex
-File: pgfcoreshade.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgf@max=\dimen291
-\pgf@sys@shading@range@num=\count465
-\pgf@shadingcount=\count466
-) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreimage.code.tex
-File: pgfcoreimage.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreexternal.code.tex
-File: pgfcoreexternal.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgfexternal@startupbox=\box64
-) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/basiclayer/pgfcorelayers.code.tex
-File: pgfcorelayers.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/basiclayer/pgfcoretransparency.code.tex
-File: pgfcoretransparency.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepatterns.code.tex
-File: pgfcorepatterns.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/basiclayer/pgfcorerdf.code.tex
-File: pgfcorerdf.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-))) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/modules/pgfmoduleshapes.code.tex
-File: pgfmoduleshapes.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgfnodeparttextbox=\box65
-) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/modules/pgfmoduleplot.code.tex
-File: pgfmoduleplot.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-) (c:/tools/TinyTeX/texmf-dist/tex/latex/pgf/compatibility/pgfcomp-version-0-65.sty
-Package: pgfcomp-version-0-65 2025-08-29 v3.1.11a (3.1.11a)
-\pgf@nodesepstart=\dimen292
-\pgf@nodesepend=\dimen293
-) (c:/tools/TinyTeX/texmf-dist/tex/latex/pgf/compatibility/pgfcomp-version-1-18.sty
-Package: pgfcomp-version-1-18 2025-08-29 v3.1.11a (3.1.11a)
-)) (c:/tools/TinyTeX/texmf-dist/tex/latex/pgf/utilities/pgffor.sty (c:/tools/TinyTeX/texmf-dist/tex/latex/pgf/utilities/pgfkeys.sty (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code.tex)) (c:/tools/TinyTeX/texmf-dist/tex/latex/pgf/math/pgfmath.sty (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex)) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/utilities/pgffor.code.tex
-Package: pgffor 2025-08-29 v3.1.11a (3.1.11a)
-\pgffor@iter=\dimen294
-\pgffor@skip=\dimen295
-\pgffor@stack=\toks37
-\pgffor@toks=\toks38
-)) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/frontendlayer/tikz/tikz.code.tex
-Package: tikz 2025-08-29 v3.1.11a (3.1.11a)
- (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/libraries/pgflibraryplothandlers.code.tex
-File: pgflibraryplothandlers.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgf@plot@mark@count=\count467
-\pgfplotmarksize=\dimen296
-)
-\tikz@lastx=\dimen297
-\tikz@lasty=\dimen298
-\tikz@lastxsaved=\dimen299
-\tikz@lastysaved=\dimen300
-\tikz@lastmovetox=\dimen301
-\tikz@lastmovetoy=\dimen302
-\tikzleveldistance=\dimen303
-\tikzsiblingdistance=\dimen304
-\tikz@figbox=\box66
-\tikz@figbox@bg=\box67
-\tikz@tempbox=\box68
-\tikz@tempbox@bg=\box69
-\tikztreelevel=\count468
-\tikznumberofchildren=\count469
-\tikznumberofcurrentchild=\count470
-\tikz@fig@count=\count471
- (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/modules/pgfmodulematrix.code.tex
-File: pgfmodulematrix.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgfmatrixcurrentrow=\count472
-\pgfmatrixcurrentcolumn=\count473
-\pgf@matrix@numberofcolumns=\count474
-)
-\tikz@expandcount=\count475
- (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibrarytopaths.code.tex
-File: tikzlibrarytopaths.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-))) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibraryarrows.code.tex
-File: tikzlibraryarrows.code.tex 2025-08-29 v3.1.11a (3.1.11a)
- (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/libraries/pgflibraryarrows.code.tex
-File: pgflibraryarrows.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\arrowsize=\dimen305
-)) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibrarybackgrounds.code.tex
-File: tikzlibrarybackgrounds.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgf@layerbox@background=\box70
-\pgf@layerboxsaved@background=\box71
-) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibrarycalc.code.tex
-File: tikzlibrarycalc.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibrarypatterns.code.tex
-File: tikzlibrarypatterns.code.tex 2025-08-29 v3.1.11a (3.1.11a)
- (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/libraries/pgflibrarypatterns.code.tex
-File: pgflibrarypatterns.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-)) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibrarypositioning.code.tex
-File: tikzlibrarypositioning.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-) (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibraryshapes.geometric.code.tex
-File: tikzlibraryshapes.geometric.code.tex 2025-08-29 v3.1.11a (3.1.11a)
- (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/libraries/shapes/pgflibraryshapes.geometric.code.tex
-File: pgflibraryshapes.geometric.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-)) (c:/tools/TinyTeX/texmf-dist/tex/latex/pgf/utilities/pgfcalendar.sty (c:/tools/TinyTeX/texmf-dist/tex/generic/pgf/utilities/pgfcalendar.code.tex
-File: pgfcalendar.code.tex 2025-08-29 v3.1.11a (3.1.11a)
-\pgfcalendarcurrentjulian=\count476
-\pgf@cal@easter@Y=\count477
-\pgf@cal@easter@G=\count478
-\pgf@cal@easter@C=\count479
-\pgf@cal@easter@X=\count480
-\pgf@cal@easter@Z=\count481
-\pgf@cal@easter@D=\count482
-\pgf@cal@easter@E=\count483
-\pgf@cal@easter@N=\count484
-\pgf@cal@easter@M=\count485
-\pgf@cal@easter@julianday=\count486
-))
-\gtt@currentline=\count487
-\gtt@lasttitleline=\count488
-\gtt@currgrid=\count489
-\gtt@chartwidth=\count490
-\gtt@lasttitleslot=\count491
-\gtt@elementid=\count492
-\gtt@today@slot=\count493
-\gtt@startjulian=\count494
-\gtt@endjulian=\count495
-\gtt@chartid=\count496
-\gtt@vrule@slot=\count497
-\gtt@calendar@slots=\count498
-\gtt@calendar@weeknumber=\count499
-\gtt@calendar@startofweek=\count500
-\gtt@left@slot=\count501
-\gtt@right@slot=\count502
-) (c:/tools/TinyTeX/texmf-dist/tex/latex/graphics/rotating.sty
-Package: rotating 2025/01/14 v2.16e rotated objects in LaTeX
-\c@r@tfl@t=\count503
-\rotFPtop=\skip93
-\rotFPbot=\skip94
-\rot@float@box=\box72
-\rot@mess@toks=\toks39
-)
-Package hyperref Info: Option `colorlinks' set `true' on input line 38.
+Package hyperref Info: Option `colorlinks' set `true' on input line 48.
  (c:/tools/TinyTeX/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2025/11/14 1.11b listings language file
 )
-\@quotelevel=\count504
-\@quotereset=\count505
- (./report.aux)
+\@quotelevel=\count496
+\@quotereset=\count497
+ (./report.aux
+\g__glossaries_gls_ref_main_int=\count498
+)
 \openout1 = `report.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 60.
-LaTeX Font Info:    ... okay on input line 60.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 60.
-LaTeX Font Info:    ... okay on input line 60.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 60.
-LaTeX Font Info:    ... okay on input line 60.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 60.
-LaTeX Font Info:    ... okay on input line 60.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 60.
-LaTeX Font Info:    ... okay on input line 60.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 60.
-LaTeX Font Info:    ... okay on input line 60.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 60.
-LaTeX Font Info:    ... okay on input line 60.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 60.
-LaTeX Font Info:    ... okay on input line 60.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 60.
-LaTeX Font Info:    ... okay on input line 60.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 267.
+LaTeX Font Info:    ... okay on input line 267.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 267.
+LaTeX Font Info:    ... okay on input line 267.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 267.
+LaTeX Font Info:    ... okay on input line 267.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 267.
+LaTeX Font Info:    ... okay on input line 267.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 267.
+LaTeX Font Info:    ... okay on input line 267.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 267.
+LaTeX Font Info:    ... okay on input line 267.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 267.
+LaTeX Font Info:    ... okay on input line 267.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 267.
+LaTeX Font Info:    ... okay on input line 267.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 267.
+LaTeX Font Info:    ... okay on input line 267.
 
 *geometry* detected driver: pdftex
 *geometry* verbose mode - [ preamble ] result:
@@ -893,12 +801,15 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 48
  (c:/tools/TinyTeX/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 ))
-\c@lstlisting=\count506
-Package hyperref Info: Link coloring ON on input line 60.
+\c@lstlisting=\count499
+Package hyperref Info: Link coloring ON on input line 267.
  (./report.out) (./report.out)
-\@outlinefile=\write5
-\openout5 = `report.out'.
+\@outlinefile=\write4
+\openout4 = `report.out'.
 
+Package caption Info: Begin \AtBeginDocument code.
+Package caption Info: rotating package is loaded.
+Package caption Info: End \AtBeginDocument code.
 Package biblatex Info: Trying to load language 'english'...
 Package biblatex Info: ... file 'english.lbx' found.
  (c:/tools/TinyTeX/texmf-dist/tex/latex/biblatex/lbx/english.lbx
@@ -912,19 +823,16 @@ Package biblatex Info: Automatic encoding selection.
 Package biblatex Info: Trying to load bibliographic data...
 Package biblatex Info: ... file 'report.bbl' found.
  (./report.bbl)
-Package biblatex Info: Reference section=0 on input line 60.
-Package biblatex Info: Reference segment=0 on input line 60.
-Package caption Info: Begin \AtBeginDocument code.
-Package caption Info: rotating package is loaded.
-Package caption Info: End \AtBeginDocument code.
-<UCD_Logo.pdf, id=95, 196.735pt x 286.06876pt>
+Package biblatex Info: Reference section=0 on input line 267.
+Package biblatex Info: Reference segment=0 on input line 267.
+<UCD_Logo.pdf, id=430, 196.735pt x 286.06876pt>
 File: UCD_Logo.pdf Graphic file (type pdf)
 <use UCD_Logo.pdf>
-Package pdftex.def Info: UCD_Logo.pdf  used on input line 62.
+Package pdftex.def Info: UCD_Logo.pdf  used on input line 269.
 (pdftex.def)             Requested size: 117.40549pt x 170.71652pt.
  [0
 
-{c:/tools/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map} <./UCD_Logo.pdf>] (./report.toc
+] [1{c:/tools/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map} <./UCD_Logo.pdf>] (./report.toc
 LaTeX Font Info:    Calculating math sizes for size <11> on input line 1.
 
 
@@ -946,96 +854,231 @@ File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 LaTeX Font Info:    Trying to load font information for U+msb on input line 1.
  (c:/tools/TinyTeX/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
-))
-\tf@toc=\write6
-\openout6 = `report.toc'.
+)
+Package acronym Info: Label `acro:vqc' newly defined as it shall be overridden
+although it is yet undefined on input line 39.
+Package acronym Info: Label `acro:vqc' overridden on input line 68.
 
- [1
-
-] [2
+pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.73 ...mECOC} Ensemble Analysis}{33}{section.4.3}
+                                                  % [1
 
 ]
-Overfull \hbox (6.4451pt too wide) in paragraph at lines 117--118
-\T1/cmss/m/n/10.95 Documents a spe-cific short-com-ing of an ex-ist-ing ap-proach. Par-tic-u-larly use-ful for flag-ging simulation-
- []
+Package acronym Info: Label `acro:vqc' overridden on input line 94.
+Package acronym Info: Label `acro:vqc' overridden on input line 115.
+)
+\tf@toc=\write5
+\openout5 = `report.toc'.
 
-[3
+ [2] [3
 
-] [4]
+]
+
+Package glossaries Info: Preparing to sort glossary `main' (total number of
+(glossaries)             referenced entries: 38)
+
+[4
+
+
+] [5]
+Package acronym Info: Label `acro:vqc' overridden on input line 315.
+Package acronym Info: Label `acro:f1' newly defined as it shall be overridden
+although it is yet undefined on input line 319.
+ [6
+
+]
 Chapter 1.
+Package acronym Info: Label `acro:qml' newly defined as it shall be overridden
+although it is yet undefined on input line 334.
+Package acronym Info: Label `acro:vqc' overridden on input line 334.
+Package acronym Info: Label `acro:ecoc' newly defined as it shall be overridden
+although it is yet undefined on input line 336.
 
-Overfull \hbox (4.43622pt too wide) in paragraph at lines 180--181
-\T1/cmss/m/n/10.95 scal-a-bil-ity, and train-abil-ity, us-ing mul-ti-ple smaller cir-cuits rather than one mono-lithic VQC [[][]15[][]].[] 
+Overfull \hbox (21.68642pt too wide) in paragraph at lines 340--341
+[][][][]\T1/cmss/m/n/10.95 Validation-weighted de-cod-ing[][] of the [][] out-puts pro-vides the di-rect op-er-at-ing mode of \T1/cmtt/m/n/10.95 QuantumECOC\T1/cmss/m/n/10.95 ,
  []
 
-[5
+[7
 
-] [6] [7] [8] [9] [10]
+] [8] [9] [10]
 Chapter 2.
+Package acronym Info: Label `acro:f1' overridden on input line 436.
+Package acronym Info: Label `acro:oof' newly defined as it shall be overridden
+although it is yet undefined on input line 441.
 [11
 
-] [12] [13]
+] [12]
+Package acronym Info: Label `acro:qnn' newly defined as it shall be overridden
+although it is yet undefined on input line 471.
+
+Overfull \hbox (2.29765pt too wide) in paragraph at lines 471--472
+[]\T1/cmss/m/n/10.95 Structured ini-tial-i-sa-tion, lo-cal cost func-tions and re-stricted cir-cuit de-signs are com-mon re-sponses [[][]8[][]].
+ []
+
+[13]
+Package acronym Info: Label `acro:qsvc' newly defined as it shall be overridden
+although it is yet undefined on input line 479.
+Package acronym Info: Label `acro:seqsvm' newly defined as it shall be overridden
+although it is yet undefined on input line 486.
+ [14] [15]
 Chapter 3.
-[14
 
-] [15] [16] [17] [18]
-Overfull \hbox (70.41583pt too wide) in paragraph at lines 483--484
-[]\T1/cmss/m/n/10.95 QSVM hy-per-pa-ram-e-ters are op-ti-mised over $\OML/cmm/m/it/10.95 C \OMS/cmsy/m/n/10.95 2 f\OT1/cmr/m/n/10.95 0\OML/cmm/m/it/10.95 :\OT1/cmr/m/n/10.95 1\OML/cmm/m/it/10.95 ; \OT1/cmr/m/n/10.95 0\OML/cmm/m/it/10.95 :\OT1/cmr/m/n/10.95 5\OML/cmm/m/it/10.95 ; \OT1/cmr/m/n/10.95 1\OML/cmm/m/it/10.95 ; \OT1/cmr/m/n/10.95 5\OML/cmm/m/it/10.95 ; \OT1/cmr/m/n/10.95 10\OML/cmm/m/it/10.95 ; \OT1/cmr/m/n/10.95 100\OMS/cmsy/m/n/10.95 g$ \T1/cmss/m/n/10.95 and $\OML/cmm/m/it/10.95 ^^M \OMS/cmsy/m/n/10.95 2 f\OT1/cmr/m/n/10.95 0\OML/cmm/m/it/10.95 :\OT1/cmr/m/n/10.95 01\OML/cmm/m/it/10.95 ; \OT1/cmr/m/n/10.95 0\OML/cmm/m/it/10.95 :\OT1/cmr/m/n/10.95 05\OML/cmm/m/it/10.95 ; \OT1/cmr/m/n/10.95 0\OML/cmm/m/it/10.95 :\OT1/cmr/m/n/10.95 1\OML/cmm/m/it/10.95 ; \OT1/cmr/m/n/10.95 0\OML/cmm/m/it/10.95 :\OT1/cmr/m/n/10.95 5\OML/cmm/m/it/10.95 ; \OT1/cmr/m/n/10.95 1\OML/cmm/m/it/10.95 ; \OT1/cmr/m/n/10.95 3\OML/cmm/m/it/10.95 ; \OT1/cmr/m/n/10.95 5\OMS/cmsy/m/n/10.95 g$\T1/cmss/m/n/10.95 ,
+Overfull \hbox (16.35205pt too wide) in paragraph at lines 521--522
+[]\T1/cmss/m/n/10.95 Validation-weighted [][] de-cod-ing formed the di-rect op-er-at-ing mode of \T1/cmtt/m/n/10.95 QuantumECOC\T1/cmss/m/n/10.95 . \T1/cmtt/m/n/10.95 StackedECOC
  []
 
-[19]
-Overfull \hbox (1.11926pt too wide) in paragraph at lines 491--492
-[]\T1/cmss/m/n/10.95 The stack-ing con-fig-u-ra-tion uses het-ero-ge-neous quan-tum base clas-si-fiers with classifier-specific
- []
-
-[20]
-Overfull \hbox (5.60109pt too wide) in paragraph at lines 527--528
-[]\T1/cmss/m/n/10.95 The ex-per-i-ments em-u-late NISQ con-di-tions with cal-i-brated de-po-lar-is-ing and amplitude-damping
- []
-
-[21] [22] [23] [24] [25] [26]
-Chapter 4.
-[27
+[16
 
 ]
+Package acronym Info: Label `acro:uci' newly defined as it shall be overridden
+although it is yet undefined on input line 536.
+Package acronym Info: Label `acro:ctg' newly defined as it shall be overridden
+although it is yet undefined on input line 540.
+ [17] [18]
+Package acronym Info: Label `acro:svc' newly defined as it shall be overridden
+although it is yet undefined on input line 597.
+Package acronym Info: Label `acro:rbf' newly defined as it shall be overridden
+although it is yet undefined on input line 597.
+ [19]
+Package acronym Info: Label `acro:rx' newly defined as it shall be overridden
+although it is yet undefined on input line 625.
+Package acronym Info: Label `acro:rz' newly defined as it shall be overridden
+although it is yet undefined on input line 625.
+Package acronym Info: Label `acro:rzz' newly defined as it shall be overridden
+although it is yet undefined on input line 627.
+Package acronym Info: Label `acro:cz' newly defined as it shall be overridden
+although it is yet undefined on input line 629.
+ [20]
+LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <17.28> not available
+(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 656.
+ [21] [22] [23] [24] [25] [26] [27]
+Package acronym Info: Label `acro:jsonl' newly defined as it shall be overridden
+although it is yet undefined on input line 831.
+ [28]
+Chapter 4.
+[29
+
+]
+<figures/plot4.png, id=905, 946.28531pt x 378.66469pt>
+File: figures/plot4.png Graphic file (type png)
+<use figures/plot4.png>
+Package pdftex.def Info: figures/plot4.png  used on input line 904.
+(pdftex.def)             Requested size: 418.96548pt x 167.653pt.
+ [30 <./figures/plot4.png>]
+<figures/plot1.png, id=916, 810.77907pt x 308.65312pt>
+File: figures/plot1.png Graphic file (type png)
+<use figures/plot1.png>
+Package pdftex.def Info: figures/plot1.png  used on input line 943.
+(pdftex.def)             Requested size: 418.96548pt x 159.49738pt.
+ [31 <./figures/plot1.png>]
+<figures/plot2.png, id=923, 795.72281pt x 401.24907pt>
+File: figures/plot2.png Graphic file (type png)
+<use figures/plot2.png>
+Package pdftex.def Info: figures/plot2.png  used on input line 955.
+(pdftex.def)             Requested size: 418.96548pt x 211.26505pt.
+<figures/plot3.png, id=924, 805.50937pt x 407.27156pt>
+File: figures/plot3.png Graphic file (type png)
+<use figures/plot3.png>
+Package pdftex.def Info: figures/plot3.png  used on input line 969.
+(pdftex.def)             Requested size: 418.96548pt x 211.83214pt.
+ [32 <./figures/plot2.png>]
+<figures/plot5.png, id=934, 1003.49907pt x 408.77719pt>
+File: figures/plot5.png Graphic file (type png)
+<use figures/plot5.png>
+Package pdftex.def Info: figures/plot5.png  used on input line 991.
+(pdftex.def)             Requested size: 418.96548pt x 170.66853pt.
+ [33 <./figures/plot3.png>]
+<figures/plot6.png, id=942, 922.19531pt x 414.79968pt>
+File: figures/plot6.png Graphic file (type png)
+<use figures/plot6.png>
+Package pdftex.def Info: figures/plot6.png  used on input line 1007.
+(pdftex.def)             Requested size: 418.96548pt x 188.44933pt.
+ [34 <./figures/plot5.png> <./figures/plot6.png>]
+<figures/plot7.png, id=950, 990.70125pt x 402.00188pt>
+File: figures/plot7.png Graphic file (type png)
+<use figures/plot7.png>
+Package pdftex.def Info: figures/plot7.png  used on input line 1023.
+(pdftex.def)             Requested size: 418.96548pt x 170.0051pt.
+ [35 <./figures/plot7.png>] [36] [37]
+Overfull \hbox (15.3426pt too wide) in paragraph at lines 1124--1124
+[]\T1/cmss/bx/n/17.28 Cross-Stage Rank-ing and Performance--Cost Anal-
+ []
+
+[38] [39]
 Chapter 5.
-[28
 
-] [29] [30]
-Overfull \hbox (6.51813pt too wide) in paragraph at lines 717--718
-\T1/cmss/m/n/10.95 re-quir-ing at most 15 sim-u-lated qubits, lim-it-ing con-clu-sions about multi-class, high-dimensional,
+Overfull \hbox (10.06616pt too wide) in paragraph at lines 1179--1179
+[][] \T1/cmss/bx/n/17.28 Com-po-nent Anal-y-sis and Pro-gres-sive Search
  []
 
-[31]
-Overfull \hbox (1.91028pt too wide) in paragraph at lines 742--743
-\T1/cmss/m/n/10.95 IBM Lima sim-u-la-tion and on the IBM La-gos su-per-con-duct-ing QPU, mak-ing it use-ful hardware-
- []
+Package acronym Info: Label `acro:fyp' newly defined as it shall be overridden
+although it is yet undefined on input line 1193.
+[40
 
-[32] [33] [34
+] [41]
+Package acronym Info: Label `acro:swap' newly defined as it shall be overridden
+although it is yet undefined on input line 1245.
+Package acronym Info: Label `acro:nisq' newly defined as it shall be overridden
+although it is yet undefined on input line 1247.
+ [42] [43]
+Chapter 6.
+[44
+
+] [45]
+Appendix A.
+[46
+
+]
+Appendix B.
+Package acronym Info: Label `acro:json' newly defined as it shall be overridden
+although it is yet undefined on input line 1369.
+[47
+
+]
+Appendix C.
+[48
+
+]
+Appendix D.
+[49
+
+]
+Appendix E.
+[50
+
+]
+Appendix F.
+Package acronym Info: Label `acro:hpc' newly defined as it shall be overridden
+although it is yet undefined on input line 1408.
+[51
+
+] [52
 
 ]
 
 LaTeX Font Warning: Font shape `T1/cmss/m/sc' in size <11> not available
-(Font)              Font shape `T1/cmr/m/sc' tried instead on input line 778.
+(Font)              Font shape `T1/cmr/m/sc' tried instead on input line 1421.
 
 
-Overfull \hbox (23.74658pt too wide) in paragraph at lines 779--779
+Overfull \hbox (23.74658pt too wide) in paragraph at lines 1422--1422
 \T1/cmr/m/sc/10.95 issn\T1/cmss/m/n/10.95 : 2468-1113. \T1/cmr/m/sc/10.95 doi\T1/cmss/m/n/10.95 : [][]$\T1/cmtt/m/n/10.95 10 . 1016 / j . comtox . 2025 . 100388$[][]\T1/cmss/m/n/10.95 . \T1/cmr/m/sc/10.95 url\T1/cmss/m/n/10.95 : [][]$\T1/cmtt/m/n/10.95 https : / / www . sciencedirect .
  []
 
-[35
+[53
 
 ]
-Overfull \hbox (50.50142pt too wide) in paragraph at lines 779--779
+Overfull \hbox (50.50142pt too wide) in paragraph at lines 1422--1422
 \T1/cmss/m/it/10.95 tice and Ex-pe-ri-ence \T1/cmss/m/n/10.95 37.15 (2025). _eprint: https://onlinelibrary.wiley.com/doi/pdf/10.1002/cpe.70166,
  []
 
 
-Overfull \hbox (125.22014pt too wide) in paragraph at lines 779--779
+Overfull \hbox (125.22014pt too wide) in paragraph at lines 1422--1422
 \T1/cmss/m/n/10.95 chine learn-ing''. In: \T1/cmss/m/it/10.95 Con-tem-po-rary Physics \T1/cmss/m/n/10.95 56.2 (Apr. 3, 2015). _eprint: https://doi.org/10.1080/00107514.2014.964942,
  []
 
-[36] [37] 
+[54] [55] 
 enddocument/afterlastpage (AED): lastpage setting LastPage.
 (./report.aux)
  ***********
@@ -1048,24 +1091,24 @@ LaTeX Font Warning: Size substitutions with differences
 (Font)              up to 0.5pt have occurred.
 
 Package rerunfilecheck Info: File `report.out' has not changed.
-(rerunfilecheck)             Checksum: F225669AF7C17F849FEF7B30587632C8;3262.
+(rerunfilecheck)             Checksum: 6B443D7468A64CE927C9B436DEB610EC;22471.
 Package logreq Info: Writing requests to 'report.run.xml'.
 \openout1 = `report.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 33542 strings out of 469515
- 644343 string characters out of 5467662
- 1467198 words of memory out of 5000000
- 61611 multiletter control sequences out of 15000+600000
- 642881 words of font info for 71 fonts, out of 8000000 for 9000
+ 33826 strings out of 469515
+ 652453 string characters out of 5467662
+ 1591781 words of memory out of 5000000
+ 61895 multiletter control sequences out of 15000+600000
+ 644883 words of font info for 80 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 99i,11n,108p,2191b,1503s stack positions out of 10000i,1000n,20000p,200000b,200000s
- <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/eccc1095.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsi1095.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/tcss1095.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsx1728.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecss2074.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsx1200.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt1095.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecss1095.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsx1095.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsx2074.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecss1200.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsx1440.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecss1440.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecss1728.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsx2488.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecss2488.600pk><c:/tools/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb><c:/tools/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb><c:/tools/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><c:/tools/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb><c:/tools/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb><c:/tools/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb>
-Output written on report.pdf (38 pages, 346602 bytes).
+ 93i,12n,131p,2580b,1802s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/eccc1095.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsi1095.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt1728.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecss1000.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsx1728.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecss2074.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/tcss1095.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt1095.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsx1095.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsx2074.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecss1095.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecss1200.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsx1440.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecss1440.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecss1728.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsx2488.600pk> <c:/tools/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecss2488.600pk><c:/tools/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb><c:/tools/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><c:/tools/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb><c:/tools/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb>
+Output written on report.pdf (57 pages, 737893 bytes).
 PDF statistics:
- 1436 PDF objects out of 1440 (max. 8388607)
- 888 compressed objects within 9 object streams
- 108 named destinations out of 1000 (max. 500000)
- 194 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1941 PDF objects out of 2073 (max. 8388607)
+ 1229 compressed objects within 13 object streams
+ 268 named destinations out of 1000 (max. 500000)
+ 889 words of extra memory for PDF output out of 10000 (max. 10000000)
 

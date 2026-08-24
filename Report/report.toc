@@ -1,32 +1,119 @@
-\contentsline {chapter}{\numberline {1}Introduction}{5}{chapter.1}%
-\contentsline {section}{\numberline {1.1}Motivation}{5}{section.1.1}%
-\contentsline {paragraph}{Research notes.}{5}{section*.4}%
-\contentsline {section}{\numberline {1.2}Problem Statement}{7}{section.1.2}%
-\contentsline {paragraph}{Research notes.}{7}{section*.5}%
-\contentsline {section}{\numberline {1.3}Research Questions}{9}{section.1.3}%
-\contentsline {section}{\numberline {1.4}Scope and Contributions}{10}{section.1.4}%
+\contentsline {chapter}{List of Acronyms}{3}{chapter*.2}%
+\contentsline {chapter}{Glossary of Key Terms}{4}{section*.3}%
+\contentsline {chapter}{\numberline {1}Introduction}{7}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Background and Motivation}{7}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Problem and Research Gap}{7}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Aim, Objectives and Research Questions}{8}{section.1.3}%
+\contentsline {subsection}{\numberline {1.3.1}Overall Aim}{8}{subsection.1.3.1}%
+\contentsline {subsection}{\numberline {1.3.2}Research Objectives}{8}{subsection.1.3.2}%
+\contentsline {subsection}{\numberline {1.3.3}Research Questions}{9}{subsection.1.3.3}%
+\contentsline {section}{\numberline {1.4}Contributions and Scope}{9}{section.1.4}%
+\contentsline {subsection}{\numberline {1.4.1}Contributions}{9}{subsection.1.4.1}%
+\contentsline {subsection}{\numberline {1.4.2}Scope and Delimitations}{10}{subsection.1.4.2}%
+\contentsline {section}{\numberline {1.5}Dissertation Structure}{10}{section.1.5}%
 \contentsline {chapter}{\numberline {2}Related Work}{11}{chapter.2}%
-\contentsline {paragraph}{Research notes.}{11}{section*.6}%
-\contentsline {chapter}{\numberline {3}Methodology}{14}{chapter.3}%
-\contentsline {section}{\numberline {3.1}Experimental Conditions}{14}{section.3.1}%
-\contentsline {paragraph}{Research notes.}{14}{section*.7}%
-\contentsline {section}{\numberline {3.2}Circuit Architecture}{16}{section.3.2}%
-\contentsline {paragraph}{Research notes.}{16}{section*.8}%
-\contentsline {section}{\numberline {3.3}Training Strategy}{18}{section.3.3}%
-\contentsline {paragraph}{Research notes.}{18}{section*.9}%
-\contentsline {section}{\numberline {3.4}Simulation Framework}{20}{section.3.4}%
-\contentsline {paragraph}{Research notes.}{20}{section*.10}%
-\contentsline {section}{\numberline {3.5}Hardware Deployment}{20}{section.3.5}%
-\contentsline {paragraph}{Research notes.}{20}{section*.11}%
-\contentsline {section}{\numberline {3.6}Evaluation Metrics}{22}{section.3.6}%
-\contentsline {paragraph}{Research notes.}{22}{section*.12}%
-\contentsline {chapter}{\numberline {4}Results and Analysis}{27}{chapter.4}%
-\contentsline {section}{\numberline {4.1}Noiseless Simulation Results}{27}{section.4.1}%
-\contentsline {section}{\numberline {4.2}Noisy Simulation Results}{27}{section.4.2}%
-\contentsline {section}{\numberline {4.3}IBM Hardware Results}{27}{section.4.3}%
-\contentsline {section}{\numberline {4.4}Discussion}{27}{section.4.4}%
-\contentsline {chapter}{\numberline {5}Conclusion and Future Work}{28}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Summary of Findings}{28}{section.5.1}%
-\contentsline {section}{\numberline {5.2}Contributions}{28}{section.5.2}%
-\contentsline {section}{\numberline {5.3}Limitations and Future Work}{28}{section.5.3}%
-\contentsline {paragraph}{Research notes.}{28}{section*.13}%
+\contentsline {section}{\numberline {2.1}Classical Ensemble Foundations}{11}{section.2.1}%
+\contentsline {subsection}{\numberline {2.1.1}Diversity, Bagging and Learned Aggregation}{11}{subsection.2.1.1}%
+\contentsline {subsection}{\numberline {2.1.2}Out-of-Fold Stacking and Model Selection}{11}{subsection.2.1.2}%
+\contentsline {subsection}{\numberline {2.1.3}\acs *{ecoc}}{12}{subsection.2.1.3}%
+\contentsline {section}{\numberline {2.2}Variational Quantum Classification}{12}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Near-Term \acs *{vqc} Workflow}{12}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}Encoding, Re-uploading and Ansatz Design}{13}{subsection.2.2.2}%
+\contentsline {subsection}{\numberline {2.2.3}Trainability and Scaling}{13}{subsection.2.2.3}%
+\contentsline {section}{\numberline {2.3}Quantum Ensemble and Stacking Methods}{14}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Measured Quantum Ensembles}{14}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}Measured and Hybrid Quantum Stacking}{14}{subsection.2.3.2}%
+\contentsline {subsection}{\numberline {2.3.3}Coherent and State-Preserving Aggregation}{15}{subsection.2.3.3}%
+\contentsline {section}{\numberline {2.4}Synthesis and Dissertation Gap}{15}{section.2.4}%
+\contentsline {chapter}{\numberline {3}Approach and Methodology}{16}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Research Design and Experimental Progression}{16}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Implemented Framework Architecture}{16}{section.3.2}%
+\contentsline {section}{\numberline {3.3}Experimental Setup}{17}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Implementation Framework}{17}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}Dataset Selection}{17}{subsection.3.3.2}%
+\contentsline {subsection}{\numberline {3.3.3}Preprocessing and Data Splits}{17}{subsection.3.3.3}%
+\contentsline {subsection}{\numberline {3.3.4}Training Configuration}{18}{subsection.3.3.4}%
+\contentsline {section}{\numberline {3.4}Stage I: Classical Reference Baselines}{19}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}Models}{19}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}Evaluation and Role in the Progressive Search}{19}{subsection.3.4.2}%
+\contentsline {section}{\numberline {3.5}Stage II: \acs *{vqc} Component Analysis}{19}{section.3.5}%
+\contentsline {subsection}{\numberline {3.5.1}Parametric \acs *{vqc} and Ansatz Representation}{19}{subsection.3.5.1}%
+\contentsline {subsection}{\numberline {3.5.2}Architecture Variables}{20}{subsection.3.5.2}%
+\contentsline {subsection}{\numberline {3.5.3}Search Execution and Evaluation}{21}{subsection.3.5.3}%
+\contentsline {subsection}{\numberline {3.5.4}\acs *{vqc} Ranking and Shortlisting}{21}{subsection.3.5.4}%
+\contentsline {section}{\numberline {3.6}Stage III: \texttt {QuantumECOC} Ensemble Analysis}{22}{section.3.6}%
+\contentsline {subsection}{\numberline {3.6.1}\acs *{ecoc} Decomposition and Base Learners}{22}{subsection.3.6.1}%
+\contentsline {subsection}{\numberline {3.6.2}Ensemble Variability}{22}{subsection.3.6.2}%
+\contentsline {subsection}{\numberline {3.6.3}Direct Aggregation and Evaluation}{23}{subsection.3.6.3}%
+\contentsline {section}{\numberline {3.7}Stage IV: Measured Aggregation Comparisons}{23}{section.3.7}%
+\contentsline {subsection}{\numberline {3.7.1}Candidate Pool and Matched Comparison}{23}{subsection.3.7.1}%
+\contentsline {subsection}{\numberline {3.7.2}Meta-Training Procedures}{23}{subsection.3.7.2}%
+\contentsline {paragraph}{Single-split training.}{24}{section*.7}%
+\contentsline {paragraph}{$k$-fold training.}{24}{section*.8}%
+\contentsline {subsection}{\numberline {3.7.3}Classical Meta-Learner}{24}{subsection.3.7.3}%
+\contentsline {subsection}{\numberline {3.7.4}Quantum Meta-Learner}{24}{subsection.3.7.4}%
+\contentsline {subsection}{\numberline {3.7.5}Evaluation}{25}{subsection.3.7.5}%
+\contentsline {section}{\numberline {3.8}Stage V: \texttt {CoherentECOC} Innovation}{25}{section.3.8}%
+\contentsline {subsection}{\numberline {3.8.1}Circuit Construction}{25}{subsection.3.8.1}%
+\contentsline {subsection}{\numberline {3.8.2}Meta-Circuit Variability}{26}{subsection.3.8.2}%
+\contentsline {subsection}{\numberline {3.8.3}Coherent Training Procedures}{26}{subsection.3.8.3}%
+\contentsline {subsection}{\numberline {3.8.4}Coherent Evaluation and Finalist Selection}{26}{subsection.3.8.4}%
+\contentsline {section}{\numberline {3.9}Cross-Stage Evaluation and Ranking}{27}{section.3.9}%
+\contentsline {subsection}{\numberline {3.9.1}Common Predictive and Stability Metrics}{27}{subsection.3.9.1}%
+\contentsline {subsection}{\numberline {3.9.2}Global Ranking}{27}{subsection.3.9.2}%
+\contentsline {subsection}{\numberline {3.9.3}Progressive Selection Criteria}{28}{subsection.3.9.3}%
+\contentsline {section}{\numberline {3.10}Reproducibility and Computational Scope}{28}{section.3.10}%
+\contentsline {chapter}{\numberline {4}Evaluation and Results}{29}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Stage I: Classical Reference Performance}{29}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Stage II: \acs *{vqc} Component Analysis}{30}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Predictive Performance Across Datasets}{30}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Trainable Capacity, Circuit Width and Training Time}{31}{subsection.4.2.2}%
+\contentsline {subsection}{\numberline {4.2.3}Reuploads and Trainable Layer Placement}{31}{subsection.4.2.3}%
+\contentsline {subsection}{\numberline {4.2.4}Features per Qubit and Feature Strategy}{32}{subsection.4.2.4}%
+\contentsline {section}{\numberline {4.3}Stage III: \texttt {QuantumECOC} Ensemble Analysis}{33}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Predictive Performance Across Datasets}{33}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}Learner Count and Architecture Composition}{34}{subsection.4.3.2}%
+\contentsline {subsection}{\numberline {4.3.3}Feature Allocation and Encoding Design}{35}{subsection.4.3.3}%
+\contentsline {section}{\numberline {4.4}Stage IV: Measured Aggregation Comparisons}{36}{section.4.4}%
+\contentsline {subsection}{\numberline {4.4.1}Meta-Training Procedure}{36}{subsection.4.4.1}%
+\contentsline {subsection}{\numberline {4.4.2}Classical Stacking}{36}{subsection.4.4.2}%
+\contentsline {subsection}{\numberline {4.4.3}Measured Quantum Stacking}{36}{subsection.4.4.3}%
+\contentsline {subsection}{\numberline {4.4.4}Stacking Candidate Reduction}{36}{subsection.4.4.4}%
+\contentsline {paragraph}{Research notes and evidence.}{36}{section*.19}%
+\contentsline {paragraph}{Results to insert.}{37}{section*.20}%
+\contentsline {section}{\numberline {4.5}Stage V: \texttt {CoherentECOC} Innovation}{37}{section.4.5}%
+\contentsline {subsection}{\numberline {4.5.1}Implementation and Trainability}{37}{subsection.4.5.1}%
+\contentsline {subsection}{\numberline {4.5.2}Predictive Comparison}{37}{subsection.4.5.2}%
+\contentsline {subsection}{\numberline {4.5.3}Resource Comparison}{37}{subsection.4.5.3}%
+\contentsline {paragraph}{Research notes and evidence.}{38}{section*.21}%
+\contentsline {paragraph}{Results to insert.}{38}{section*.22}%
+\contentsline {section}{\numberline {4.6}Cross-Stage Ranking and Performance--Cost Analysis}{38}{section.4.6}%
+\contentsline {paragraph}{Results to insert.}{38}{section*.23}%
+\contentsline {section}{\numberline {4.7}Summary by Research Question}{39}{section.4.7}%
+\contentsline {chapter}{\numberline {5}Discussion}{40}{chapter.5}%
+\contentsline {section}{\numberline {5.1}\acs *{vqc} Component Analysis and Progressive Search Narrowing}{40}{section.5.1}%
+\contentsline {paragraph}{Research notes and evidence.}{40}{section*.24}%
+\contentsline {section}{\numberline {5.2}\texttt {QuantumECOC} Ensemble Analysis and Measured Comparisons}{40}{section.5.2}%
+\contentsline {paragraph}{Research notes and evidence.}{41}{section*.25}%
+\contentsline {section}{\numberline {5.3}\texttt {CoherentECOC} Innovation and Measurement-Free Aggregation}{41}{section.5.3}%
+\contentsline {paragraph}{Research notes and evidence.}{41}{section*.26}%
+\contentsline {section}{\numberline {5.4}Performance--Resource Trade-Offs and Practical Implications}{42}{section.5.4}%
+\contentsline {paragraph}{Research notes and evidence.}{42}{section*.27}%
+\contentsline {section}{\numberline {5.5}Relationship to Existing Literature}{42}{section.5.5}%
+\contentsline {section}{\numberline {5.6}Limitations and Threats to Validity}{43}{section.5.6}%
+\contentsline {subsection}{\numberline {5.6.1}Internal and Conclusion Validity}{43}{subsection.5.6.1}%
+\contentsline {subsection}{\numberline {5.6.2}Construct Validity}{43}{subsection.5.6.2}%
+\contentsline {subsection}{\numberline {5.6.3}External Validity}{43}{subsection.5.6.3}%
+\contentsline {paragraph}{Research notes and evidence.}{43}{section*.28}%
+\contentsline {chapter}{\numberline {6}Conclusion and Future Work}{44}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Summary and Answers to the Research Questions}{44}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Contributions}{44}{section.6.2}%
+\contentsline {section}{\numberline {6.3}Limitations and Future Work}{44}{section.6.3}%
+\contentsline {paragraph}{Research notes and evidence.}{45}{section*.29}%
+\contentsline {section}{\numberline {6.4}Final Conclusion}{45}{section.6.4}%
+\contentsline {chapter}{\numberline {A}Dataset Details}{46}{appendix.A}%
+\contentsline {chapter}{\numberline {B}\acs *{vqc} and Ansatz Configurations}{47}{appendix.B}%
+\contentsline {chapter}{\numberline {C}Experimental Search Spaces}{48}{appendix.C}%
+\contentsline {chapter}{\numberline {D}Additional Results}{49}{appendix.D}%
+\contentsline {chapter}{\numberline {E}Circuit and Resource Details}{50}{appendix.E}%
+\contentsline {chapter}{\numberline {F}Computational Environment and Reproducibility}{51}{appendix.F}%
