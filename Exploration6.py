@@ -178,7 +178,7 @@ def train_model(name, dataset, model_args, fit_args=None, job_id=None):
         model.fit(X_train, y_train, X_test, y_test, verbosity=1, **fit_args)
     elif name.startswith("StackedECOC"):
         model = StackedECOC(**model_args).to(DEVICE)
-        model.fit(X_train, y_train, X_test, y_test, verbosity=1, **fit_args)
+        model.fit(X_train, y_train, X_test, y_test, k_folds=1, verbosity=1, **fit_args)
     elif name.startswith("Quantum StackedECOC"):
         c = len(np.unique(y_train))
         metaVQC = VQC.from_template(
@@ -204,7 +204,7 @@ def train_model(name, dataset, model_args, fit_args=None, job_id=None):
         model.fit(X_train, y_train, X_test, y_test, verbosity=1, **fit_args)
     elif name.startswith("CoherentECOC"):
         model = CoherentECOC(**model_args).to(DEVICE)
-        model.fit(X_train, y_train, X_test, y_test, tune_size=0, verbosity=1, **fit_args)
+        model.fit(X_train, y_train, X_test, y_test, k_folds=1, tune_size=0, verbosity=1, **fit_args)
 
     if name.startswith("VQC"):
         report = model.val_report
@@ -547,19 +547,19 @@ if __name__ == "__main__":
                         )["ansatz"],
                     })
 
-                # for model_name in [
-                #     "QuantumECOC",
-                #     "StackedECOC",
-                #     "Quantum StackedECOC",
-                # ]:
-                #     jobs.extend(create_search_jobs(
-                #         f"{model_name} {suffix}",
-                #         path,
-                #         {
-                #             "templates": [templates],
-                #         },
-                #         existing_ids=existing_ids,
-                #     ))
+                for model_name in [
+                    # "QuantumECOC",
+                    "StackedECOC-1F",
+                    # "Quantum StackedECOC",
+                ]:
+                    jobs.extend(create_search_jobs(
+                        f"{model_name} {suffix}",
+                        path,
+                        {
+                            "templates": [templates],
+                        },
+                        existing_ids=existing_ids,
+                    ))
 
                 if entangler == "mixed":
                     meta_entangler = ["cz", "rzz"][(group_index + config_index) % 2]
@@ -589,7 +589,7 @@ if __name__ == "__main__":
                 )
 
                 jobs.extend(create_search_jobs(
-                    f"CoherentECOC {meta_suffix}",
+                    f"CoherentECOC-1F {meta_suffix}",
                     path,
                     {
                         "templates": [templates],

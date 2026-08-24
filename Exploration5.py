@@ -547,57 +547,57 @@ if __name__ == "__main__":
                         )["ansatz"],
                     })
 
-                # for model_name in [
-                #     "QuantumECOC",
-                #     "StackedECOC",
-                #     "Quantum StackedECOC",
-                # ]:
-                #     jobs.extend(create_search_jobs(
-                #         f"{model_name} {suffix}",
-                #         path,
-                #         {
-                #             "templates": [templates],
-                #         },
-                #         existing_ids=existing_ids,
-                #     ))
+                for model_name in [
+                    # "QuantumECOC",
+                    # "StackedECOC",
+                    "Quantum StackedECOC",
+                ]:
+                    jobs.extend(create_search_jobs(
+                        f"{model_name} {suffix}",
+                        path,
+                        {
+                            "templates": [templates],
+                        },
+                        existing_ids=existing_ids,
+                    ))
 
-                if entangler == "mixed":
-                    meta_entangler = ["cz", "rzz"][(group_index + config_index) % 2]
-                else:
-                    meta_entangler = entangler
+                # if entangler == "mixed":
+                #     meta_entangler = ["cz", "rzz"][(group_index + config_index) % 2]
+                # else:
+                #     meta_entangler = entangler
 
-                meta_template = build_ansatz(
-                    feats_per_qubit=1,
-                    reuploads=len(meta_layout),
-                    encoding_style="none",
-                    feature_strategy=feat_strategy,
-                    trainable_layers=meta_layout,
-                    entangling_uploads="all",
-                    entangling_layers="all",
-                    entangling_pattern=entangling_pattern,
-                    entangler=meta_entangler,
-                )["ansatz"]
+                # meta_template = build_ansatz(
+                #     feats_per_qubit=1,
+                #     reuploads=len(meta_layout),
+                #     encoding_style="none",
+                #     feature_strategy=feat_strategy,
+                #     trainable_layers=meta_layout,
+                #     entangling_uploads="all",
+                #     entangling_layers="all",
+                #     entangling_pattern=entangling_pattern,
+                #     entangler=meta_entangler,
+                # )["ansatz"]
 
-                meta_layout_label = "-".join(
-                    str(value)
-                    for value in meta_layout
-                )
+                # meta_layout_label = "-".join(
+                #     str(value)
+                #     for value in meta_layout
+                # )
 
-                meta_suffix = (
-                    f"{suffix}_meta-{meta_design}_"
-                    f"{meta_layout_label}_{meta_entangler}"
-                )
+                # meta_suffix = (
+                #     f"{suffix}_meta-{meta_design}_"
+                #     f"{meta_layout_label}_{meta_entangler}"
+                # )
 
-                jobs.extend(create_search_jobs(
-                    f"CoherentECOC {meta_suffix}",
-                    path,
-                    {
-                        "templates": [templates],
-                        "meta_design": [meta_design],
-                        "meta_template": [meta_template],
-                    },
-                    existing_ids=existing_ids,
-                ))
+                # jobs.extend(create_search_jobs(
+                #     f"CoherentECOC {meta_suffix}",
+                #     path,
+                #     {
+                #         "templates": [templates],
+                #         "meta_design": [meta_design],
+                #         "meta_template": [meta_template],
+                #     },
+                #     existing_ids=existing_ids,
+                # ))
 
             # if group != "representative":
             #     continue

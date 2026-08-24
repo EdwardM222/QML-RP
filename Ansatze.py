@@ -23,7 +23,7 @@ from pennylane.measurements import (
 )
 
 from qiskit_ibm_runtime import fake_provider
-import qiskit_service
+# import qiskit_service
 from qiskit_aer import AerSimulator
 from qiskit_aer.noise import NoiseModel
 from pennylane_qiskit import load_noise_model
@@ -1279,7 +1279,6 @@ class AnsatzSpec:
 
         qnode_kwargs = {
             "interface": interface,
-            "shots": 256,
         }
 
         if isinstance(device_name, str) and device_name.startswith("Fake"):
@@ -1306,6 +1305,7 @@ class AnsatzSpec:
             )
             diff_method = "spsa"
             qnode_kwargs["gradient_kwargs"] = {
+                "shots": 256,
                 "h": 0.03,
                 "num_directions": 2,
             }

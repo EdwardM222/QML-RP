@@ -847,7 +847,7 @@ class StackedECOC(QuantumECOC):
         y: Series,
         X_test: DataFrame | None = None,
         y_test: Series | None = None,
-        k_folds: int = 5,
+        k_folds: int = 3,
         bagging: tuple[float, int, int] | None = (0.5, 512, 2048),
         plot: bool = False,
         verbosity: int = 0,
@@ -922,7 +922,7 @@ class StackedECOC(QuantumECOC):
             )
         else:
             if verbosity > 0:
-                print(f"\nNot enough samples for {k_folds} folds. Training on a single train/validation split...")
+                print(f"\nTraining on a single train/validation split...")
 
             X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3, random_state=2, stratify=y)
             
@@ -1070,7 +1070,6 @@ class CoherentECOC(QuantumECOC):
 
         qnode_kwargs = {
             "interface": "torch",
-            "shots": 256,
         }
 
         if isinstance(self.meta_device, str) and self.meta_device.startswith("Fake"):
@@ -1098,6 +1097,7 @@ class CoherentECOC(QuantumECOC):
             if self.meta_diff_method == "best":
                 self.meta_diff_method = "spsa"
                 qnode_kwargs["gradient_kwargs"] = {
+                    "shots": 256,
                     "h": 0.1,
                     "num_directions": 2,
                 }
@@ -1184,8 +1184,8 @@ class CoherentECOC(QuantumECOC):
         X_test: DataFrame | None = None,
         y_test: Series | None = None,
         base_epochs: int = 200,
-        meta_epochs: int = 100,
-        k_folds: int = 5,
+        meta_epochs: int = 50,
+        k_folds: int = 3,
         tune_size: float = 0.1,
         freeze_base_main: bool = True,
         freeze_base_tune: bool = False,
@@ -1349,7 +1349,7 @@ class CoherentECOC(QuantumECOC):
             ),
 
             "coherent_vqc": (
-                self.coherent_vqc.results_dict()
+                self.coherent_vqc.get_results()
                 if hasattr(self, "coherent_vqc")
                 else None
             ),

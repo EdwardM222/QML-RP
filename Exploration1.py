@@ -172,7 +172,7 @@ def train_model(name, dataset, model_args, fit_args=None, job_id=None):
         y_tr = y_train.map({label: idx for idx, label in enumerate(sorted(y_train.unique()))}).values
         y_te = y_test.map({label: idx for idx, label in enumerate(sorted(y_test.unique()))}).values
 
-        model.fit(X_tr, y_tr, X_te, y_te, **fit_args)
+        model.fit(X_tr, y_tr, X_te, y_te, batch_size=16, **fit_args)
     elif name.startswith("QuantumECOC"):
         model = QuantumECOC(**model_args).to(DEVICE)
         model.fit(X_train, y_train, X_test, y_test, verbosity=1, **fit_args)
@@ -324,6 +324,8 @@ if __name__ == "__main__":
             for line in f:
                 try:
                     record = json.loads(line)
+                    # if record.get("run", {}).get("status") == "pending":
+                    #     continue
                     job_id = record.get("run", {}).get("id")
 
                     if job_id is not None:
@@ -561,109 +563,109 @@ if __name__ == "__main__":
                 #         existing_ids=existing_ids,
                 #     ))
 
-                if entangler == "mixed":
-                    meta_entangler = ["cz", "rzz"][(group_index + config_index) % 2]
+                # if entangler == "mixed":
+                #     meta_entangler = ["cz", "rzz"][(group_index + config_index) % 2]
+                # else:
+                #     meta_entangler = entangler
+
+                # meta_template = build_ansatz(
+                #     feats_per_qubit=1,
+                #     reuploads=len(meta_layout),
+                #     encoding_style="none",
+                #     feature_strategy=feat_strategy,
+                #     trainable_layers=meta_layout,
+                #     entangling_uploads="all",
+                #     entangling_layers="all",
+                #     entangling_pattern=entangling_pattern,
+                #     entangler=meta_entangler,
+                # )["ansatz"]
+
+                # meta_layout_label = "-".join(
+                #     str(value)
+                #     for value in meta_layout
+                # )
+
+                # meta_suffix = (
+                #     f"{suffix}_meta-{meta_design}_"
+                #     f"{meta_layout_label}_{meta_entangler}"
+                # )
+
+                # jobs.extend(create_search_jobs(
+                #     f"CoherentECOC {meta_suffix}",
+                #     path,
+                #     {
+                #         "templates": [templates],
+                #         "meta_design": [meta_design],
+                #         "meta_template": [meta_template],
+                #     },
+                #     existing_ids=existing_ids,
+                # ))
+
+            if group != "representative":
+                continue
+
+            vqc_secondary_order = secondary_configs.copy()
+            random.Random(100 + group_index).shuffle(vqc_secondary_order)
+
+            assigned_vqc_secondary = [
+                vqc_secondary_order[config_index % len(vqc_secondary_order)]
+                for config_index in range(len(vqc_primary_configs))
+            ]
+
+            for config_index, (primary, secondary) in enumerate(zip(
+                vqc_primary_configs,
+                assigned_vqc_secondary,
+            )):
+                feature_density, encoding_style = primary
+                feat_strategy, entangler, fpq = secondary
+
+                if feature_density == "mixed":
+                    vqc_densities = [0.25, 0.5, 0.75]
                 else:
-                    meta_entangler = entangler
+                    vqc_densities = [feature_density]
 
-                meta_template = build_ansatz(
-                    feats_per_qubit=1,
-                    reuploads=len(meta_layout),
-                    encoding_style="none",
-                    feature_strategy=feat_strategy,
-                    trainable_layers=meta_layout,
-                    entangling_uploads="all",
-                    entangling_layers="all",
-                    entangling_pattern=entangling_pattern,
-                    entangler=meta_entangler,
-                )["ansatz"]
+                if encoding_style == "mixed":
+                    vqc_encoding = "parallel_pairwise"
+                else:
+                    vqc_encoding = "angle"
 
-                meta_layout_label = "-".join(
-                    str(value)
-                    for value in meta_layout
-                )
+                if entangler == "mixed":
+                    vqc_entangler = ["cz", "rzz"][config_index % 2]
+                else:
+                    vqc_entangler = entangler
 
-                meta_suffix = (
-                    f"{suffix}_meta-{meta_design}_"
-                    f"{meta_layout_label}_{meta_entangler}"
-                )
+                if fpq == "mixed":
+                    vqc_fpq = [3, 4, 5][config_index % 3]
+                else:
+                    vqc_fpq = fpq
 
-                jobs.extend(create_search_jobs(
-                    f"CoherentECOC {meta_suffix}",
-                    path,
-                    {
-                        "templates": [templates],
-                        "meta_design": [meta_design],
-                        "meta_template": [meta_template],
-                    },
-                    existing_ids=existing_ids,
-                ))
+                for layout in layouts:
+                    for vqc_density in vqc_densities:
+                        suffix = (
+                            f"{layout}_{vqc_encoding}_{vqc_fpq}_{vqc_density}_{feat_strategy}_{vqc_entangler}"
+                        )
 
-            # if group != "representative":
-            #     continue
-
-            # vqc_secondary_order = secondary_configs.copy()
-            # random.Random(100 + group_index).shuffle(vqc_secondary_order)
-
-            # assigned_vqc_secondary = [
-            #     vqc_secondary_order[config_index % len(vqc_secondary_order)]
-            #     for config_index in range(len(vqc_primary_configs))
-            # ]
-
-            # for config_index, (primary, secondary) in enumerate(zip(
-            #     vqc_primary_configs,
-            #     assigned_vqc_secondary,
-            # )):
-            #     feature_density, encoding_style = primary
-            #     feat_strategy, entangler, fpq = secondary
-
-            #     if feature_density == "mixed":
-            #         vqc_densities = [0.25, 0.5, 0.75]
-            #     else:
-            #         vqc_densities = [feature_density]
-
-            #     if encoding_style == "mixed":
-            #         vqc_encoding = "parallel_pairwise"
-            #     else:
-            #         vqc_encoding = "angle"
-
-            #     if entangler == "mixed":
-            #         vqc_entangler = ["cz", "rzz"][config_index % 2]
-            #     else:
-            #         vqc_entangler = entangler
-
-            #     if fpq == "mixed":
-            #         vqc_fpq = [3, 4, 5][config_index % 3]
-            #     else:
-            #         vqc_fpq = fpq
-
-            #     for layout in layouts:
-            #         for vqc_density in vqc_densities:
-            #             suffix = (
-            #                 f"{layout}_{vqc_encoding}_{vqc_fpq}_{vqc_density}_{feat_strategy}_{vqc_entangler}"
-            #             )
-
-            #             jobs.extend(create_search_jobs(
-            #                 f"VQC {suffix}",
-            #                 path,
-            #                 {
-            #                     "n_qubits": [12],
-            #                     "ansatz": [build_ansatz(
-            #                         feats_per_qubit=vqc_fpq,
-            #                         reuploads=len(layout),
-            #                         encoding_style=vqc_encoding,
-            #                         feature_strategy=feat_strategy,
-            #                         trainable_layers=layout,
-            #                         entangling_uploads="all",
-            #                         entangling_layers="all",
-            #                         entangling_pattern=entangling_pattern,
-            #                         entangler=vqc_entangler,
-            #                     )["ansatz"]],
-            #                     "feature_density": [vqc_density],
-            #                     "feature_range": [(0, np.pi)],
-            #                 },
-            #                 existing_ids=existing_ids,
-            #             ))
+                        jobs.extend(create_search_jobs(
+                            f"VQC {suffix}",
+                            path,
+                            {
+                                "n_qubits": [12, 20],
+                                "ansatz": [build_ansatz(
+                                    feats_per_qubit=vqc_fpq,
+                                    reuploads=len(layout),
+                                    encoding_style=vqc_encoding,
+                                    feature_strategy=feat_strategy,
+                                    trainable_layers=layout,
+                                    entangling_uploads="all",
+                                    entangling_layers="all",
+                                    entangling_pattern=entangling_pattern,
+                                    entangler=vqc_entangler,
+                                )["ansatz"]],
+                                "feature_density": [vqc_density],
+                                "feature_range": [(0, np.pi)],
+                            },
+                            existing_ids=existing_ids,
+                        ))
 
     print(f"Total jobs: {len(jobs)}\n")
     if args.split != "0":
@@ -677,6 +679,7 @@ if __name__ == "__main__":
         append_jsonl(results_path, {
             "run": {
                 "id": job[-1],
+                "model_name": job[0],
                 "status": "pending",
             }
         })

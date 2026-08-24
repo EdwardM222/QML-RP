@@ -1016,6 +1016,7 @@ if page == "Rankings":
             render_mode="webgl",
             opacity=0.7,
             title=f"{y_column} against {x_column}",
+            color_continuous_scale="Turbo"
         )
 
         figure.update_layout(height=plot_height)
@@ -1113,6 +1114,8 @@ if page == "Rankings":
 elif page == "Comparison":
     st.header("Configuration comparison")
 
+    category_orders = {}
+
     comparison_scope = st.sidebar.selectbox(
         "Comparison scope",
         [
@@ -1131,15 +1134,50 @@ elif page == "Comparison":
     elif comparison_scope == "Dataset results":
         comparison_data = results.copy()
 
-        selected_datasets = st.sidebar.multiselect(
-            "Datasets",
-            sorted(results["dataset"].dropna().astype(str).unique()),
-            default=sorted(results["dataset"].dropna().astype(str).unique()),
+        dataset_group = st.sidebar.selectbox(
+            "Dataset selection",
+            ["Main", "Stress", "Selection"],
         )
-
-        comparison_data = comparison_data[
-            comparison_data["dataset"].astype(str).isin(selected_datasets)
+        main_datasets = [
+            "iris",
+            "balance-scale",
+            "contraceptive-method-choice",
+            "heart-disease",
+            "obesity",
+            "image-segmentation",
+            "steel-plates",
+            "yeast",
         ]
+        stress_datasets = [
+            "waveform",
+            "ctg-10classes",
+            "wine-quality",
+            "nursery",
+            "optical",
+            "letter",
+        ]
+
+        if dataset_group == "Main":
+            comparison_data = comparison_data[
+                comparison_data["dataset"].isin(main_datasets)
+            ]
+            category_orders["dataset"] = main_datasets
+        elif dataset_group == "Stress":
+            comparison_data = comparison_data[
+                comparison_data["dataset"].isin(stress_datasets)
+            ]
+            category_orders["dataset"] = stress_datasets
+        else:
+            selected_datasets = st.sidebar.multiselect(
+                "Datasets",
+                sorted(results["dataset"].dropna().astype(str).unique()),
+                default=sorted(results["dataset"].dropna().astype(str).unique()),
+            )
+
+            comparison_data = comparison_data[
+                comparison_data["dataset"].astype(str).isin(selected_datasets)
+            ]
+            category_orders["dataset"] = [dataset for dataset in main_datasets + stress_datasets if dataset in selected_datasets]
 
         default_y = "rank_percentile"
         default_selection_metric = "rank_percentile"
@@ -1324,6 +1362,24 @@ elif page == "Comparison":
 
     facet_row = st.sidebar.selectbox("Facet row", facet_options)
     facet_column = st.sidebar.selectbox("Facet column", facet_options)
+    facet_order = st.sidebar.selectbox(
+        "Facet order",
+        ["Ascending", "Descending"],
+        index=0,
+    )
+
+    if facet_row != "None":
+        facet_row_values = set(plot_data[facet_row].dropna())
+        facet_row_values = np.sort(list(facet_row_values))
+        if facet_order == "Descending":
+            facet_row_values = facet_row_values[::-1]
+        category_orders[facet_row] = facet_row_values
+    if facet_column != "None":
+        facet_column_values = set(plot_data[facet_column].dropna())
+        facet_column_values = np.sort(list(facet_column_values))
+        if facet_order == "Descending":
+            facet_column_values = facet_column_values[::-1]
+        category_orders[facet_column] = facet_column_values
 
     hover_options = available(plot_data, [
         "model_family",
@@ -1398,11 +1454,17 @@ elif page == "Comparison":
             size=None if size_column == "None" else size_column,
             facet_row=None if facet_row == "None" else facet_row,
             facet_col=None if facet_column == "None" else facet_column,
+            category_orders=category_orders,
             hover_data=hover_columns,
             render_mode="webgl",
             opacity=opacity,
             title=f"{y_column} against {x_column}",
+            color_continuous_scale="Turbo",
         )
+
+        figure.for_each_annotation(lambda a: a.update(text=a.text.split("=")[-1]))
+        figure.update_xaxes(showline=True, linewidth=2, linecolor="LightGrey")
+        figure.update_yaxes(showline=True, linewidth=2, linecolor="LightGrey")
 
     elif plot_type in ["Box", "Violin"]:
         x_column = st.sidebar.selectbox(
@@ -1434,10 +1496,13 @@ elif page == "Comparison":
             color=None if colour_column == "None" else colour_column,
             facet_row=None if facet_row == "None" else facet_row,
             facet_col=None if facet_column == "None" else facet_column,
+            category_orders=category_orders,
             points=points,
             hover_data=hover_columns,
             title=f"{y_column} by {x_column}",
         )
+        figure.update_xaxes(type="category")
+        figure.for_each_annotation(lambda a: a.update(text=a.text.split("=")[-1]))
 
     elif plot_type == "Bar":
         x_column = st.sidebar.selectbox(
@@ -1492,6 +1557,8 @@ elif page == "Comparison":
                 .reset_index()
             )
 
+        bar_data[colour_column] = bar_data[colour_column].astype(str)
+
         figure = px.bar(
             bar_data,
             x=x_column,
@@ -1520,6 +1587,7 @@ elif page == "Comparison":
             color=None if colour_column == "None" else colour_column,
             facet_row=None if facet_row == "None" else facet_row,
             facet_col=None if facet_column == "None" else facet_column,
+            category_orders=category_orders,
             nbins=n_bins,
             barmode=st.sidebar.selectbox(
                 "Histogram mode",
@@ -1528,6 +1596,8 @@ elif page == "Comparison":
             opacity=st.sidebar.slider("Bar opacity", 0.1, 1.0, 0.6, 0.05),
             title=f"Distribution of {x_column}",
         )
+
+        figure.for_each_annotation(lambda a: a.update(text=a.text.split("=")[-1]))
 
     plot_width, plot_height = plot_size_controls(
         "comparison",
@@ -2063,6 +2133,7 @@ elif page == "Aggregation comparison":
             ]),
             opacity=0.65,
             title=f"{y_column} against {x_column}",
+            color_continuous_scale="Turbo"
         )
 
         valid_values = pd.concat([

@@ -16,17 +16,25 @@ from EnsembleResults import (
 RESULTS_DIR = Path("results")
 OUTPUT_DIR = RESULTS_DIR / "analysis"
 
-RUNS_PATH = OUTPUT_DIR / "ensemble_runs.parquet"
-RESULTS_PATH = OUTPUT_DIR / "ensemble_results.parquet"
-RANKINGS_PATH = OUTPUT_DIR / "ensemble_rankings.parquet"
-ANSATZ_RESULTS_PATH = OUTPUT_DIR / "ensemble_ansatz_results.parquet"
-ANSATZ_DATASET_RESULTS_PATH = OUTPUT_DIR / "ensemble_ansatz_dataset_results.parquet"
-PAIRED_RESULTS_PATH = OUTPUT_DIR / "ensemble_paired_results.parquet"
+# RUNS_PATH = OUTPUT_DIR / "ensemble_runs.parquet"
+# RESULTS_PATH = OUTPUT_DIR / "ensemble_results.parquet"
+# RANKINGS_PATH = OUTPUT_DIR / "ensemble_rankings.parquet"
+# ANSATZ_RESULTS_PATH = OUTPUT_DIR / "ensemble_ansatz_results.parquet"
+# ANSATZ_DATASET_RESULTS_PATH = OUTPUT_DIR / "ensemble_ansatz_dataset_results.parquet"
+# PAIRED_RESULTS_PATH = OUTPUT_DIR / "ensemble_paired_results.parquet"
+
+RUNS_PATH = OUTPUT_DIR / "ensemble_s3_runs.parquet"
+RESULTS_PATH = OUTPUT_DIR / "ensemble_s3_results.parquet"
+RANKINGS_PATH = OUTPUT_DIR / "ensemble_s3_rankings.parquet"
+ANSATZ_RESULTS_PATH = OUTPUT_DIR / "ensemble_s3_ansatz_results.parquet"
+ANSATZ_DATASET_RESULTS_PATH = OUTPUT_DIR / "ensemble_s3_ansatz_dataset_results.parquet"
+PAIRED_RESULTS_PATH = OUTPUT_DIR / "ensemble_s3_paired_results.parquet"
 
 DASHBOARD_PATH = Path("Dashboard.py")
 
-FILE_PREFIX = "combined"
-RELOAD_JSONL = True
+# FILE_PREFIX = "Ensemble"
+FILE_PREFIX = "ensemble/Ensemble_S3"
+RELOAD_JSONL = False
 
 TEST_MODE = False
 N_TEST_RESULTS = 1000
