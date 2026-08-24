@@ -21,7 +21,7 @@ RANKINGS_PATH = OUTPUT_DIR / "vqc_rankings.parquet"
 ANSATZ_RESULTS_PATH = OUTPUT_DIR / "vqc_ansatz_results.parquet"
 ANSATZ_DATASET_RESULTS_PATH = OUTPUT_DIR / "vqc_ansatz_dataset_results.parquet"
 
-DASHBOARD_PATH = Path("VQCDashboard.py")
+DASHBOARD_PATH = Path("Dashboard.py")
 
 FILE_PREFIX = "VQCS"
 RELOAD_JSONL = False

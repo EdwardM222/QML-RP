@@ -1,4 +1,5 @@
 from concurrent.futures import ProcessPoolExecutor, as_completed
+import sys
 from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
@@ -62,7 +63,78 @@ def append_jsonl(path, record):
     with path.open("a", encoding="utf-8") as f:
         f.write(json.dumps(json_safe(record)) + "\n")
 
+def replace_pending_job(path, job_id, record):
+    path = Path(path)
+    temporary_path = path.with_suffix(path.suffix + ".tmp")
+
+    replaced = False
+
+    with (
+        path.open("r", encoding="utf-8") as source,
+        temporary_path.open("w", encoding="utf-8") as destination,
+    ):
+        for line in source:
+            try:
+                existing = json.loads(line)
+            except json.JSONDecodeError:
+                destination.write(line)
+                continue
+
+            run = existing.get("run", {})
+
+            if (
+                not replaced
+                and run.get("id") == job_id
+                and run.get("status") == "pending"
+            ):
+                destination.write(json.dumps(json_safe(record)) + "\n")
+                replaced = True
+            else:
+                destination.write(line)
+
+    temporary_path.replace(path)
+
+    if not replaced:
+        raise RuntimeError(
+            f"Pending job '{job_id}' was not found in {path}."
+        )
+
+def remove_pending_job(path, job_id):
+    path = Path(path)
+    temporary_path = path.with_suffix(path.suffix + ".tmp")
+
+    removed = False
+
+    with (
+        path.open("r", encoding="utf-8") as source,
+        temporary_path.open("w", encoding="utf-8") as destination,
+    ):
+        for line in source:
+            try:
+                existing = json.loads(line)
+            except json.JSONDecodeError:
+                destination.write(line)
+                continue
+
+            run = existing.get("run", {})
+
+            if (
+                not removed
+                and run.get("id") == job_id
+                and run.get("status") == "pending"
+            ):
+                removed = True
+                continue
+
+            destination.write(line)
+
+    temporary_path.replace(path)
+
+
 def train_model(name, dataset, model_args, fit_args=None, job_id=None):
+    sys.stdout.reconfigure(line_buffering=True, write_through=True)
+    sys.stderr.reconfigure(line_buffering=True, write_through=True)
+    
     if fit_args is None:
         fit_args = {}
 
@@ -114,15 +186,15 @@ def train_model(name, dataset, model_args, fit_args=None, job_id=None):
                 "n_qubits": 12,
                 "feature_density": 1.0,
                 "ansatz": build_ansatz(
-                    feats_per_qubit=3,
+                    feats_per_qubit=5,
                     reuploads=3,
                     encoding_style="angle",
                     feature_strategy="cyclic",
-                    trainable_layers=[3, 3, 3],
+                    trainable_layers=[1, 2, 3],
                     entangling_uploads="all",
                     entangling_layers="all",
                     entangling_pattern="parallel",
-                    entangler="rzz",
+                    entangler="cz",
                 )["ansatz"]
             },
             n_classes=c,
@@ -132,7 +204,7 @@ def train_model(name, dataset, model_args, fit_args=None, job_id=None):
         model.fit(X_train, y_train, X_test, y_test, verbosity=1, **fit_args)
     elif name.startswith("CoherentECOC"):
         model = CoherentECOC(**model_args).to(DEVICE)
-        model.fit(X_train, y_train, X_test, y_test, verbosity=1, **fit_args)
+        model.fit(X_train, y_train, X_test, y_test, tune_size=0, verbosity=1, **fit_args)
 
     if name.startswith("VQC"):
         report = model.val_report
@@ -288,56 +360,40 @@ if __name__ == "__main__":
         [2, 3],
         [3, 2],
         [1, 3],
-        [2, 0, 2],
-        [2, 2],
-        [3, 1],
-        [0, 3, 0],
-        [3, 0, 0],
     ]
 
     train_layer_groups = {
         "same-333": [[3, 3, 3]],
-        "same-222": [[2, 2, 2]],
-        "same-303": [[3, 0, 3]],
-        "same-22": [[2, 2]],
+        # "same-33": [[3, 3]],
+        # "same-303": [[3, 0, 3]],
 
         "uniform": [
             [3, 3, 3],
             [2, 2, 2],
             [3, 3],
-            [2, 2],
+            [2, 2]
         ],
 
-        "directional": [
-            [1, 2, 3],
-            [3, 2, 1],
-            [1, 3],
-            [3, 1],
-        ],
+        # "directional": [
+        #     [1, 2, 3],
+        #     [3, 2, 1],
+        #     [1, 3],
+        # ],
 
-        "sparse": [
-            [3, 0, 3],
-            [2, 0, 2],
-            [0, 3, 0],
-            [3, 0, 0],
-        ],
-
-        "dense": [
-            [3, 3, 3],
-            [2, 2, 2],
-            [1, 2, 3],
-            [3, 2, 1],
-            [3, 3],
-            [2, 2],
-        ],
+        # "dense": [
+        #     [3, 3, 3],
+        #     [2, 2, 2],
+        #     [1, 2, 3],
+        #     [3, 2, 1],
+        #     [3, 3],
+        # ],
 
         "representative": [
-            [3, 3, 3],
+            [2, 2, 2],
             [1, 2, 3],
             [3, 0, 3],
             [1, 3],
-            [2, 2],
-            [3, 1],
+            [2, 2]
         ],
 
         "two-layer": [
@@ -345,8 +401,6 @@ if __name__ == "__main__":
             [2, 3],
             [3, 2],
             [1, 3],
-            [2, 2],
-            [3, 1],
         ],
 
         "three-layer": [
@@ -355,9 +409,6 @@ if __name__ == "__main__":
             [1, 2, 3],
             [3, 0, 3],
             [3, 2, 1],
-            [2, 0, 2],
-            [0, 3, 0],
-            [3, 0, 0],
         ],
 
         "all-layouts": train_layers,
@@ -372,13 +423,13 @@ if __name__ == "__main__":
 
     jobs = []
 
-    feature_density_options = [0.25, 0.5, 0.75, "mixed"]
-    encoding_options = ["angle", "mixed"]
-    n_learners_options = [6, 10, 14]
+    feature_density_options = [0.75, "mixed"]
+    encoding_options = ["angle"]
+    n_learners_options = [6, 10]
 
-    feat_strategy_options = ["block", "cyclic"]
-    entangler_options = ["cz", "rzz", "mixed"]
-    fpq_options = [3, 4, 5, "mixed"]
+    feat_strategy_options = ["cyclic"]
+    entangler_options = ["cz"]
+    fpq_options = ["mixed"]
 
     primary_configs = list(product(
         feature_density_options,
@@ -393,8 +444,9 @@ if __name__ == "__main__":
     ))
 
     meta_configs = list(product(
-        ["main", "full"],
-        train_layers,
+        ["main"],
+        # train_layers,
+        [[1, 3]],
     ))
 
     vqc_primary_configs = list(product(
@@ -414,28 +466,30 @@ if __name__ == "__main__":
         elif dataset not in main_datasets and dataset not in stress_datasets:
             continue
 
-        jobs.extend(create_search_jobs("SVC", path, {
-            "kernel": ["rbf"],
-            "class_weight": ["balanced"],
-            "random_state": [2],
-        }, existing_ids=existing_ids))
+        # jobs.extend(create_search_jobs("SVC", path, {
+        #     "kernel": ["rbf"],
+        #     "class_weight": ["balanced"],
+        #     "random_state": [2],
+        # }, existing_ids=existing_ids))
 
-        jobs.extend(create_search_jobs("Random Forest", path, {
-            "n_estimators": [100],
-            "class_weight": ["balanced"],
-            "random_state": [2],
-        }, existing_ids=existing_ids))
+        # jobs.extend(create_search_jobs("Random Forest", path, {
+        #     "n_estimators": [100],
+        #     "class_weight": ["balanced"],
+        #     "random_state": [2],
+        # }, existing_ids=existing_ids))
 
         for group_index, (group, layouts) in enumerate(train_layer_groups.items()):
-            assigned_secondary = secondary_configs.copy()
-            random.Random(2 + group_index).shuffle(assigned_secondary)
+            secondary_order = secondary_configs.copy()
 
-            # Rotate through all design-layout combinations across groups.
+            random.Random(2 + group_index).shuffle(secondary_order)
+
+            assigned_secondary = [
+                secondary_order[config_index % len(secondary_order)]
+                for config_index in range(len(primary_configs))
+            ]
+
             assigned_meta = [
-                meta_configs[
-                    (group_index * len(primary_configs) + config_index)
-                    % len(meta_configs)
-                ]
+                meta_configs[(group_index * len(primary_configs) + config_index) % len(meta_configs)]
                 for config_index in range(len(primary_configs))
             ]
 
@@ -449,8 +503,7 @@ if __name__ == "__main__":
                 meta_design, meta_layout = meta
 
                 suffix = (
-                    f"{n_learners}_{group}_{encoding_style}_{fpq}_"
-                    f"{feature_density}_{feat_strategy}_{entangler}"
+                    f"{n_learners}_{group}_{encoding_style}_{fpq}_{feature_density}_{feat_strategy}_{entangler}"
                 )
 
                 templates = []
@@ -459,30 +512,22 @@ if __name__ == "__main__":
                     layout = layouts[(i + config_index) % len(layouts)]
 
                     if feature_density == "mixed":
-                        learner_density = [0.25, 0.5, 0.75][
-                            (i + group_index + config_index) % 3
-                        ]
+                        learner_density = [0.25, 0.5, 0.75][(i + group_index + config_index) % 3]
                     else:
                         learner_density = feature_density
 
                     if encoding_style == "mixed":
-                        encoding = ["angle", "angle", "parallel_pairwise"][
-                            (i + group_index + config_index + 1) % 3
-                        ]
+                        encoding = ["angle", "angle", "parallel_pairwise"][(i + group_index + config_index + 1) % 3]
                     else:
                         encoding = "angle"
 
                     if entangler == "mixed":
-                        entangler_gate = ["cz", "rzz"][
-                            (i + group_index + config_index) % 2
-                        ]
+                        entangler_gate = ["cz", "rzz"][(i + group_index + config_index)  % 2]
                     else:
                         entangler_gate = entangler
 
                     if fpq == "mixed":
-                        fpq_value = [3, 4, 5][
-                            (i + group_index + config_index + 2) % 3
-                        ]
+                        fpq_value = [3, 4, 5][(i + group_index + config_index + 2) % 3]
                     else:
                         fpq_value = fpq
 
@@ -504,20 +549,20 @@ if __name__ == "__main__":
 
                 for model_name in [
                     "QuantumECOC",
-                    "StackedECOC",
-                    "Quantum StackedECOC",
+                    # "StackedECOC",
+                    # "Quantum StackedECOC",
                 ]:
                     jobs.extend(create_search_jobs(
                         f"{model_name} {suffix}",
                         path,
-                        {"templates": [templates]},
+                        {
+                            "templates": [templates],
+                        },
                         existing_ids=existing_ids,
                     ))
 
                 # if entangler == "mixed":
-                #     meta_entangler = ["cz", "rzz"][
-                #         (group_index + config_index) % 2
-                #     ]
+                #     meta_entangler = ["cz", "rzz"][(group_index + config_index) % 2]
                 # else:
                 #     meta_entangler = entangler
 
@@ -533,7 +578,10 @@ if __name__ == "__main__":
                 #     entangler=meta_entangler,
                 # )["ansatz"]
 
-                # meta_layout_label = "-".join(str(value) for value in meta_layout)
+                # meta_layout_label = "-".join(
+                #     str(value)
+                #     for value in meta_layout
+                # )
 
                 # meta_suffix = (
                 #     f"{suffix}_meta-{meta_design}_"
@@ -551,79 +599,88 @@ if __name__ == "__main__":
                 #     existing_ids=existing_ids,
                 # ))
 
-            if group != "all-layouts":
-                continue
+            # if group != "representative":
+            #     continue
 
-            assigned_vqc_secondary = secondary_configs.copy()
-            random.Random(100 + group_index).shuffle(assigned_vqc_secondary)
+            # vqc_secondary_order = secondary_configs.copy()
+            # random.Random(100 + group_index).shuffle(vqc_secondary_order)
 
-            for config_index, (primary, secondary) in enumerate(zip(
-                vqc_primary_configs,
-                assigned_vqc_secondary,
-            )):
-                feature_density, encoding_style = primary
-                feat_strategy, entangler, fpq = secondary
+            # assigned_vqc_secondary = [
+            #     vqc_secondary_order[config_index % len(vqc_secondary_order)]
+            #     for config_index in range(len(vqc_primary_configs))
+            # ]
 
-                if feature_density == "mixed":
-                    vqc_densities = [0.25, 0.5, 0.75]
-                else:
-                    vqc_densities = [feature_density]
+            # for config_index, (primary, secondary) in enumerate(zip(
+            #     vqc_primary_configs,
+            #     assigned_vqc_secondary,
+            # )):
+            #     feature_density, encoding_style = primary
+            #     feat_strategy, entangler, fpq = secondary
 
-                if encoding_style == "mixed":
-                    vqc_encoding = "parallel_pairwise"
-                else:
-                    vqc_encoding = "angle"
+            #     if feature_density == "mixed":
+            #         vqc_densities = [0.25, 0.5, 0.75]
+            #     else:
+            #         vqc_densities = [feature_density]
 
-                if entangler == "mixed":
-                    vqc_entangler = ["cz", "rzz"][config_index % 2]
-                else:
-                    vqc_entangler = entangler
+            #     if encoding_style == "mixed":
+            #         vqc_encoding = "parallel_pairwise"
+            #     else:
+            #         vqc_encoding = "angle"
 
-                if fpq == "mixed":
-                    vqc_fpq = [3, 4, 5][config_index % 3]
-                else:
-                    vqc_fpq = fpq
+            #     if entangler == "mixed":
+            #         vqc_entangler = ["cz", "rzz"][config_index % 2]
+            #     else:
+            #         vqc_entangler = entangler
 
-                for layout in layouts:
-                    for vqc_density in vqc_densities:
-                        suffix = (
-                            f"{layout}_{vqc_encoding}_{vqc_fpq}_{vqc_density}_"
-                            f"{feat_strategy}_{vqc_entangler}"
-                        )
+            #     if fpq == "mixed":
+            #         vqc_fpq = [3, 4, 5][config_index % 3]
+            #     else:
+            #         vqc_fpq = fpq
 
-                        jobs.extend(create_search_jobs(
-                            f"VQC {suffix}",
-                            path,
-                            {
-                                "n_qubits": [12],
-                                "ansatz": [build_ansatz(
-                                    feats_per_qubit=vqc_fpq,
-                                    reuploads=len(layout),
-                                    encoding_style=vqc_encoding,
-                                    feature_strategy=feat_strategy,
-                                    trainable_layers=layout,
-                                    entangling_uploads="all",
-                                    entangling_layers="all",
-                                    entangling_pattern=entangling_pattern,
-                                    entangler=vqc_entangler,
-                                )["ansatz"]],
-                                "feature_density": [vqc_density],
-                                 "feature_range": [(0, np.pi)],
-                            },
-                            existing_ids=existing_ids,
-                        ))
-                        
+            #     for layout in layouts:
+            #         for vqc_density in vqc_densities:
+            #             suffix = (
+            #                 f"{layout}_{vqc_encoding}_{vqc_fpq}_{vqc_density}_{feat_strategy}_{vqc_entangler}"
+            #             )
+
+            #             jobs.extend(create_search_jobs(
+            #                 f"VQC {suffix}",
+            #                 path,
+            #                 {
+            #                     "n_qubits": [12],
+            #                     "ansatz": [build_ansatz(
+            #                         feats_per_qubit=vqc_fpq,
+            #                         reuploads=len(layout),
+            #                         encoding_style=vqc_encoding,
+            #                         feature_strategy=feat_strategy,
+            #                         trainable_layers=layout,
+            #                         entangling_uploads="all",
+            #                         entangling_layers="all",
+            #                         entangling_pattern=entangling_pattern,
+            #                         entangler=vqc_entangler,
+            #                     )["ansatz"]],
+            #                     "feature_density": [vqc_density],
+            #                     "feature_range": [(0, np.pi)],
+            #                 },
+            #                 existing_ids=existing_ids,
+            #             ))
+
     print(f"Total jobs: {len(jobs)}\n")
     if args.split != "0":
-        split_index = int(args.split)
-        split_size = len(jobs) // 3
-        if split_index == 1:
+        split_size = len(jobs) // int(args.split)
+        if len(jobs) > split_size * 1.5:
             jobs = jobs[:split_size]
-        elif split_index == 2:
-            jobs = jobs[split_size:2*split_size]
-        elif split_index == 3:
-            jobs = jobs[2*split_size:]
+        
     print(f"Jobs running in this split ({args.split}): {len(jobs)}\n")
+
+    for job in jobs:
+        append_jsonl(results_path, {
+            "run": {
+                "id": job[-1],
+                "status": "pending",
+            }
+        })
+
     # jobs = jobs[:10]
     # exit()
 
@@ -641,7 +698,7 @@ if __name__ == "__main__":
 
             try:
                 result = future.result()
-                append_jsonl(results_path, result)
+                replace_pending_job(results_path, job_id, result)
                 results += 1
 
                 # metrics = result.get("metrics", {})
@@ -665,6 +722,7 @@ if __name__ == "__main__":
                     "completed_at": datetime.now().isoformat(timespec="seconds"),
                 }
 
+                remove_pending_job(results_path, job_id)
                 # append_jsonl(results_path, error_record)
                 print(f"Error occurred while processing {job_name}: {error_record['error']}")
 
